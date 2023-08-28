@@ -1,0 +1,85 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "airbnb",
+    "airbnb/hooks",
+    "plugin:sonarjs/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react"
+  ],
+  "rules": {
+    // "indent": [
+    //   "error",
+    //   2
+    // ],
+    "linebreak-style": [
+      "error",
+      "windows"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      "error",
+      "never"
+    ],
+    "no-trailing-spaces": [
+      "error",
+      {
+        "ignoreComments": true
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-plusplus": "off",
+    "import/named": "off",
+    "react/no-danger": "off",
+    "no-param-reassign": "off",
+    "import/no-unresolved": "off",
+    "react/forbid-prop-types": "off",
+    "react/no-array-index-key": "off",
+    "import/no-named-as-default": "off",
+    "sonarjs/cognitive-complexity": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/no-named-as-default-member": "off",
+    "react/jsx-no-useless-fragment": "off",
+    "default-param-last": 0,
+    "no-undef": "off",
+    "no-extra-boolean-cast": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "no-underscore-dangle": "off",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    ],
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": [
+          "function-declaration",
+          "arrow-function"
+        ],
+        "unnamedComponents": "arrow-function"
+      }
+    ]
+  }
+}

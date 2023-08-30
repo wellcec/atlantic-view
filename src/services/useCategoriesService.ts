@@ -4,7 +4,8 @@ import { CategoryType, IGetAllCategoriesResponse } from 'models/categories'
 import { ISampleFilter, ISuccessResponse } from 'models'
 
 const useCategoriesService = () => {
-  const getCategories = useCallback((filter: ISampleFilter) => axios.get<IGetAllCategoriesResponse>(`api/categories?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
+  const getCategories = useCallback((filter: ISampleFilter) => axios
+    .get<IGetAllCategoriesResponse>(`api/categories?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
 
   const createCategory = useCallback((data: CategoryType) => axios.post<ISuccessResponse>('api/categories', data), [])
 

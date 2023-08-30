@@ -14,7 +14,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 import Container from 'components/layout/ContainerMain'
-import { CategoryType, SubCategoryType } from 'models/categories'
+import { CategoryType, GetAllCategoriesType, SubCategoryType } from 'models/categories'
 import Paper from 'components/layout/Paper'
 import Modal from 'components/molecules/Modal'
 import Menu from 'components/atoms/Menu'
@@ -60,7 +60,7 @@ const Categories = () => {
 
   const getAllCategories = useCallback((newFilter?: ISampleFilter) => {
     getCategories(newFilter || filter).then(
-      (response) => {
+      (response: GetAllCategoriesType) => {
         const { data = [] } = response.data ?? {}
         setSubCategories([])
         setCategories(data)
@@ -73,7 +73,7 @@ const Categories = () => {
 
   const deleteCategory = useCallback(() => {
     deleteCat(objToAction.id).then(
-      async () => {
+      () => {
         setAlert({ type: 'success', message: 'Categoria excluída com sucesso.' })
         setConfirmatioOpen(false)
         setAnchorEl(null)
@@ -121,7 +121,7 @@ const Categories = () => {
         }
 
         updateCategory(objToAction.id, category).then(
-          async () => {
+          () => {
             setAlert({ type: 'success', message: 'Categoria atualizada com sucesso.' })
             setAction('create')
             setObjToAction(null)

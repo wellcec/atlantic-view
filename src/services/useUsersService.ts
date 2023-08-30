@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import axios from 'axios'
-import { IGetAllUsersRespnse } from 'models/users'
+import { IGetAllUsersResponse } from 'models/users'
 
 const useUsersService = () => {
-  const getUsers = useCallback(() => axios.get<IGetAllUsersRespnse>('api/users'), [])
+  const getUsers = useCallback(() => axios.get<IGetAllUsersResponse>('api/users'), [])
 
   return {
     getUsers,

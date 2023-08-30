@@ -4,7 +4,7 @@ import {
 } from '@mui/material'
 import Divider from 'components/atoms/Divider'
 import Modal from 'components/molecules/Modal'
-import { CategoryType, SubCategoryType } from 'models/categories'
+import { CategoryType, GetAllCategoriesType, SubCategoryType } from 'models/categories'
 import useCategoriesService from 'services/useCategoriesService'
 import { useAlerts } from 'shared/alerts/AlertContext'
 import { ISampleFilter } from 'models'
@@ -42,7 +42,7 @@ const AddCategories = ({
 
   const getAllCategories = useCallback(() => {
     getCategories(emptyFilter).then(
-      (response) => {
+      (response: GetAllCategoriesType) => {
         const { data: dataRes = [] } = response.data ?? {}
         setCategoriesOptions(dataRes)
       },

@@ -1,3 +1,5 @@
+import { AxiosResponse } from 'axios'
+
 export type VariationType = {
   id?: string,
   name: string,
@@ -10,3 +12,5 @@ export interface IGetAllVariationsResponse {
   pageSize: number
   count: number
 }
+
+export type GetAllVariationsType = AxiosResponse<IGetAllVariationsResponse, any>

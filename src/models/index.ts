@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 export interface IDefaultTheme {
   id: string,
   primary: string
@@ -27,6 +29,5 @@ export type AlertType = {
 
 export interface IAlerts {
   alert: AlertType,
-  // eslint-disable-next-line no-unused-vars
   setAlert: (alert: AlertType) => void
 }

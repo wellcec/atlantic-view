@@ -1,3 +1,5 @@
+import { AxiosResponse } from 'axios'
+
 export type UserType = {
   id: string,
   name: string,
@@ -5,9 +7,11 @@ export type UserType = {
   createdDate: Date,
 }
 
-export interface IGetAllUsersRespnse {
+export interface IGetAllUsersResponse {
   data: UserType[]
   page: number
   pageSize: number
   count: number
 }
+
+export type GetAllUsersType = AxiosResponse<IGetAllUsersResponse, any>

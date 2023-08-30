@@ -8,7 +8,7 @@ import Modal from 'components/molecules/Modal'
 import EmptyDataText from 'components/atoms/EmptyDataText'
 import AddChips from 'components/molecules/AddChips'
 import { ISampleFilter } from 'models'
-import { VariationType } from 'models/variations'
+import { GetAllVariationsType, VariationType } from 'models/variations'
 import useVariationsService from 'services/useVariationsService'
 import { useAlerts } from 'shared/alerts/AlertContext'
 import { IconDelete } from 'constants/icons'
@@ -38,7 +38,7 @@ const AddVariations = ({
 
   const getAllVariations = useCallback(() => {
     getVariations(emptyFilter).then(
-      (response) => {
+      (response: GetAllVariationsType) => {
         const { data: dataRes = [] } = response.data ?? {}
         setVariations(dataRes)
       },

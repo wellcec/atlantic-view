@@ -8,7 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import colors from 'shared/theme/colors'
 import Container from 'components/layout/ContainerMain'
 import useUsersService from 'services/useUsersService'
-import { UserType } from 'models/users'
+import { UserType, GetAllUsersType } from 'models/users'
 import Paper from 'components/layout/Paper'
 
 const useStyles = makeStyles(() => ({
@@ -29,7 +29,7 @@ const Users = () => {
 
   useEffect(() => {
     getUsers().then(
-      (response) => {
+      (response: GetAllUsersType) => {
         const { data = [] } = response.data ?? {}
 
         setUsers(data)

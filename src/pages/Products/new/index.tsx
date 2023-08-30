@@ -22,6 +22,7 @@ import AddVariations from 'components/organisms/AddVariations'
 import AddCategories from '../../../components/organisms/AddCategories'
 import ChipsCategories from './ChipsCategories'
 import FormProduct from './FormProduct'
+import Images from './Images'
 
 const {
   firstInfo: firstInfoKey,
@@ -51,6 +52,8 @@ const New = () => {
   const [variations, setVariations] = useState<VariationType[]>([])
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
   // const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
+
+  const [openAddImages, setOpenAddImages] = useState<boolean>(false)
 
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
 
@@ -104,8 +107,23 @@ const New = () => {
         </Accordion>
 
         <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => handleChangeAccordion(imagesKey)}>
-          Imagens
+          <Box display="flex">
+            <Box width={1}>
+              Imagens
+            </Box>
+
+            <Box display="flex" alignItems="center">
+              <ButtonAdd title="Adicionar imagem" onClick={() => setOpenAddImages(!openAddImages)} />
+            </Box>
+          </Box>
         </Accordion>
+
+        {openAddImages && (
+          <Images
+            open={openAddImages}
+            handleClose={() => setOpenAddImages(!openAddImages)}
+          />
+        )}
 
         <Accordion open={getExpanded(categoriesKey)} title="Categorias" onChange={() => handleChangeAccordion(categoriesKey)}>
           <Box display="flex">

@@ -1,3 +1,5 @@
+import { AxiosResponse } from 'axios'
+
 export type SubCategoryType = {
   id?: string,
   name: string,
@@ -17,3 +19,5 @@ export interface IGetAllCategoriesResponse {
   pageSize: number
   count: number
 }
+
+export type GetAllCategoriesType = AxiosResponse<IGetAllCategoriesResponse, any>

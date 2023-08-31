@@ -1,28 +1,37 @@
-import React, { useState } from 'react'
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable import/no-dynamic-require */
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Box, Button, Chip, Grid, Typography,
+  Box, Button, Chip, Grid, ImageList, ImageListItem, Typography,
 } from '@mui/material'
-import Container from 'components/layout/ContainerMain'
-import Accordion from 'components/molecules/Accordion'
-import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useFormik } from 'formik'
+import makeStyles from '@mui/styles/makeStyles'
 
-import { PREENCHIMENTO_OBRIGATORIO } from 'constants/messages'
 import { NEW_PRODUCT_KEYS } from 'constants/index'
+import { PREENCHIMENTO_OBRIGATORIO } from 'constants/messages'
 import { IconSingleArrowDownCircule, IconSingleArrowUpCircule } from 'constants/icons'
+
 import colors from 'shared/theme/colors'
-import { TagType } from 'models/products'
-import AddChips from 'components/molecules/AddChips'
-import ButtonAdd from 'components/atoms/ButtonAdd'
-import EmptyDataText from 'components/atoms/EmptyDataText'
-import { CategoryType } from 'models/categories'
 import useTestsForm from 'shared/hooks/useTestsForm'
+
+import { ImageType, TagType } from 'models/products'
+import { CategoryType } from 'models/categories'
 import { VariationType } from 'models/variations'
+
+import ButtonAdd from 'components/atoms/ButtonAdd'
+import AddChips from 'components/molecules/AddChips'
+import Accordion from 'components/molecules/Accordion'
+import Container from 'components/layout/ContainerMain'
+import EmptyDataText from 'components/atoms/EmptyDataText'
 import AddVariations from 'components/organisms/AddVariations'
-import AddCategories from '../../../components/organisms/AddCategories'
-import ChipsCategories from './ChipsCategories'
-import FormProduct from './FormProduct'
+import AddCategories from 'components/organisms/AddCategories'
+
+import useProductsService from 'services/useProductsService'
+import { useAlerts } from 'shared/alerts/AlertContext'
 import Images from './Images'
+import FormProduct from './FormProduct'
+import ChipsCategories from './ChipsCategories'
 
 const {
   firstInfo: firstInfoKey,
@@ -31,6 +40,15 @@ const {
   tags: tagsKey,
   variations: variationsKey,
 } = NEW_PRODUCT_KEYS
+
+const useStyles = makeStyles(() => ({
+  img: {
+    borderRadius: 5,
+  },
+  list: {
+    marginTop: 0,
+  },
+}))
 
 const DEFAULT_VALUES = {
   title: '',
@@ -45,17 +63,20 @@ const DEFAULT_VALUES = {
 
 const New = () => {
   const [panelAccordion, setPanelAccordion] = useState(firstInfoKey)
-  const [allExpanded, setAllExpanded] = useState(false)
+  const [allExpanded, setAllExpanded] = useState(true)
   const [tags, setTags] = useState<TagType[]>([])
   const [categories, setCategories] = useState<CategoryType[]>([])
   const [openAddCategories, setOpenAddCategories] = useState<boolean>(false)
   const [variations, setVariations] = useState<VariationType[]>([])
+  const [images, setImages] = useState<ImageType[]>([])
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
   // const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
-
   const [openAddImages, setOpenAddImages] = useState<boolean>(false)
 
+  const classes = useStyles()
+  const { setAlert } = useAlerts()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
+  const { getImages: getAllImages } = useProductsService()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -86,6 +107,23 @@ const New = () => {
 
   const getExpanded = (key: string) => allExpanded || panelAccordion === key
 
+  const getImages = useCallback(() => {
+    getAllImages().then(
+      async (response) => {
+        const { data = [] } = response?.data || {}
+        setImages(data)
+      },
+      (err) => {
+        const { message } = err
+        setAlert({ type: 'error', message })
+      },
+    )
+  }, [getAllImages, setAlert])
+
+  useEffect(() => {
+    getImages()
+  }, [getImages])
+
   return (
     <Container title="Novo produto">
       <Box display="flex" justifyContent="end">
@@ -108,11 +146,24 @@ const New = () => {
 
         <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => handleChangeAccordion(imagesKey)}>
           <Box display="flex">
-            <Box width={1}>
-              Imagens
+            <Box width={1} mt={0} mx={2}>
+
+              <ImageList variant="masonry" cols={4} gap={10} className={classes.list}>
+                {images.map((img) => (
+                  <ImageListItem>
+                    <img
+                      className={classes.img}
+                      src={`${img.base64}`}
+                      srcSet={`${img.base64}`}
+                      alt={img.fileName}
+                      loading="lazy"
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
             </Box>
 
-            <Box display="flex" alignItems="center">
+            <Box display="flex">
               <ButtonAdd title="Adicionar imagem" onClick={() => setOpenAddImages(!openAddImages)} />
             </Box>
           </Box>
@@ -122,6 +173,7 @@ const New = () => {
           <Images
             open={openAddImages}
             handleClose={() => setOpenAddImages(!openAddImages)}
+            callback={getImages}
           />
         )}
 

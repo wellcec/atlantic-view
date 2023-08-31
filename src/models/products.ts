@@ -5,6 +5,13 @@ export type ProductType = {
   createdDate: Date,
 }
 
+export type ImageType = {
+  id: string,
+  fileName: string,
+  base64: string,
+  createdDate: Date,
+}
+
 export type TagType = {
   id?: string,
   name: string,
@@ -20,6 +27,10 @@ export interface IGetAllProductsResponse {
   page: number
   pageSize: number
   count: number
+}
+
+export interface IGetAllImagesResponse {
+  data: ImageType[]
 }
 
 export interface IProductsContext {

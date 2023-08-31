@@ -2,7 +2,6 @@
 import React, { useState } from 'react'
 import ReactCrop, {
   Crop,
-  PixelCrop,
   centerCrop,
   makeAspectCrop,
 } from 'react-image-crop'
@@ -14,6 +13,8 @@ import Modal from 'components/molecules/Modal'
 import useUtils from 'shared/hooks/useUtils'
 import useProductsService from 'services/useProductsService'
 import { useAlerts } from 'shared/alerts/AlertContext'
+import { IconUpload } from 'constants/icons'
+import colors from 'shared/theme/colors'
 
 const centerAspectCrop = (
   mediaWidth: number,
@@ -36,12 +37,12 @@ const centerAspectCrop = (
 interface IProps {
   open: boolean,
   handleClose: () => void
+  callback: () => void
 }
 
-const Images = ({ open, handleClose }: IProps) => {
+const Images = ({ open, handleClose, callback }: IProps) => {
   const [image, setImage] = useState<any>(undefined)
   const [crop, setCrop] = useState<Crop>()
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>()
   const [fileImage, setFileImage] = useState<any>()
 
   const { base64ToImage, imageToBase64 } = useUtils()
@@ -76,9 +77,11 @@ const Images = ({ open, handleClose }: IProps) => {
       await uploadImage([formdataimage]).then(
         () => {
           console.info('Image uplaoded successfully')
+          callback()
         },
-        () => {
-          setAlert({ type: 'error', message: 'Algo deu errado ao fazer upload.' })
+        (err) => {
+          const { message } = err
+          setAlert({ type: 'error', message })
         },
       )
       handleClose()
@@ -89,14 +92,11 @@ const Images = ({ open, handleClose }: IProps) => {
   return (
     <Modal open={open} handleClose={handleClose} title="Adicionar imagem">
       <Box minWidth={500}>
-        <input type="file" accept="image/jpeg, image/png" onChange={onSelectFile} />
-
         {!!image && (
-          <>
+          <Box display="flex" justifyContent="center" mb={3}>
             <ReactCrop
               crop={crop}
               onChange={(cropChange) => setCrop(cropChange)}
-              onComplete={(c) => setCompletedCrop(c)}
             >
               <img
                 alt="Crop me"
@@ -104,12 +104,40 @@ const Images = ({ open, handleClose }: IProps) => {
                 onLoad={onImageLoad}
               />
             </ReactCrop>
-          </>
+          </Box>
         )}
 
-        <Button variant="contained" color="primary" onClick={save}>
-          Adicionar imagem
-        </Button>
+        <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
+          <Button variant="text" component="label">
+            <Box display="flex" alignItems="center" justifyContent="center" gap={1} width={150}>
+              <Box>
+                <IconUpload color={colors.primary.main} />
+              </Box>
+
+              <Box>
+                Upload imagem
+              </Box>
+            </Box>
+
+            <input type="file" accept="image/jpeg, image/png" onChange={onSelectFile} hidden />
+          </Button>
+
+          <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+            <Box>
+              <Button variant="outlined" color="primary" onClick={handleClose}>
+                Cancelar
+              </Button>
+            </Box>
+
+            {!!image && (
+              <Box>
+                <Button variant="contained" color="primary" onClick={save}>
+                  Adicionar imagem
+                </Button>
+              </Box>
+            )}
+          </Box>
+        </Box>
       </Box>
     </Modal>
   )

@@ -42,8 +42,9 @@ const AddVariations = ({
         const { data: dataRes = [] } = response.data ?? {}
         setVariations(dataRes)
       },
-      () => {
-        setAlert({ type: 'error', message: 'Erro ao buscar variações.' })
+      (err) => {
+        const { message } = err
+        setAlert({ type: 'error', message })
       },
     )
   }, [getVariations, setAlert])

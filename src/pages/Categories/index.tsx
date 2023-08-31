@@ -65,8 +65,9 @@ const Categories = () => {
         setSubCategories([])
         setCategories(data)
       },
-      () => {
-        setAlert({ type: 'error', message: 'Erro ao buscar categorias.' })
+      (err) => {
+        const { message } = err
+        setAlert({ type: 'error', message })
       },
     )
   }, [getCategories, setAlert, filter])
@@ -80,9 +81,10 @@ const Categories = () => {
         setObjToAction(null)
         getAllCategories()
       },
-      () => {
+      (error) => {
+        const { message } = error
         setAnchorEl(null)
-        setAlert({ type: 'error', message: 'Erro ao excluir categoria.' })
+        setAlert({ type: 'error', message })
       },
     )
   }, [deleteCat, objToAction, getAllCategories, setAlert])
@@ -107,8 +109,9 @@ const Categories = () => {
             setOpenModal(false)
             getAllCategories()
           },
-          () => {
-            setAlert({ type: 'error', message: 'Erro ao adicionar categoria.' })
+          (err) => {
+            const { message } = err
+            setAlert({ type: 'error', message })
             setOpenModal(false)
           },
         )
@@ -128,8 +131,9 @@ const Categories = () => {
             setOpenModal(false)
             getAllCategories()
           },
-          () => {
-            setAlert({ type: 'error', message: 'Erro ao atualizar categoria.' })
+          (err) => {
+            const { message } = err
+            setAlert({ type: 'error', message })
             setOpenModal(false)
           },
         )

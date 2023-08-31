@@ -46,8 +46,9 @@ const AddCategories = ({
         const { data: dataRes = [] } = response.data ?? {}
         setCategoriesOptions(dataRes)
       },
-      () => {
-        setAlert({ type: 'error', message: 'Erro ao buscar categorias.' })
+      (err) => {
+        const { message } = err
+        setAlert({ type: 'error', message })
       },
     )
   }, [getCategories, setAlert])

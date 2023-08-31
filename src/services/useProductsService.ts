@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import axios from 'axios'
 import { ISuccessResponse } from 'models'
+import { IGetAllImagesResponse } from 'models/products'
 
 const useProductsService = () => {
   const uploadImage = useCallback((files: any[]) => {
@@ -15,7 +16,10 @@ const useProductsService = () => {
     })
   }, [])
 
+  const getImages = useCallback(() => axios.get<IGetAllImagesResponse>('api/products/images'), [])
+
   return {
+    getImages,
     uploadImage,
   }
 }

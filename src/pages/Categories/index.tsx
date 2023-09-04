@@ -176,7 +176,7 @@ const Categories = () => {
     setConfirmatioOpen(false)
   }
 
-  const handleChangeSearch = (event: any) => {
+  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { value } = event.target
     const newFilter = { ...filter, term: value }
     setFilter(newFilter)

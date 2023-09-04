@@ -5,12 +5,12 @@ const useTestsForm = () => {
   const { formatNumber } = useUtils()
 
   const greaterThanZero = {
-    test: (v) => v > 0,
+    test: (v) => (v ?? 0) > 0,
     message: MAIOR_QUE_ZERO,
   }
 
   const greaterThanZeroCurrency = {
-    test: (v) => formatNumber(v, 'float') > 0,
+    test: (v) => formatNumber(v ?? 0, 'float') > 0,
     message: MAIOR_QUE_ZERO,
   }
 

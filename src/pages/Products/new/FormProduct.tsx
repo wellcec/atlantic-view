@@ -1,10 +1,13 @@
 import React from 'react'
-import { Grid } from '@mui/material'
+import {
+  Grid, MenuItem, Select,
+} from '@mui/material'
 
 import FormInput from 'components/atoms/Inputs/InputForm'
 import useUtils from 'shared/hooks/useUtils'
 import InputText from 'components/atoms/Inputs/InputText'
 import InputSufix from 'components/atoms/Inputs/InputSufix'
+import ShipingOptions from '../fragments/constants'
 
 interface IProps {
   parentFormik: any
@@ -79,7 +82,6 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('weight')}
             error={parentFormik.touched.weight && !!parentFormik.errors.weight}
             value={parentFormik.values.weight}
-            InputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('weight', value)
@@ -96,7 +98,6 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('height')}
             error={parentFormik.touched.height && !!parentFormik.errors.height}
             value={parentFormik.values.height}
-            InputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('height', value)
@@ -113,7 +114,6 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('length')}
             error={parentFormik.touched.length && !!parentFormik.errors.length}
             value={parentFormik.values.length}
-            InputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('length', value)
@@ -130,12 +130,32 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('width')}
             error={parentFormik.touched.width && !!parentFormik.errors.width}
             value={parentFormik.values.width}
-            InputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('width', value)
             }}
           />
+        </FormInput>
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <FormInput fullWidth title="Tipo de frete*">
+          <Select
+            size="small"
+            variant="outlined"
+            value={parentFormik.values.shipping}
+            {...parentFormik.getFieldProps('shipping')}
+            error={parentFormik.touched.shipping && !!parentFormik.errors.shipping}
+          >
+            <MenuItem value="n/a" disabled>
+              Selecione tipo de frete
+            </MenuItem>
+            {ShipingOptions.map((item, index) => (
+              <MenuItem key={`shipping-opt-${index}`} value={item.key}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
         </FormInput>
       </Grid>
     </Grid>

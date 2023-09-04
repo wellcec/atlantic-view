@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
 interface IProps {
   placeholder: string
   // eslint-disable-next-line no-unused-vars
-  onChange: (event: any) => void
+  onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }
 
 const InputSearch = ({ placeholder, onChange }: IProps) => {

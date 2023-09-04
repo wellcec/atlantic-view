@@ -5,7 +5,6 @@ import ReactCrop, {
   centerCrop,
   makeAspectCrop,
 } from 'react-image-crop'
-import { v4 as uuidv4 } from 'uuid'
 import 'react-image-crop/dist/ReactCrop.css'
 
 import { Box, Button } from '@mui/material'
@@ -35,22 +34,27 @@ const centerAspectCrop = (
 )
 
 interface IProps {
+  lengthImages: number
+  titleProduct: string
   open: boolean,
   handleClose: () => void
   callback: () => void
 }
 
-const Images = ({ open, handleClose, callback }: IProps) => {
+const Images = ({
+  lengthImages, titleProduct, open, handleClose, callback,
+}: IProps) => {
   const [image, setImage] = useState<any>(undefined)
   const [crop, setCrop] = useState<Crop>()
   const [fileImage, setFileImage] = useState<any>()
 
-  const { base64ToImage, imageToBase64 } = useUtils()
+  const { base64ToImage, imageToBase64, normalize } = useUtils()
   const { uploadImage } = useProductsService()
   const { setAlert } = useAlerts()
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget
+
     setFileImage(e.currentTarget)
     setCrop(centerAspectCrop(width, height, 1 / 1))
   }
@@ -72,11 +76,11 @@ const Images = ({ open, handleClose, callback }: IProps) => {
 
     const base64image = imageToBase64(fileImage, crop)
     if (base64image) {
-      const formdataimage = base64ToImage(base64image, `${uuidv4()}.png`)
+      const nameImage = normalize(titleProduct)
+      const formdataimage = base64ToImage(base64image, `${lengthImages}-${nameImage}.png`)
 
       await uploadImage([formdataimage]).then(
         () => {
-          console.info('Image uplaoded successfully')
           callback()
         },
         (err) => {
@@ -96,7 +100,7 @@ const Images = ({ open, handleClose, callback }: IProps) => {
           <Box display="flex" justifyContent="center" mb={3}>
             <ReactCrop
               crop={crop}
-              onChange={(cropChange) => setCrop(cropChange)}
+              onChange={(_, percent) => setCrop(percent)}
             >
               <img
                 alt="Crop me"
@@ -131,7 +135,7 @@ const Images = ({ open, handleClose, callback }: IProps) => {
 
             {!!image && (
               <Box>
-                <Button variant="contained" color="primary" onClick={save}>
+                <Button variant="contained" color="primary" onClick={save} onSubmit={(event) => event.preventDefault()}>
                   Adicionar imagem
                 </Button>
               </Box>

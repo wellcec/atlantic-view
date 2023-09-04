@@ -128,7 +128,6 @@ const AddCategories = ({
                   </Box>
                 )
               }}
-              value={selected}
               handleHomeEndKeys
               autoSelect={false}
               options={categoriesOptions}
@@ -193,11 +192,12 @@ const AddCategories = ({
             {data?.length > 0 && (
               <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
                 {data?.map((cat, indexCat) => (
-                  <ChipsCategories
-                    category={cat}
-                    indexCat={indexCat}
-                    handleRemove={handleRemove}
-                  />
+                  <React.Fragment key={`add-cat-${indexCat}`}>
+                    <ChipsCategories
+                      category={cat}
+                      handleRemove={handleRemove}
+                    />
+                  </React.Fragment>
                 ))}
               </Box>
             )}

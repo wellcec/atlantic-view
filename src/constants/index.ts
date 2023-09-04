@@ -11,6 +11,7 @@ export const NEW_PRODUCT_KEYS = {
   categories: 'categories',
   variations: 'variations',
   tags: 'tags',
+  status: 'status',
 }
 
 export default DEFAULT_THEME

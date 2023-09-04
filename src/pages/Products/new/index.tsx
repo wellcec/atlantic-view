@@ -1,8 +1,10 @@
+/* eslint-disable sonarjs/no-nested-template-literals */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable import/no-dynamic-require */
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Box, Button, Chip, Grid, ImageList, ImageListItem, Typography,
+  Box, Button, Checkbox, Chip, FormControlLabel, FormGroup,
+  Grid, ImageList, ImageListItem, ImageListItemBar, Typography,
 } from '@mui/material'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
@@ -15,7 +17,10 @@ import { IconSingleArrowDownCircule, IconSingleArrowUpCircule } from 'constants/
 import colors from 'shared/theme/colors'
 import useTestsForm from 'shared/hooks/useTestsForm'
 
-import { ImageType, TagType } from 'models/products'
+import {
+  CreateProductType,
+  ImageType, StatusProductProps, StatusProductType, TagType,
+} from 'models/products'
 import { CategoryType } from 'models/categories'
 import { VariationType } from 'models/variations'
 
@@ -29,9 +34,14 @@ import AddCategories from 'components/organisms/AddCategories'
 
 import useProductsService from 'services/useProductsService'
 import { useAlerts } from 'shared/alerts/AlertContext'
+import ButtonRemove from 'components/atoms/ButtonRemove'
+import useUtils from 'shared/hooks/useUtils'
+import path from 'path'
 import Images from './Images'
 import FormProduct from './FormProduct'
 import ChipsCategories from './ChipsCategories'
+import { useProducts } from '../fragments/context'
+import { ShippingKeys } from '../fragments/constants'
 
 const {
   firstInfo: firstInfoKey,
@@ -39,6 +49,7 @@ const {
   categories: categoriesKey,
   tags: tagsKey,
   variations: variationsKey,
+  status: statusKey,
 } = NEW_PRODUCT_KEYS
 
 const useStyles = makeStyles(() => ({
@@ -46,7 +57,13 @@ const useStyles = makeStyles(() => ({
     borderRadius: 5,
   },
   list: {
+    paddingTop: 15,
+    paddingRight: 15,
     marginTop: 0,
+  },
+  imageBar: {
+    background: 'inherit !important',
+    padding: 8,
   },
 }))
 
@@ -59,6 +76,7 @@ const DEFAULT_VALUES = {
   height: '',
   length: '',
   width: '',
+  shipping: ShippingKeys.correios,
 }
 
 const New = () => {
@@ -70,13 +88,21 @@ const New = () => {
   const [variations, setVariations] = useState<VariationType[]>([])
   const [images, setImages] = useState<ImageType[]>([])
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
-  // const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
   const [openAddImages, setOpenAddImages] = useState<boolean>(false)
+  const [statusProduct, setStatusProduct] = useState<StatusProductType>({
+    isLaunch: false,
+    isSale: false,
+    isBestSeller: false,
+    isPreOrder: false,
+  })
 
   const classes = useStyles()
+
   const { setAlert } = useAlerts()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { getImages: getAllImages } = useProductsService()
+  const { getAllImages, deleteImageById, createProduct } = useProductsService()
+  const { setCreating } = useProducts()
+  const { formatCurrentRequest } = useUtils()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -84,18 +110,44 @@ const New = () => {
       title: Yup.string().required(PREENCHIMENTO_OBRIGATORIO),
       subtitle: Yup.string(),
       value: Yup.string().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZeroCurrency),
-      valueUnique: Yup.string().test(greaterThanZeroCurrency),
+      valueUnique: Yup.string(),
       weight: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       height: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       length: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       width: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
+      shipping: Yup.string().required(PREENCHIMENTO_OBRIGATORIO).test({
+        test: (v) => (v === ShippingKeys.free || v === ShippingKeys.correios),
+        message: 'Tipo de frete inválido',
+      }),
     }),
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: (data) => {
-      console.log('data', data)
+      const payload: CreateProductType = {
+        ...data,
+        status: statusProduct,
+        categories,
+        variations,
+        tags,
+        images,
+        value: formatCurrentRequest(data.value),
+        valueUnique: formatCurrentRequest(data.valueUnique),
+      }
+
+      createProduct(payload).then(
+        () => {
+          setCreating(false)
+          setAlert({ type: 'success', message: 'Produto criado com sucesso.' })
+        },
+        (err) => {
+          const { message } = err
+          setAlert({ type: 'error', message })
+        },
+      )
     },
   })
+
+  const { title: titleProduct } = formik?.values ?? {}
 
   const handleChangeAccordion = (key: string) => {
     if (key === panelAccordion) {
@@ -107,9 +159,22 @@ const New = () => {
 
   const getExpanded = (key: string) => allExpanded || panelAccordion === key
 
+  const handleChangeStatus = (checked: boolean, prop: StatusProductProps) => {
+    statusProduct[prop] = checked
+    setStatusProduct(statusProduct)
+  }
+
+  const handleAddImages = () => {
+    if (titleProduct && titleProduct !== '') {
+      setOpenAddImages(!openAddImages)
+    } else {
+      setAlert({ type: 'warning', message: 'Nome do produto é necessário.' })
+    }
+  }
+
   const getImages = useCallback(() => {
     getAllImages().then(
-      async (response) => {
+      (response) => {
         const { data = [] } = response?.data || {}
         setImages(data)
       },
@@ -118,7 +183,20 @@ const New = () => {
         setAlert({ type: 'error', message })
       },
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getAllImages, setAlert])
+
+  const deleteImage = useCallback((id: string) => {
+    deleteImageById(id).then(
+      () => {
+        getImages()
+      },
+      (err) => {
+        const { message } = err
+        setAlert({ type: 'error', message })
+      },
+    )
+  }, [deleteImageById, getImages, setAlert])
 
   useEffect(() => {
     getImages()
@@ -144,19 +222,39 @@ const New = () => {
           <FormProduct parentFormik={formik} />
         </Accordion>
 
+        <Accordion open={getExpanded(statusKey)} title="Status" onChange={() => handleChangeAccordion(statusKey)}>
+          <FormGroup>
+            <Box display="flex" flexWrap="wrap" justifyContent="center">
+              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isLaunch')} />} label="Lançamento" />
+              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isSale')} />} label="Promoção" />
+              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isBestSeller')} />} label="Mais Vendidos" />
+              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isPreOrder')} />} label="Pré-venda" />
+            </Box>
+          </FormGroup>
+        </Accordion>
+
         <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => handleChangeAccordion(imagesKey)}>
           <Box display="flex">
             <Box width={1} mt={0} mx={2}>
-
               <ImageList variant="masonry" cols={4} gap={10} className={classes.list}>
-                {images.map((img) => (
-                  <ImageListItem>
+                {images.map((img, index) => (
+                  <ImageListItem key={`image-temp-${index}`}>
                     <img
+                      key={`temp-image-temp-${index}`}
                       className={classes.img}
-                      src={`${img.base64}`}
-                      srcSet={`${img.base64}`}
+                      src={`file://${path.join(__dirname, `images/${img.fileName}`)}`}
+                      srcSet={`file://${path.join(__dirname, `images/${img.fileName}`)}`}
+                      // src={`images/${img.fileName}`}
+                      // srcSet={`images/${img.fileName}`}
                       alt={img.fileName}
                       loading="lazy"
+                    />
+
+                    <ImageListItemBar
+                      className={classes.imageBar}
+                      actionIcon={
+                        <ButtonRemove title="Remover imagem" onClick={() => deleteImage(img.id)} />
+                      }
                     />
                   </ImageListItem>
                 ))}
@@ -164,16 +262,18 @@ const New = () => {
             </Box>
 
             <Box display="flex">
-              <ButtonAdd title="Adicionar imagem" onClick={() => setOpenAddImages(!openAddImages)} />
+              <ButtonAdd title="Adicionar imagem" onClick={handleAddImages} />
             </Box>
           </Box>
         </Accordion>
 
-        {openAddImages && (
+        {(openAddImages && formik.values.title !== '') && (
           <Images
             open={openAddImages}
-            handleClose={() => setOpenAddImages(!openAddImages)}
+            lengthImages={images?.length ?? 0}
+            titleProduct={titleProduct}
             callback={getImages}
+            handleClose={() => setOpenAddImages(!openAddImages)}
           />
         )}
 
@@ -185,7 +285,9 @@ const New = () => {
               {categories?.length > 0 && (
                 <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
                   {categories?.map((cat, indexCat) => (
-                    <ChipsCategories category={cat} indexCat={indexCat} />
+                    <React.Fragment key={`chip-cat-${indexCat}`}>
+                      <ChipsCategories category={cat} />
+                    </React.Fragment>
                   ))}
                 </Box>
               )}
@@ -252,12 +354,12 @@ const New = () => {
         />
       )}
 
-      <Box display="flex" alignItems="center" justifyContent="end" position="sticky" bottom={8} right={16} pt={4}>
-        <Box display="flex" alignItems="center" justifyContent="end" gap={1} bgcolor={colors.background.main}>
-          <Button variant="outlined" color="primary">
+      <Box display="flex" alignItems="center" justifyContent="end" position="sticky" bottom={8} right={16} pt={4} width="fit-content" ml="auto">
+        <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
+          <Button variant="outlined" color="primary" onClick={() => setCreating(false)}>
             Cancelar
           </Button>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>
             Salvar
           </Button>
         </Box>

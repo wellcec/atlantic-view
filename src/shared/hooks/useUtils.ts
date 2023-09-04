@@ -19,23 +19,31 @@ const useUtils = () => {
     return parseFloat(current)
   }
 
+  const formatCurrentRequest = (value: string) => {
+    const cleared = value.replace('R$ ', '')
+    return formatNumber(cleared, 'float') / 100
+  }
+
   const imageToBase64 = (image, crop) => {
     const canvas = document.createElement('canvas')
-    const scaleX = image.naturalWidth / image.width
-    const scaleY = image.naturalHeight / image.height
-    canvas.width = crop.width
-    canvas.height = crop.height
+
+    const scalex = image.naturalWidth * 0.01
+    const scaley = image.naturalHeight * 0.01
+
+    canvas.width = crop.width * scalex
+    canvas.height = crop.height * scaley
+
     const imgCx = canvas.getContext('2d')
     imgCx.drawImage(
       image,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
+      crop.x * scalex,
+      crop.y * scaley,
+      crop.width * scalex,
+      crop.height * scaley,
       0,
       0,
-      crop.width,
-      crop.height,
+      crop.width * scalex,
+      crop.height * scaley,
     )
 
     // As Base64 string
@@ -55,8 +63,14 @@ const useUtils = () => {
     return new File([u8arr], filename, { type: mime })
   }
 
+  const normalize = (str: string): string => {
+    let normalized = str.replace(/[^a-z0-9A-Z\s]/g, '-')
+    normalized = normalized.replace(' ', '-')
+    return normalized.toLocaleLowerCase()
+  }
+
   return {
-    formatFormCurrency, formatNumber, imageToBase64, base64ToImage,
+    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrentRequest,
   }
 }
 

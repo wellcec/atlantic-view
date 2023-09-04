@@ -13,7 +13,23 @@
     rel="stylesheet">
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  <title>React App</title>
+  <title>Atlantic</title>
+  <!-- <script>
+    {
+      // console.info("[DEV NOTICE] Live Reload Has Been Disabled");
+      var WS = window.WebSocket;
+      function DevWebSocket(s) {
+        if (s === "ws://localhost:3000/ws") {
+          console.info("[DEV NOTICE] Live Reload Has Been Disabled");
+          return {};
+        } else {
+          // Pass through other usage of sockets
+          return new WS(s);
+        }
+      }
+      window.WebSocket = DevWebSocket;
+    }
+  </script> -->
 </head>
 
 <body>

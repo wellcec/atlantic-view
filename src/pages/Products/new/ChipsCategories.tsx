@@ -17,17 +17,16 @@ const useStyles = makeStyles(() => ({
 }))
 
 interface IProps {
-  indexCat: number
   category: CategoryType
   // eslint-disable-next-line no-unused-vars
   handleRemove?: (cat: CategoryType, subCat: SubCategoryType) => void
 }
 
-const ChipsCategories = ({ category, indexCat, handleRemove }: IProps) => {
+const ChipsCategories = ({ category, handleRemove }: IProps) => {
   const classes = useStyles()
 
   return (
-    <Box key={`chip-cat-${indexCat}`} className={classes.selectedCategories}>
+    <Box className={classes.selectedCategories}>
       <Typography variant="body2" color="primary" fontWeight={600}>
         {category?.name}
       </Typography>

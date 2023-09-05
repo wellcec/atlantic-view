@@ -32,7 +32,6 @@ const LOADER_DISABLE = 'loader.disable'
 
 interface IProps {
   show: boolean,
-  // eslint-disable-next-line no-unused-vars
   setLoading: (loading: boolean) => void
 }
 

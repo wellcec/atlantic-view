@@ -19,10 +19,12 @@ export type VariantionType = {
 }
 
 export type StatusProductType = {
-  isLaunch: boolean,
-  isSale: boolean,
-  isBestSeller: boolean,
-  isPreOrder: boolean,
+  isActive?: boolean,
+  isHighlighted?: boolean,
+  isLaunch?: boolean,
+  isSale?: boolean,
+  isBestSeller?: boolean,
+  isPreOrder?: boolean,
 }
 
 export type StatusProductProps = keyof StatusProductType

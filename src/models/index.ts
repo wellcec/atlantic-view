@@ -16,6 +16,10 @@ export interface ISuccessResponse {
   message: string
 }
 
+export interface INoLoading {
+  noLoading: boolean
+}
+
 export interface ISampleFilter {
   term: string,
   page: number,

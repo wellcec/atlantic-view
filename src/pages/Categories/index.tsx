@@ -30,6 +30,7 @@ import InputForm from '~/components/atoms/Inputs/InputForm'
 import AddChips from '~/components/molecules/AddChips'
 import Divider from '~/components/atoms/Divider'
 import InputText from '~/components/atoms/Inputs/InputText'
+import { DEFAULT_PAGESIZE } from '~/constants'
 
 const DEFAULT_VALUES = {
   name: '',
@@ -38,7 +39,7 @@ const DEFAULT_VALUES = {
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: 10,
+  pageSize: DEFAULT_PAGESIZE,
 }
 
 const Categories = () => {

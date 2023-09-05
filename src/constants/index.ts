@@ -14,4 +14,6 @@ export const NEW_PRODUCT_KEYS = {
   status: 'status',
 }
 
+export const DEFAULT_PAGESIZE = 10
+
 export default DEFAULT_THEME

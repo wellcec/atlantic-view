@@ -14,6 +14,7 @@ import Alerts from '~/components/layout/Alerts'
 
 const App = () => {
   const [loading, setLoading] = useState<boolean>(false)
+  const [showLoading, setShowLoading] = useState<boolean>(true)
 
   const { Provider: ProviderAlerts } = AlertsContext
   const [alert, setAlert] = useState<AlertType>({ type: 'info', message: '' })
@@ -29,7 +30,10 @@ const App = () => {
               <Alerts />
 
               <AxiosSettings
-                onStartRequest={() => setLoading(true)}
+                handleShowLoading={(state) => setShowLoading(state)}
+                onStartRequest={() => {
+                  if (showLoading) setLoading(true)
+                }}
                 onStopRequest={() => setLoading(false)}
               />
 

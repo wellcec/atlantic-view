@@ -64,9 +64,10 @@ const useUtils = () => {
   }
 
   const normalize = (str: string): string => {
-    let normalized = str.replace(/[^a-z0-9A-Z\s]/g, '-')
-    normalized = normalized.replace(' ', '-')
-    return normalized.toLocaleLowerCase()
+    let normalized = str.replace(/[^a-z0-9A-Z\s]/g, '')
+    const split = normalized.split(' ').filter((str) => str !== '')
+    const join = split.join('-')
+    return join.toLowerCase()
   }
 
   return {

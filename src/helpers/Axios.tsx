@@ -6,11 +6,12 @@ import useSecurity from '~/shared/hooks/useSecurity'
 axios.defaults.baseURL = 'http://localhost:3001/'
 
 interface IProps {
+  handleShowLoading: (loading: boolean) => void,
   onStopRequest: () => void,
   onStartRequest: () => void,
 }
 
-const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startRequest }: IProps) => {
+const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startRequest, handleShowLoading }: IProps) => {
   const {
     signout,
     getUser,
@@ -25,7 +26,9 @@ const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startReques
 
   useEffect(() => {
     let token: string | null
-    const requestId = axios.interceptors.request.use((config) => {
+    const requestId = axios.interceptors.request.use((config: any) => {
+      const { noLoading = false } = config ?? {}
+      handleShowLoading(!noLoading)
       setCount((current) => current + 1)
 
       const newConfig = { ...config }

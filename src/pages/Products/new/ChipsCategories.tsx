@@ -36,7 +36,7 @@ const ChipsCategories = ({ category, handleRemove }: IProps) => {
             key={`chip-subCategories-${indexSubCat}`}
             label={subCat?.name}
             variant="outlined"
-            onDelete={handleRemove ? () => handleRemove(category, subCat) : null}
+            onDelete={handleRemove ? () => handleRemove(category, subCat) : () => { }}
             deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}
           />
         ))}

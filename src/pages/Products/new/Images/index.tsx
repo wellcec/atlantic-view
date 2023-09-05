@@ -8,12 +8,12 @@ import ReactCrop, {
 import 'react-image-crop/dist/ReactCrop.css'
 
 import { Box, Button } from '@mui/material'
-import Modal from 'components/molecules/Modal'
-import useUtils from 'shared/hooks/useUtils'
-import useProductsService from 'services/useProductsService'
-import { useAlerts } from 'shared/alerts/AlertContext'
-import { IconUpload } from 'constants/icons'
-import colors from 'shared/theme/colors'
+import Modal from '~/components/molecules/Modal'
+import useUtils from '~/shared/hooks/useUtils'
+import useProductsService from '~/services/useProductsService'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+import { IconUpload } from '~/constants/icons'
+import colors from '~/shared/theme/colors'
 
 const centerAspectCrop = (
   mediaWidth: number,

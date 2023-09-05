@@ -12,19 +12,19 @@ import {
 } from '@mui/material'
 // import makeStyles from '@mui/styles/makeStyles'
 import AddIcon from '@mui/icons-material/Add'
-import Container from 'components/layout/ContainerMain'
-import Paper from 'components/layout/Paper'
-import Menu from 'components/atoms/Menu'
-import { useAlerts } from 'shared/alerts/AlertContext'
-// import useDebounce from 'shared/hooks/useDebounce'
-import Dialog from 'components/atoms/Dialog'
-import InputSearch from 'components/atoms/Inputs/InputSearch'
+import Container from '~/components/layout/ContainerMain'
+import Paper from '~/components/layout/Paper'
+import Menu from '~/components/atoms/Menu'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+// import useDebounce from '~/shared/hooks/useDebounce'
+import Dialog from '~/components/atoms/Dialog'
+import InputSearch from '~/components/atoms/Inputs/InputSearch'
 // import { SampleFilter } from 'models'
-import { IconDelete, IconEdit } from 'constants/icons'
-import { GetAllProductsType, ProductType } from 'models/products'
-import useProductsService from 'services/useProductsService'
-import { ISampleFilter } from 'models'
-import useDebounce from 'shared/hooks/useDebounce'
+import { IconDelete, IconEdit } from '~/constants/icons'
+import { GetAllProductsType, ProductType } from '~/models/products'
+import useProductsService from '~/services/useProductsService'
+import { ISampleFilter } from '~/models'
+import useDebounce from '~/shared/hooks/useDebounce'
 import { useProducts } from './fragments/context'
 
 const emptyFilter: ISampleFilter = {
@@ -66,7 +66,7 @@ const List = () => {
 
   const handleCloseMenu = () => {
     setAnchorEl(null)
-    setObjToAction(null)
+    setObjToAction(undefined)
   }
 
   const handleConfirmDelete = () => {

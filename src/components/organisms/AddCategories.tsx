@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react'
 import {
   Autocomplete, Box, Chip, Paper, TextField, Typography, useTheme,
 } from '@mui/material'
-import Divider from 'components/atoms/Divider'
-import Modal from 'components/molecules/Modal'
-import { CategoryType, GetAllCategoriesType, SubCategoryType } from 'models/categories'
-import useCategoriesService from 'services/useCategoriesService'
-import { useAlerts } from 'shared/alerts/AlertContext'
-import { ISampleFilter } from 'models'
-import colors from 'shared/theme/colors'
-import EmptyDataText from 'components/atoms/EmptyDataText'
-import { IconCheckCircule } from 'constants/icons'
+import Divider from '~/components/atoms/Divider'
+import Modal from '~/components/molecules/Modal'
+import { CategoryType, GetAllCategoriesType, SubCategoryType } from '~/models/categories'
+import useCategoriesService from '~/services/useCategoriesService'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+import { ISampleFilter } from '~/models'
+import colors from '~/shared/theme/colors'
+import EmptyDataText from '~/components/atoms/EmptyDataText'
+import { IconCheckCircule } from '~/constants/icons'
 import ChipsCategories from '../../pages/Products/new/ChipsCategories'
 
-const CustomPaper = (props) => (
+const CustomPaper = ({ ...props }) => (
   <Paper {...props} sx={{ boxShadow: useTheme().shadows[14] }} />
 )
 
@@ -34,7 +34,7 @@ interface IProps {
 const AddCategories = ({
   open, handleClose, data, setData,
 }: IProps) => {
-  const [selected, setSelected] = useState<CategoryType>()
+  const [selected, setSelected] = useState<CategoryType | null>(null)
   const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
 
   const { getCategories } = useCategoriesService()
@@ -53,7 +53,7 @@ const AddCategories = ({
     )
   }, [getCategories, setAlert])
 
-  const handleChange = (_, value) => setSelected(value)
+  const handleChange = (_: React.SyntheticEvent<Element, Event>, value: CategoryType | null) => setSelected(value)
 
   const handleAddCategory = (newSubCategory: SubCategoryType) => {
     if (selected) {

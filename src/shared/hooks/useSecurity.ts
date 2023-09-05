@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-import { useSecurityAction } from 'shared/store/ducks/security'
+import { useSecurityAction } from '~/shared/store/ducks/security'
 
 const useSecurity = () => {
   const navigate = useNavigate()

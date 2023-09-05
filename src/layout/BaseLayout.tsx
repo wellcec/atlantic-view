@@ -15,10 +15,10 @@ import {
 import { styled } from '@mui/material/styles'
 import makeStyles from '@mui/styles/makeStyles'
 
-import iconLogo from 'assets/images/logo64.png'
-import colors from 'shared/theme/colors'
-import { DEFAULT_THEME } from '../constants'
-import { MenuItems } from '../constants/menus'
+import iconLogo from '~/assets/images/logo64.png'
+import colors from '~/shared/theme/colors'
+import { DEFAULT_THEME } from '~/constants'
+import { MenuItems } from '~/constants/menus'
 
 const drawerWidth = 240
 

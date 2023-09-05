@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Button } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
-import { IconDelete } from 'constants/icons'
+import { IconDelete } from '~/constants/icons'
 
 const useStyles = makeStyles(() => ({
   buttonAdd: {

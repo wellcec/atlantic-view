@@ -1,11 +1,11 @@
 import React from 'react'
 import SVG from 'react-inlinesvg'
 
-import iconDashboard from 'assets/icons/icon-dashboard.svg'
-import iconCustomers from 'assets/icons/icon-customers.svg'
-import iconProducts from 'assets/icons/icon-products.svg'
-import iconCategories from 'assets/icons/icon-categories.svg'
-import { IMenuItem } from 'models'
+import iconDashboard from '~/assets/icons/icon-dashboard.svg'
+import iconCustomers from '~/assets/icons/icon-customers.svg'
+import iconProducts from '~/assets/icons/icon-products.svg'
+import iconCategories from '~/assets/icons/icon-categories.svg'
+import { IMenuItem } from '~/models'
 
 export const SIZE_ICONS_HOME = 20
 

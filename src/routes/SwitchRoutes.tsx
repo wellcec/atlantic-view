@@ -1,11 +1,11 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
-import BaseLayout from 'layout/BaseLayout'
-import Home from 'pages/Home'
-import Users from 'pages/Users'
-import Products from 'pages/Products'
-import Categories from 'pages/Categories'
+import BaseLayout from '~/layout/BaseLayout'
+import Home from '~/pages/Home'
+import Users from '~/pages/Users'
+import Products from '~/pages/Products'
+import Categories from '~/pages/Categories'
 import WithLayoutRoute from './WithLayoutRoute'
 
 const SwitchRoutes = () => (

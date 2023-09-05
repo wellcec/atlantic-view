@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
-import useSecurity from 'shared/hooks/useSecurity'
+import useSecurity from '~/shared/hooks/useSecurity'
 
 axios.defaults.baseURL = 'http://localhost:3001/'
 

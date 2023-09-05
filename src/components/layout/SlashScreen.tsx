@@ -3,22 +3,10 @@ import Box from '@mui/material/Box'
 import makeStyles from '@mui/styles/makeStyles'
 import { Theme } from '@mui/material/styles'
 import { Player } from '@lottiefiles/react-lottie-player'
-import Loading from 'assets/Loading.json'
+import Loading from '~/assets/Loading.json'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    // backgroundColor: theme.palette.primary.main,
-    // alignItems: 'center',
-    // display: 'flex',
-    // flexDirection: 'column',
-    // height: '100%',
-    // justifyContent: 'center',
-    // left: 0,
-    // padding: theme.spacing(3),
-    // position: 'fixed',
-    // top: 0,
-    // width: '100%',
-    // zIndex: 1000002,
   },
   logo: {
     width: 200,

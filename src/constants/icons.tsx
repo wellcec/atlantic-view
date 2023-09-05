@@ -2,16 +2,16 @@
 import React from 'react'
 import SVG from 'react-inlinesvg'
 
-import iconEdit from 'assets/icons/icon-edit.svg'
-import iconDelete from 'assets/icons/icon-delete.svg'
-import iconSearch from 'assets/icons/icon-search.svg'
-import iconDoubleArrowDown from 'assets/icons/icon-double-arrow-down.svg'
-import iconSingleArrowDownCircule from 'assets/icons/icon-single-arrow-circule.svg'
-import iconSingleArrowUpCircule from 'assets/icons/icon-single-arrow-up-circule.svg'
-import iconCheckCircule from 'assets/icons/icon-check-circule.svg'
-import iconUpload from 'assets/icons/icon-upload.svg'
+import iconEdit from '~/assets/icons/icon-edit.svg'
+import iconDelete from '~/assets/icons/icon-delete.svg'
+import iconSearch from '~/assets/icons/icon-search.svg'
+import iconDoubleArrowDown from '~/assets/icons/icon-double-arrow-down.svg'
+import iconSingleArrowDownCircule from '~/assets/icons/icon-single-arrow-circule.svg'
+import iconSingleArrowUpCircule from '~/assets/icons/icon-single-arrow-up-circule.svg'
+import iconCheckCircule from '~/assets/icons/icon-check-circule.svg'
+import iconUpload from '~/assets/icons/icon-upload.svg'
 
-import colors from 'shared/theme/colors'
+import colors from '~/shared/theme/colors'
 
 const SIZE_ICONS = 20
 

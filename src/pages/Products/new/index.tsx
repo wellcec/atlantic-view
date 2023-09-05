@@ -1,6 +1,3 @@
-/* eslint-disable sonarjs/no-nested-template-literals */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable import/no-dynamic-require */
 import React, { useCallback, useEffect, useState } from 'react'
 import {
   Box, Button, Checkbox, Chip, FormControlLabel, FormGroup,
@@ -10,33 +7,32 @@ import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import makeStyles from '@mui/styles/makeStyles'
 
-import { NEW_PRODUCT_KEYS } from 'constants/index'
-import { PREENCHIMENTO_OBRIGATORIO } from 'constants/messages'
-import { IconSingleArrowDownCircule, IconSingleArrowUpCircule } from 'constants/icons'
+import { NEW_PRODUCT_KEYS } from '~/constants/index'
+import { PREENCHIMENTO_OBRIGATORIO } from '~/constants/messages'
+import { IconSingleArrowDownCircule, IconSingleArrowUpCircule } from '~/constants/icons'
 
-import colors from 'shared/theme/colors'
-import useTestsForm from 'shared/hooks/useTestsForm'
+import colors from '~/shared/theme/colors'
+import useTestsForm from '~/shared/hooks/useTestsForm'
 
 import {
   CreateProductType,
   ImageType, StatusProductProps, StatusProductType, TagType,
 } from 'models/products'
-import { CategoryType } from 'models/categories'
-import { VariationType } from 'models/variations'
+import { CategoryType } from '~/models/categories'
+import { VariationType } from '~/models/variations'
 
-import ButtonAdd from 'components/atoms/ButtonAdd'
-import AddChips from 'components/molecules/AddChips'
-import Accordion from 'components/molecules/Accordion'
-import Container from 'components/layout/ContainerMain'
-import EmptyDataText from 'components/atoms/EmptyDataText'
-import AddVariations from 'components/organisms/AddVariations'
-import AddCategories from 'components/organisms/AddCategories'
+import ButtonAdd from '~/components/atoms/ButtonAdd'
+import AddChips from '~/components/molecules/AddChips'
+import Accordion from '~/components/molecules/Accordion'
+import Container from '~/components/layout/ContainerMain'
+import EmptyDataText from '~/components/atoms/EmptyDataText'
+import AddVariations from '~/components/organisms/AddVariations'
+import AddCategories from '~/components/organisms/AddCategories'
 
-import useProductsService from 'services/useProductsService'
-import { useAlerts } from 'shared/alerts/AlertContext'
-import ButtonRemove from 'components/atoms/ButtonRemove'
-import useUtils from 'shared/hooks/useUtils'
-import path from 'path'
+import useProductsService from '~/services/useProductsService'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+import ButtonRemove from '~/components/atoms/ButtonRemove'
+import useUtils from '~/shared/hooks/useUtils'
 import Images from './Images'
 import FormProduct from './FormProduct'
 import ChipsCategories from './ChipsCategories'
@@ -219,7 +215,7 @@ const New = () => {
 
       <Box>
         <Accordion open={getExpanded(firstInfoKey)} title="Primeiras informações" onChange={() => handleChangeAccordion(firstInfoKey)}>
-          <FormProduct parentFormik={formik} />
+          <FormProduct hasImages={images.length > 0} parentFormik={formik} />
         </Accordion>
 
         <Accordion open={getExpanded(statusKey)} title="Status" onChange={() => handleChangeAccordion(statusKey)}>
@@ -242,10 +238,8 @@ const New = () => {
                     <img
                       key={`temp-image-temp-${index}`}
                       className={classes.img}
-                      src={`file://${path.join(__dirname, `images/${img.fileName}`)}`}
-                      srcSet={`file://${path.join(__dirname, `images/${img.fileName}`)}`}
-                      // src={`images/${img.fileName}`}
-                      // srcSet={`images/${img.fileName}`}
+                      src={`images/${img.fileName}`}
+                      srcSet={`images/${img.fileName}`}
                       alt={img.fileName}
                       loading="lazy"
                     />

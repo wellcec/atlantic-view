@@ -62,8 +62,8 @@ export interface IGetAllImagesResponse {
 }
 
 export interface IProductsContext {
-  product: ProductType,
-  setProduct: React.Dispatch<React.SetStateAction<ProductType>>,
+  product?: ProductType,
+  setProduct: React.Dispatch<React.SetStateAction<ProductType | undefined>>,
   creating: boolean,
   setCreating: React.Dispatch<React.SetStateAction<boolean>>,
 }

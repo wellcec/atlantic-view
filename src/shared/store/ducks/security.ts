@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 import { useCallback } from 'react'
 import { produce } from 'immer'
 import { useDispatch } from 'react-redux'

@@ -4,7 +4,7 @@ import {
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
-import { IconSearch } from 'constants/icons'
+import { IconSearch } from '~/constants/icons'
 
 const useStyles = makeStyles(() => ({
   inputSearch: {

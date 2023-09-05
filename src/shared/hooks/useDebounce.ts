@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 const useDebounce = () => {
   const [run, setRun] = useState<any>()
 
-  const debounceWait = (exec) => {
+  const debounceWait = (exec: () => void) => {
     if (run) {
       run.current.cancel()
     }

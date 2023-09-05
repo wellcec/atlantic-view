@@ -6,9 +6,9 @@ import {
   Accordion as ComponentAccordion,
   Box,
 } from '@mui/material'
-import { IconDoubleArrowDown } from 'constants/icons'
+import { IconDoubleArrowDown } from '~/constants/icons'
 import makeStyles from '@mui/styles/makeStyles'
-import Divider from 'components/atoms/Divider'
+import Divider from '~/components/atoms/Divider'
 
 const useStyles = makeStyles(() => ({
   accordion: {

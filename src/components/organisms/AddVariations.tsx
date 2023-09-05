@@ -3,15 +3,15 @@ import {
   Box, Chip,
 } from '@mui/material'
 import { last as getLast } from 'lodash'
-import Divider from 'components/atoms/Divider'
-import Modal from 'components/molecules/Modal'
-import EmptyDataText from 'components/atoms/EmptyDataText'
-import AddChips from 'components/molecules/AddChips'
-import { ISampleFilter } from 'models'
-import { GetAllVariationsType, VariationType } from 'models/variations'
-import useVariationsService from 'services/useVariationsService'
-import { useAlerts } from 'shared/alerts/AlertContext'
-import { IconDelete } from 'constants/icons'
+import Divider from '~/components/atoms/Divider'
+import Modal from '~/components/molecules/Modal'
+import EmptyDataText from '~/components/atoms/EmptyDataText'
+import AddChips from '~/components/molecules/AddChips'
+import { ISampleFilter } from '~/models'
+import { GetAllVariationsType, VariationType } from '~/models/variations'
+import useVariationsService from '~/services/useVariationsService'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+import { IconDelete } from '~/constants/icons'
 
 const MAX_REGISTERS = 10000
 const emptyFilter: ISampleFilter = {
@@ -50,21 +50,23 @@ const AddVariations = ({
   }, [getVariations, setAlert])
 
   const handleAddVariation = (variationAdded: VariationType[]) => {
-    const last: VariationType = getLast(variationAdded)
+    const last: VariationType | undefined = getLast(variationAdded)
 
-    createVariation(last).then(
-      () => {
-        setVariations(variationAdded)
-      },
-      (err) => {
-        const { message } = err
-        setAlert({ type: 'error', message })
-      },
-    )
+    if (last) {
+      createVariation(last).then(
+        () => {
+          setVariations(variationAdded)
+        },
+        (err) => {
+          const { message } = err
+          setAlert({ type: 'error', message })
+        },
+      )
+    }
   }
 
   const handleRemoveVariation = (variationRemoved: VariationType) => {
-    deleteVariation(variationRemoved.id).then(
+    deleteVariation(variationRemoved?.id ?? '').then(
       () => {
         const newarr = variations.filter((item) => item.name !== variationRemoved.name)
         setVariations(newarr)

@@ -3,17 +3,18 @@ import {
   Grid, MenuItem, Select,
 } from '@mui/material'
 
-import FormInput from 'components/atoms/Inputs/InputForm'
-import useUtils from 'shared/hooks/useUtils'
-import InputText from 'components/atoms/Inputs/InputText'
-import InputSufix from 'components/atoms/Inputs/InputSufix'
+import FormInput from '~/components/atoms/Inputs/InputForm'
+import useUtils from '~/shared/hooks/useUtils'
+import InputText from '~/components/atoms/Inputs/InputText'
+import InputSufix from '~/components/atoms/Inputs/InputSufix'
 import ShipingOptions from '../fragments/constants'
 
 interface IProps {
-  parentFormik: any
+  parentFormik: any,
+  hasImages: boolean,
 }
 
-const FormProduct = ({ parentFormik }: IProps) => {
+const FormProduct = ({ hasImages, parentFormik }: IProps) => {
   const { formatFormCurrency, formatNumber } = useUtils()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, prop: string) => {
@@ -33,6 +34,7 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('title')}
             error={parentFormik.touched.title && !!parentFormik.errors.title}
             value={parentFormik.values.title}
+            disabled={hasImages}
           />
         </FormInput>
       </Grid>
@@ -56,7 +58,7 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('value')}
             error={parentFormik.touched.value && !!parentFormik.errors.value}
             value={parentFormik.values.value}
-            onChange={(event) => handleChange(event, 'value')}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(event, 'value')}
           />
         </FormInput>
       </Grid>
@@ -69,7 +71,7 @@ const FormProduct = ({ parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('valueUnique')}
             error={parentFormik.touched.valueUnique && !!parentFormik.errors.valueUnique}
             value={parentFormik.values.valueUnique}
-            onChange={(event) => handleChange(event, 'valueUnique')}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(event, 'valueUnique')}
           />
         </FormInput>
       </Grid>

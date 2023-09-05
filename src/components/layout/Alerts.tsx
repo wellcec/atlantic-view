@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
 import { isEmpty } from 'lodash'
 
-import { useAlerts } from 'shared/alerts/AlertContext'
+import { useAlerts } from '~/shared/alerts/AlertContext'
 
 const Alerts = () => {
   const [open, setOpen] = useState<boolean>(false)

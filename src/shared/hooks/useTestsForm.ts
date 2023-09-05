@@ -1,4 +1,4 @@
-import { MAIOR_QUE_ZERO } from 'constants/messages'
+import { MAIOR_QUE_ZERO } from '~/constants/messages'
 import useUtils from './useUtils'
 
 const useTestsForm = () => {

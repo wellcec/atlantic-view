@@ -5,11 +5,11 @@ import {
 import makeStyles from '@mui/styles/makeStyles'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 
-import colors from 'shared/theme/colors'
-import Container from 'components/layout/ContainerMain'
-import useUsersService from 'services/useUsersService'
-import { UserType, GetAllUsersType } from 'models/users'
-import Paper from 'components/layout/Paper'
+import colors from '~/shared/theme/colors'
+import Container from '~/components/layout/ContainerMain'
+import useUsersService from '~/services/useUsersService'
+import { UserType, GetAllUsersType } from '~/models/users'
+import Paper from '~/components/layout/Paper'
 
 const useStyles = makeStyles(() => ({
   item: {

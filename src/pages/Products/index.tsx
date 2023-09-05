@@ -5,7 +5,7 @@ import New from './new'
 import List from './List'
 
 const Products = () => {
-  const [product, setProduct] = useState<ProductType | null>(null)
+  const [product, setProduct] = useState<ProductType | undefined>()
   const [creating, setCreating] = useState<boolean>(false)
 
   return (
@@ -18,13 +18,8 @@ const Products = () => {
       }}
       >
         <>
-          {creating && (
-            <New />
-          )}
-
-          {!creating && (
-            <List />
-          )}
+          {creating && (<New />)}
+          {!creating && (<List />)}
         </>
       </Provider>
     </>

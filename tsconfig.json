@@ -2,50 +2,44 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    // "lib": [
-    //   "ES2020",
-    //   "DOM",
-    //   "DOM.Iterable"
-    // ],
-    "allowJs": true,
-    "module": "ESNext" /* Specify what module code is generated. */,
-    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
-    "skipLibCheck": true, /* Skip type checking all .d.ts files. */
+    "lib": [
+      "ES2021",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "skipLibCheck": true,
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     /* Linting */
-    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-    "strict": false,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "src",
-    // "paths": {
-    //   "@constants": [
-    //     "constants/*"
-    //   ],
-    //   "@models": [
-    //     "src/models/*"
-    //   ],
-    //   "@assets": [
-    //     "src/assets/*"
-    //   ],
-    // }
+    /* Paths */
+    "baseUrl": "./src",
+    "paths": {
+      "~/*": [
+        "./*"
+      ]
+    },
+    "outDir": "./dist",
   },
-  // "include": [
-  //   "src/index.js",
-  //   "src/**/*"
-  // ],
   "include": [
     "**/*.ts",
     "**/*.tsx"
   ],
   "exclude": [
     "node_modules"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
   ]
 }

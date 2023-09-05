@@ -13,23 +13,23 @@ import AddIcon from '@mui/icons-material/Add'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
-import Container from 'components/layout/ContainerMain'
+import Container from '~/components/layout/ContainerMain'
 import { CategoryType, GetAllCategoriesType, SubCategoryType } from 'models/categories'
-import Paper from 'components/layout/Paper'
-import Modal from 'components/molecules/Modal'
-import Menu from 'components/atoms/Menu'
-import useCategoriesService from 'services/useCategoriesService'
-import { PREENCHIMENTO_OBRIGATORIO } from 'constants/messages'
-import { useAlerts } from 'shared/alerts/AlertContext'
-import useDebounce from 'shared/hooks/useDebounce'
-import Dialog from 'components/atoms/Dialog'
-import InputSearch from 'components/atoms/Inputs/InputSearch'
-import { ISampleFilter } from 'models'
-import { IconDelete, IconEdit } from 'constants/icons'
-import InputForm from 'components/atoms/Inputs/InputForm'
-import AddChips from 'components/molecules/AddChips'
-import Divider from 'components/atoms/Divider'
-import InputText from 'components/atoms/Inputs/InputText'
+import Paper from '~/components/layout/Paper'
+import Modal from '~/components/molecules/Modal'
+import Menu from '~/components/atoms/Menu'
+import useCategoriesService from '~/services/useCategoriesService'
+import { PREENCHIMENTO_OBRIGATORIO } from '~/constants/messages'
+import { useAlerts } from '~/shared/alerts/AlertContext'
+import useDebounce from '~/shared/hooks/useDebounce'
+import Dialog from '~/components/atoms/Dialog'
+import InputSearch from '~/components/atoms/Inputs/InputSearch'
+import { ISampleFilter } from '~/models'
+import { IconDelete, IconEdit } from '~/constants/icons'
+import InputForm from '~/components/atoms/Inputs/InputForm'
+import AddChips from '~/components/molecules/AddChips'
+import Divider from '~/components/atoms/Divider'
+import InputText from '~/components/atoms/Inputs/InputText'
 
 const DEFAULT_VALUES = {
   name: '',
@@ -73,12 +73,12 @@ const Categories = () => {
   }, [getCategories, setAlert, filter])
 
   const deleteCategory = useCallback(() => {
-    deleteCat(objToAction.id).then(
+    deleteCat(objToAction?.id ?? '').then(
       () => {
         setAlert({ type: 'success', message: 'Categoria excluída com sucesso.' })
         setConfirmatioOpen(false)
         setAnchorEl(null)
-        setObjToAction(null)
+        setObjToAction(undefined)
         getAllCategories()
       },
       (error) => {
@@ -123,11 +123,11 @@ const Categories = () => {
           subCategories,
         }
 
-        updateCategory(objToAction.id, category).then(
+        updateCategory(objToAction?.id ?? '', category).then(
           () => {
             setAlert({ type: 'success', message: 'Categoria atualizada com sucesso.' })
             setAction('create')
-            setObjToAction(null)
+            setObjToAction(undefined,)
             setOpenModal(false)
             getAllCategories()
           },
@@ -150,8 +150,8 @@ const Categories = () => {
 
   const handleEditCategory = () => {
     const { setValues } = formik
-    setValues({ name: objToAction.name })
-    setSubCategories(objToAction.subCategories)
+    setValues({ name: objToAction?.name ?? '' })
+    setSubCategories(objToAction?.subCategories ?? [])
     setOpenModal(true)
     setAnchorEl(null)
     setAction('update')
@@ -164,7 +164,7 @@ const Categories = () => {
 
   const handleCloseMenu = () => {
     setAnchorEl(null)
-    setObjToAction(null)
+    setObjToAction(undefined)
   }
 
   const handleConfirmDelete = () => {

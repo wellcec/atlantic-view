@@ -1,9 +1,9 @@
 import React from 'react'
-import colors from 'shared/theme/colors'
+import colors from '~/shared/theme/colors'
 import { Box, Chip, Typography } from '@mui/material'
-import { IconDelete } from 'constants/icons'
+import { IconDelete } from '~/constants/icons'
 import makeStyles from '@mui/styles/makeStyles'
-import { CategoryType, SubCategoryType } from 'models/categories'
+import { CategoryType, SubCategoryType } from '~/models/categories'
 
 const useStyles = makeStyles(() => ({
   selectedCategories: {
@@ -18,7 +18,6 @@ const useStyles = makeStyles(() => ({
 
 interface IProps {
   category: CategoryType
-  // eslint-disable-next-line no-unused-vars
   handleRemove?: (cat: CategoryType, subCat: SubCategoryType) => void
 }
 

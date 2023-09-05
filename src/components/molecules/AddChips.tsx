@@ -1,22 +1,21 @@
 import React, { useState } from 'react'
 import { Box, Chip } from '@mui/material'
-import ButtonAdd from 'components/atoms/ButtonAdd'
-import InputHarmonic from 'components/atoms/Inputs/InputHarmonic'
-import { IconDelete } from 'constants/icons'
+import ButtonAdd from '~/components/atoms/ButtonAdd'
+import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
+import { IconDelete } from '~/constants/icons'
+import { VariationType } from '~/models/variations'
 
 interface IProps {
   text: string
   titleButton: string
   data: any[]
-  setData: React.Dispatch<React.SetStateAction<any[]>>
-  // eslint-disable-next-line no-unused-vars
+  setData: (variationAdded: VariationType[]) => void
   action?: (item: any) => void
-  // eslint-disable-next-line no-unused-vars
   actionDelete?: (item: any) => void
 }
 
 const AddChips = ({
-  text, data, setData, titleButton, action, actionDelete,
+  text, data, setData, titleButton, action = () => { }, actionDelete,
 }: IProps) => {
   const [field, setField] = useState<string>('')
 

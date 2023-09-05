@@ -1,7 +1,12 @@
 import React, { useContext } from 'react'
 import { IProductsContext } from 'models/products'
 
-const productsContext = React.createContext<IProductsContext | null>(null)
+const productsContext = React.createContext<IProductsContext>({
+  creating: false,
+  setCreating: () => { },
+  product: undefined,
+  setProduct: () => { },
+})
 
 export const useProducts = () => {
   const {

@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import AppTheme from 'layout/AppTheme'
-import SwitchRoutes from 'routes/SwitchRoutes'
-import AxiosSettings from 'helpers/Axios'
-import { store, persist } from 'shared/store'
-import AlertsContext from 'shared/alerts/AlertContext'
-import { AlertType } from 'models'
-import Loader from 'components/layout/Loader'
-import Alerts from 'components/layout/Alerts'
+
+import AppTheme from '~/layout/AppTheme'
+import SwitchRoutes from '~/routes/SwitchRoutes'
+import AxiosSettings from '~/helpers/Axios'
+import { store, persist } from '~/shared/store'
+import AlertsContext from '~/shared/alerts/AlertContext'
+import { AlertType } from '~/models'
+import Loader from '~/components/layout/Loader'
+import Alerts from '~/components/layout/Alerts'
 
 const App = () => {
   const [loading, setLoading] = useState<boolean>(false)

@@ -3,7 +3,7 @@ import {
   Box, FormControl, FormLabel, FormHelperText,
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
-import colors from 'shared/theme/colors'
+import colors from '~/shared/theme/colors'
 
 const useStyles = makeStyles(() => ({
   color: {
@@ -26,6 +26,7 @@ const InputForm = ({
   title, fullWidth, formik, helperText, propField, children,
 }: PropsWithChildren<IProps>) => {
   const classes = useStyles()
+  const field = propField ?? ''
 
   return (
     <>
@@ -38,10 +39,10 @@ const InputForm = ({
 
         {helperText && (
           <FormHelperText
-            hidden={!formik.touched[propField] || !formik.errors[propField]}
-            error={formik.touched[propField] && !!formik.errors[propField]}
+            hidden={!formik.touched[field] || !formik.errors[field]}
+            error={formik.touched[field] && !!formik.errors[field]}
           >
-            {formik.errors[propField]}
+            {formik.errors[field]}
           </FormHelperText>
         )}
       </FormControl>

@@ -5,7 +5,7 @@ import iconDashboard from '~/assets/icons/icon-dashboard.svg'
 import iconCustomers from '~/assets/icons/icon-customers.svg'
 import iconProducts from '~/assets/icons/icon-products.svg'
 import iconCategories from '~/assets/icons/icon-categories.svg'
-import { IMenuItem } from '~/models'
+import { type IMenuItem } from '~/models'
 
 export const SIZE_ICONS_HOME = 20
 
@@ -20,7 +20,7 @@ export const MenuItems: IMenuItem[] = [
         width={SIZE_ICONS_HOME}
         height={SIZE_ICONS_HOME}
       />
-    ),
+    )
   },
   {
     title: 'Clientes',
@@ -32,7 +32,7 @@ export const MenuItems: IMenuItem[] = [
         width={SIZE_ICONS_HOME}
         height={SIZE_ICONS_HOME}
       />
-    ),
+    )
   },
   {
     title: 'Produtos',
@@ -44,7 +44,7 @@ export const MenuItems: IMenuItem[] = [
         width={SIZE_ICONS_HOME}
         height={SIZE_ICONS_HOME}
       />
-    ),
+    )
   },
   {
     title: 'Categorias',
@@ -56,6 +56,6 @@ export const MenuItems: IMenuItem[] = [
         width={SIZE_ICONS_HOME}
         height={SIZE_ICONS_HOME}
       />
-    ),
-  },
+    )
+  }
 ]

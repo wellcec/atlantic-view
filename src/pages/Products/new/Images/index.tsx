@@ -1,9 +1,9 @@
-/* eslint-disable sonarjs/no-identical-expressions */
 import React, { useState } from 'react'
 import ReactCrop, {
-  Crop,
+  type Crop,
   centerCrop,
   makeAspectCrop,
+  type PercentCrop
 } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 
@@ -14,36 +14,37 @@ import useProductsService from '~/services/useProductsService'
 import { useAlerts } from '~/shared/alerts/AlertContext'
 import { IconUpload } from '~/constants/icons'
 import colors from '~/shared/theme/colors'
+import { type ImageType } from '~/models/products'
 
 const centerAspectCrop = (
   mediaWidth: number,
   mediaHeight: number,
-  aspect: number,
-) => centerCrop(
+  aspect: number
+): PercentCrop => centerCrop(
   makeAspectCrop(
     {
       unit: '%',
-      width: 100,
+      width: 100
     },
     aspect,
     mediaWidth,
-    mediaHeight,
+    mediaHeight
   ),
   mediaWidth,
-  mediaHeight,
+  mediaHeight
 )
 
 interface IProps {
   lengthImages: number
   titleProduct: string
-  open: boolean,
+  open: boolean
   handleClose: () => void
-  callback: () => void
+  onCreateImage: (image: ImageType) => void
 }
 
 const Images = ({
-  lengthImages, titleProduct, open, handleClose, callback,
-}: IProps) => {
+  lengthImages, titleProduct, open, handleClose, onCreateImage
+}: IProps): React.JSX.Element => {
   const [image, setImage] = useState<any>(undefined)
   const [crop, setCrop] = useState<Crop>()
   const [fileImage, setFileImage] = useState<any>()
@@ -52,24 +53,24 @@ const Images = ({
   const { uploadImage } = useProductsService()
   const { setAlert } = useAlerts()
 
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     const { width, height } = e.currentTarget
 
     setFileImage(e.currentTarget)
     setCrop(centerAspectCrop(width, height, 1 / 1))
   }
 
-  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
       setCrop(undefined)
       const reader = new FileReader()
-      reader.addEventListener('load', () => setImage(reader.result?.toString() || ''))
+      reader.addEventListener('load', () => { setImage(reader.result?.toString() ?? '') })
       reader.readAsDataURL(file)
     }
   }
 
-  const save = async () => {
+  const save = async (): Promise<void> => {
     if (image === '') {
       return
     }
@@ -80,13 +81,17 @@ const Images = ({
       const formdataimage = base64ToImage(base64image, `${lengthImages}-${nameImage}.png`)
 
       await uploadImage([formdataimage]).then(
-        () => {
-          callback()
+        (response) => {
+          const data = response?.data ?? {}
+
+          if (data?.id) {
+            onCreateImage(data)
+          }
         },
         (err) => {
           const { message } = err
           setAlert({ type: 'error', message })
-        },
+        }
       )
       handleClose()
       setImage('')
@@ -100,7 +105,7 @@ const Images = ({
           <Box display="flex" justifyContent="center" mb={3}>
             <ReactCrop
               crop={crop}
-              onChange={(_, percent) => setCrop(percent)}
+              onChange={(_, percent) => { setCrop(percent) }}
             >
               <img
                 alt="Crop me"
@@ -135,7 +140,7 @@ const Images = ({
 
             {!!image && (
               <Box>
-                <Button variant="contained" color="primary" onClick={save} onSubmit={(event) => event.preventDefault()}>
+                <Button variant="contained" color="primary" onClick={save} onSubmit={(event) => { event.preventDefault() }}>
                   Adicionar imagem
                 </Button>
               </Box>

@@ -1,25 +1,25 @@
 import React, { useState } from 'react'
-import { ProductType } from 'models/products'
+import { type Mode, type ProductType } from 'models/products'
 import { Provider } from './fragments/context'
 import New from './new'
 import List from './List'
 
-const Products = () => {
+const Products = (): React.JSX.Element => {
   const [product, setProduct] = useState<ProductType | undefined>()
-  const [creating, setCreating] = useState<boolean>(false)
+  const [mode, setMode] = useState<Mode>('list')
 
   return (
     <>
       <Provider value={{
         product,
         setProduct,
-        creating,
-        setCreating,
+        mode,
+        setMode
       }}
       >
         <>
-          {creating && (<New />)}
-          {!creating && (<List />)}
+          {(mode === 'create' || mode === 'update') && (<New />)}
+          {(mode === 'list') && (<List />)}
         </>
       </Provider>
     </>

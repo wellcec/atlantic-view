@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  Grid, MenuItem, Select,
+  Grid, MenuItem, Select
 } from '@mui/material'
 
 import FormInput from '~/components/atoms/Inputs/InputForm'
@@ -10,14 +10,14 @@ import InputSufix from '~/components/atoms/Inputs/InputSufix'
 import ShipingOptions from '../fragments/constants'
 
 interface IProps {
-  parentFormik: any,
-  hasImages: boolean,
+  parentFormik: any
+  hasImages: boolean
 }
 
-const FormProduct = ({ hasImages, parentFormik }: IProps) => {
+const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => {
   const { formatFormCurrency, formatNumber } = useUtils()
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>, prop: string) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>, prop: string): void => {
     const { value } = event.target
     const numericValue = formatNumber(value, 'float')
     const formattedValue = formatFormCurrency(numericValue)
@@ -58,7 +58,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('value')}
             error={parentFormik.touched.value && !!parentFormik.errors.value}
             value={parentFormik.values.value}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(event, 'value')}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => { handleChange(event, 'value') }}
           />
         </FormInput>
       </Grid>
@@ -71,7 +71,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps) => {
             {...parentFormik.getFieldProps('valueUnique')}
             error={parentFormik.touched.valueUnique && !!parentFormik.errors.valueUnique}
             value={parentFormik.values.valueUnique}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleChange(event, 'valueUnique')}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => { handleChange(event, 'valueUnique') }}
           />
         </FormInput>
       </Grid>

@@ -4,14 +4,20 @@ import { useNavigate } from 'react-router-dom'
 
 import { useSecurityAction } from '~/shared/store/ducks/security'
 
-const useSecurity = () => {
+interface ISecurity {
+  getUser: () => any
+  getCredential: () => string | null
+  signout: () => void
+}
+
+const useSecurity = (): ISecurity => {
   const navigate = useNavigate()
 
   const { cleanUser, cleanCredential } = useSecurityAction()
 
   const { user, credential } = useSelector(({ security }: any) => ({
-    user: security.user as any,
-    credential: security.credential as string,
+    user: security.user,
+    credential: security.credential as string
   }))
 
   const getUser = useCallback(() => user || null, [user])
@@ -27,7 +33,7 @@ const useSecurity = () => {
   return {
     getUser,
     getCredential,
-    signout,
+    signout
   }
 }
 

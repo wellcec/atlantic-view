@@ -1,17 +1,17 @@
-import React, { PropsWithChildren } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Paper as PaperCustomer,
+  Paper as PaperCustomer
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
 const useStyles = makeStyles(() => ({
   paper: {
-    padding: 24,
+    padding: 24
   },
   fullWidth: {
-    width: '100%',
-  },
+    width: '100%'
+  }
 }))
 
 interface IProps {
@@ -19,11 +19,11 @@ interface IProps {
   fullWidth?: boolean
 }
 
-const Paper = ({ children, fullWidth, ...rest }: PropsWithChildren<IProps>) => {
+const Paper = ({ children, fullWidth, ...rest }: PropsWithChildren<IProps>): React.JSX.Element => {
   const classes = useStyles()
 
   const fullWidthClass = fullWidth ? classes.fullWidth : ''
-  const className = rest?.className || ''
+  const className = rest?.className ?? ''
   delete rest?.className
 
   return (
@@ -35,12 +35,12 @@ const Paper = ({ children, fullWidth, ...rest }: PropsWithChildren<IProps>) => {
 
 Paper.propTypes = {
   className: PropTypes.string,
-  fullWidth: PropTypes.bool,
+  fullWidth: PropTypes.bool
 }
 
 Paper.defaultProps = {
   className: '',
-  fullWidth: false,
+  fullWidth: false
 }
 
 export default Paper

@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Box, Chip,
+  Box, Chip
 } from '@mui/material'
 import { last as getLast } from 'lodash'
 import Divider from '~/components/atoms/Divider'
 import Modal from '~/components/molecules/Modal'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
 import AddChips from '~/components/molecules/AddChips'
-import { ISampleFilter } from '~/models'
-import { GetAllVariationsType, VariationType } from '~/models/variations'
+import { type ISampleFilter } from '~/models'
+import { type GetAllVariationsType, type VariationType } from '~/models/variations'
 import useVariationsService from '~/services/useVariationsService'
 import { useAlerts } from '~/shared/alerts/AlertContext'
 import { IconDelete } from '~/constants/icons'
@@ -17,20 +17,19 @@ const MAX_REGISTERS = 10000
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: MAX_REGISTERS,
+  pageSize: MAX_REGISTERS
 }
 
 interface IProps {
-  open: boolean,
+  open: boolean
   handleClose: () => void
   data: VariationType[]
   setData: React.Dispatch<React.SetStateAction<any[]>>
 }
 
 const AddVariations = ({
-  open, handleClose, data, setData,
-}: IProps) => {
-  // const [selected, setSelected] = useState<CategoryType>()
+  open, handleClose, data, setData
+}: IProps): React.JSX.Element => {
   const [variations, setVariations] = useState<VariationType[]>([])
 
   const { getVariations, createVariation, deleteVariation } = useVariationsService()
@@ -45,11 +44,11 @@ const AddVariations = ({
       (err) => {
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }, [getVariations, setAlert])
 
-  const handleAddVariation = (variationAdded: VariationType[]) => {
+  const handleAddVariation = (variationAdded: VariationType[]): void => {
     const last: VariationType | undefined = getLast(variationAdded)
 
     if (last) {
@@ -60,12 +59,12 @@ const AddVariations = ({
         (err) => {
           const { message } = err
           setAlert({ type: 'error', message })
-        },
+        }
       )
     }
   }
 
-  const handleRemoveVariation = (variationRemoved: VariationType) => {
+  const handleRemoveVariation = (variationRemoved: VariationType): void => {
     deleteVariation(variationRemoved?.id ?? '').then(
       () => {
         const newarr = variations.filter((item) => item.name !== variationRemoved.name)
@@ -74,23 +73,22 @@ const AddVariations = ({
       (err) => {
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }
 
-  const handleAddToData = (variationAddForm: VariationType) => {
+  const handleAddToData = (variationAddForm: VariationType): void => {
     const newarr = [...data, variationAddForm]
     setData(newarr)
   }
 
-  const handleDeleteToData = (variationRemoveForm: VariationType) => {
+  const handleDeleteToData = (variationRemoveForm: VariationType): void => {
     const newarr = data.filter((item) => item.name !== variationRemoveForm.name)
     setData(newarr)
   }
 
   useEffect(() => {
     getAllVariations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -128,7 +126,7 @@ const AddVariations = ({
                     key={`chip-${indexVariation}`}
                     label={variation?.name}
                     variant="outlined"
-                    onDelete={() => handleDeleteToData(variation)}
+                    onDelete={() => { handleDeleteToData(variation) }}
                     deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}
                   />
                 ))}

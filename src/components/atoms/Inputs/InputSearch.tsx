@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  FormControl, IconButton, InputAdornment, OutlinedInput,
+  FormControl, IconButton, InputAdornment, OutlinedInput
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
@@ -11,18 +11,17 @@ const useStyles = makeStyles(() => ({
     borderRadius: 30,
     paddingLeft: 23,
     '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#e7e5e5d9',
-    },
-  },
+      borderColor: '#e7e5e5d9'
+    }
+  }
 }))
 
 interface IProps {
   placeholder: string
-  // eslint-disable-next-line no-unused-vars
   onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }
 
-const InputSearch = ({ placeholder, onChange }: IProps) => {
+const InputSearch = ({ placeholder, onChange }: IProps): React.JSX.Element => {
   const classes = useStyles()
 
   return (

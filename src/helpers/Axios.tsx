@@ -6,20 +6,20 @@ import useSecurity from '~/shared/hooks/useSecurity'
 axios.defaults.baseURL = 'http://localhost:3001/'
 
 interface IProps {
-  handleShowLoading: (loading: boolean) => void,
-  onStopRequest: () => void,
-  onStartRequest: () => void,
+  handleShowLoading: (loading: boolean) => void
+  onStopRequest: () => void
+  onStartRequest: () => void
 }
 
-const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startRequest, handleShowLoading }: IProps) => {
+const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startRequest, handleShowLoading }: IProps): React.JSX.Element => {
   const {
     signout,
     getUser,
-    getCredential,
+    getCredential
   } = useSecurity()
   const [count, setCount] = useState(0)
 
-  const catchResponse = (response: any) => {
+  const catchResponse = (response: any): Promise<never> => {
     setCount((current) => current - 1)
     return Promise.reject(response)
   }
@@ -72,8 +72,8 @@ const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startReques
           ...response,
           data: {
             title: `Erro Interno - ${response.status}`,
-            message: 'Contate o administrador do sistema!',
-          },
+            message: 'Contate o administrador do sistema!'
+          }
         }
       }
 

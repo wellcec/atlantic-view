@@ -1,25 +1,25 @@
 import { DEFAULT_THEME } from '../../constants'
 
 interface Pallete {
-  mode: string,
+  mode: string
   primary: {
     main: string
-  },
+  }
   secondary: {
     main: string
     contrastText: string
     button: string
-  },
+  }
   background: {
     main: string
     container: string
-  },
+  }
   info: {
     light: string
     main: string
     secondary: string
     dark: string
-  },
+  }
   text: {
     main: string
     light: string
@@ -28,16 +28,16 @@ interface Pallete {
     tertiary: string
     quaternary: string
     quintenary: string
-  },
+  }
   danger: {
     main: string
-  },
+  }
   error: {
     main: string
-  },
+  }
   active: {
     main: string
-  },
+  }
   success: {
     main: string
   }
@@ -46,22 +46,22 @@ interface Pallete {
 const colors: Pallete = {
   mode: 'light',
   primary: {
-    main: DEFAULT_THEME.primary,
+    main: DEFAULT_THEME.primary
   },
   secondary: {
     main: '#EFEFEF',
     contrastText: '#8B7676',
-    button: '#1657d3',
+    button: '#1657d3'
   },
   background: {
     main: '#fff',
-    container: '#f0f0f9',
+    container: '#f0f0f9'
   },
   info: {
     light: '#ECF8FF',
     main: '#A2EAF3',
     secondary: '#6EDFEE',
-    dark: '#1BD4ED',
+    dark: '#1BD4ED'
   },
   text: {
     main: '#0B2049',
@@ -70,20 +70,20 @@ const colors: Pallete = {
     secondary: '#B1B3C9',
     tertiary: '#808080d9',
     quaternary: '#3F4159',
-    quintenary: '#4368AD',
+    quintenary: '#4368AD'
   },
   danger: {
-    main: '#FFC654',
+    main: '#FFC654'
   },
   error: {
-    main: '#C3284C',
+    main: '#C3284C'
   },
   active: {
-    main: '#19BDDD',
+    main: '#19BDDD'
   },
   success: {
-    main: '#34C575',
-  },
+    main: '#34C575'
+  }
 }
 
 export default colors

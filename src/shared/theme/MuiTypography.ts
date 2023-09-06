@@ -5,7 +5,7 @@ const font = ['Poppins', 'sans-serif'].join(',')
 const textStyle = {
   fontFamily: font,
   fontWeight: 600,
-  color: colors.primary.main,
+  color: colors.primary.main
 }
 
 const typographyConfig = {
@@ -19,20 +19,20 @@ const typographyConfig = {
   subtitle1: {
     fontSize: 20,
     fontWeight: 600,
-    fontFamily: font,
+    fontFamily: font
   },
   subtitle2: {
     fontSize: 17,
     fontWeight: 300,
-    fontFamily: font,
+    fontFamily: font
   },
   body1: {
-    fontSize: 14,
+    fontSize: 14
   },
   body2: {
-    fontSize: 13,
+    fontSize: 13
     // fontSize: window.innerWidth < 1600 ? '.75rem' : '.85rem',
-  },
+  }
 }
 
 export default typographyConfig

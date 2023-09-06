@@ -5,12 +5,12 @@ import makeStyles from '@mui/styles/makeStyles'
 const useStyles = makeStyles(() => ({
   divider: {
     '&.MuiDivider-root::before': {
-      width: 0,
+      width: 0
     },
     '& span.MuiDivider-wrapper': {
-      paddingLeft: 0,
-    },
-  },
+      paddingLeft: 0
+    }
+  }
 }))
 
 interface IProps {
@@ -18,7 +18,7 @@ interface IProps {
   hasControl?: boolean
 }
 
-const Divider = ({ title, hasControl }: IProps) => {
+const Divider = ({ title, hasControl }: IProps): React.JSX.Element => {
   const classes = useStyles()
 
   return (
@@ -29,8 +29,8 @@ const Divider = ({ title, hasControl }: IProps) => {
       className={classes.divider}
       sx={{
         '&.MuiDivider-root::after': {
-          width: '98%',
-        },
+          width: '98%'
+        }
       }}
       style={{ width: hasControl ? '92%' : '98%' }}
     >
@@ -39,10 +39,6 @@ const Divider = ({ title, hasControl }: IProps) => {
       </Typography>
     </ComponentDivider>
   )
-}
-
-Divider.defaultProps = {
-  hasControl: false,
 }
 
 export default Divider

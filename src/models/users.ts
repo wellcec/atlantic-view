@@ -1,10 +1,10 @@
-import { AxiosResponse } from 'axios'
+import { type AxiosResponse } from 'axios'
 
-export type UserType = {
-  id: string,
-  name: string,
-  document: string,
-  createdDate: Date,
+export interface UserType {
+  id: string
+  name: string
+  document: string
+  createdDate: Date
 }
 
 export interface IGetAllUsersResponse {

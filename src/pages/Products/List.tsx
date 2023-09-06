@@ -11,7 +11,7 @@ import {
   Grid,
   Switch,
   IconButton,
-  Pagination,
+  Pagination
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -23,27 +23,26 @@ import { useAlerts } from '~/shared/alerts/AlertContext'
 import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
 import { IconDelete, IconEdit } from '~/constants/icons'
-import { GetAllProductsType, ProductType, StatusProductType } from '~/models/products'
+import { type GetAllProductsType, type ProductType, type StatusProductType } from '~/models/products'
 import useProductsService from '~/services/useProductsService'
-import { ISampleFilter } from '~/models'
+import { type ISampleFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
-import { useProducts } from './fragments/context'
+import { useProductsContext } from './fragments/context'
 import { DEFAULT_PAGESIZE } from '~/constants'
 
 const useStyles = makeStyles(() => ({
   actions: {
-    justifyContent: 'space-between',
-  },
+    justifyContent: 'space-between'
+  }
 }))
 
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: DEFAULT_PAGESIZE,
+  pageSize: DEFAULT_PAGESIZE
 }
 
-const List = () => {
-  // const [action, setAction] = useState<'create' | 'update'>('create')
+const List = (): React.JSX.Element => {
   const [objToAction, setObjToAction] = useState<ProductType>()
   const [totalProducts, setTotalProducts] = useState<number>(0)
   const [products, setProducts] = useState<ProductType[]>([])
@@ -54,21 +53,21 @@ const List = () => {
 
   const classes = useStyles()
   const { setAlert } = useAlerts()
-  const { setCreating, creating } = useProducts()
-  const { getProducts: getAllProducts, updateStatusProduct, deleteProduct } = useProductsService()
+  const { mode, setMode, setProduct } = useProductsContext()
+  const { getProducts: getAllProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
   const { debounceWait } = useDebounce()
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, product: ProductType) => {
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, product: ProductType): void => {
     setAnchorEl(event.currentTarget)
     setObjToAction(product)
   }
 
-  const handleChangePage = (_: React.ChangeEvent<unknown>, page: number) => {
+  const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
     setFilter({ ...filter, page })
   }
 
   const getProducts = useCallback((newFilter?: ISampleFilter) => {
-    getAllProducts(newFilter || filter).then(
+    getAllProducts(newFilter ?? filter).then(
       (response: GetAllProductsType) => {
         const { data = [], count } = response.data ?? {}
         setProducts(data)
@@ -79,58 +78,58 @@ const List = () => {
         setTotalProducts(0)
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }, [filter, getAllProducts, setAlert])
 
-  const handleCloseMenu = () => {
+  const handleCloseMenu = (): void => {
     setAnchorEl(null)
     setObjToAction(undefined)
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (): void => {
     setAnchorEl(null)
     setConfirmatioOpen(true)
   }
 
-  const handleCloseDelete = () => {
+  const handleCloseDelete = (): void => {
     setConfirmatioOpen(false)
   }
 
-  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { value } = event.target
     const newFilter = { ...filter, term: value }
     setFilter(newFilter)
 
-    debounceWait(() => getProducts(newFilter))
+    debounceWait(() => { getProducts(newFilter) })
   }
 
-  const handleUpdateStatus = (index: number, id: string, status: StatusProductType) => {
+  const handleUpdateStatus = (index: number, id: string, status: StatusProductType): void => {
     products[index].status = {
       ...products[index].status,
-      ...status,
+      ...status
     }
 
     setProducts([...products])
     updateStatusProduct(id, status).then(
       () => { },
       (err) => {
-        const { message } = err?.data
+        const { message } = err?.data ?? {}
         setAlert({ type: 'warning', message })
-      },
+      }
     )
   }
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     deleteProduct(objToAction?.id ?? '').then(
       () => {
         getProducts()
         setAlert({ type: 'success', message: 'Produto excluído com sucesso.' })
       },
       (err) => {
-        const { message } = err?.data
-        setAlert({ type: 'warning', message })
-      },
+        const { message } = err?.data ?? {}
+        setAlert({ type: 'error', message })
+      }
     ).finally(() => {
       setConfirmatioOpen(false)
       setAnchorEl(null)
@@ -138,13 +137,28 @@ const List = () => {
     })
   }
 
+  const handleEdit = (id: string): void => {
+    getProductById(id).then(
+      (response) => {
+        setProduct(response?.data ?? undefined)
+        setMode('update')
+      },
+      (err) => {
+        const { message } = err?.data ?? {}
+        setAlert({ type: 'error', message })
+      }
+    )
+  }
+
   useEffect(() => {
     getProducts(filter)
   }, [filter.page])
 
   useEffect(() => {
-    getProducts()
-  }, [creating])
+    if (mode === 'list') {
+      getProducts()
+    }
+  }, [mode])
 
   return (
     <>
@@ -157,7 +171,7 @@ const List = () => {
               </Box>
 
               <Box>
-                <Button variant="contained" color="success" onClick={() => setCreating(true)}>
+                <Button variant="contained" color="success" onClick={() => { setMode('create') }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Box>
                       <AddIcon />
@@ -187,9 +201,10 @@ const List = () => {
               <Grid item xs={12} md={4} lg={3} key={`products-${index}`}>
                 <Card>
                   <CardMedia
-                    sx={{ height: 200 }}
+                    sx={{ height: 200, cursor: 'pointer' }}
                     image={`images/${product.images[0].fileName}`}
                     title={product.title}
+                    onClick={() => { handleEdit(product.id) }}
                   />
 
                   <CardContent>
@@ -210,7 +225,7 @@ const List = () => {
                         <Switch
                           size="small"
                           checked={product?.status?.isActive ?? false}
-                          onChange={(_, checked: boolean) => handleUpdateStatus(index, product.id, { isActive: checked })}
+                          onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isActive: checked }) }}
                         />
                       </Box>
 
@@ -221,13 +236,13 @@ const List = () => {
                         <Switch
                           size="small"
                           checked={product?.status?.isHighlighted ?? false}
-                          onChange={(_, checked: boolean) => handleUpdateStatus(index, product.id, { isHighlighted: checked })}
+                          onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isHighlighted: checked }) }}
                         />
                       </Box>
                     </Box>
 
                     <Box>
-                      <IconButton onClick={(event) => handleOpenMenu(event, product)}>
+                      <IconButton onClick={(event) => { handleOpenMenu(event, product) }}>
                         <MoreVertIcon color="primary" />
                       </IconButton>
                     </Box>

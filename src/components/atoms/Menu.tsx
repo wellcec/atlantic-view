@@ -1,15 +1,15 @@
-import React, { PropsWithChildren } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import {
-  Menu as ComponentMenu, Theme,
+  Menu as ComponentMenu, type Theme
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
 const useStyles = makeStyles((theme: Theme) => ({
   menu: {
     '& .MuiPaper-root': {
-      boxShadow: theme.shadows[8],
-    },
-  },
+      boxShadow: theme.shadows[8]
+    }
+  }
 }))
 
 interface IProps {
@@ -19,8 +19,8 @@ interface IProps {
 }
 
 const Menu = ({
-  open, anchorEl, handleCloseMenu, children,
-}: PropsWithChildren<IProps>) => {
+  open, anchorEl, handleCloseMenu, children
+}: PropsWithChildren<IProps>): React.JSX.Element => {
   const classes = useStyles()
 
   return (

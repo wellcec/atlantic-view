@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Box, Button, Checkbox, Chip, FormControlLabel, FormGroup,
-  Grid, ImageList, ImageListItem, ImageListItemBar, Typography,
+  Box, Button, Chip,
+  Grid, ImageList, ImageListItem, ImageListItemBar, Typography
 } from '@mui/material'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
@@ -15,11 +15,10 @@ import colors from '~/shared/theme/colors'
 import useTestsForm from '~/shared/hooks/useTestsForm'
 
 import {
-  CreateProductType,
-  ImageType, StatusProductProps, StatusProductType, TagType,
+  type CreateProductType, type ImageType, type StatusProductType, type TagType
 } from 'models/products'
-import { CategoryType } from '~/models/categories'
-import { VariationType } from '~/models/variations'
+import { type CategoryType } from '~/models/categories'
+import { type VariationType } from '~/models/variations'
 
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import AddChips from '~/components/molecules/AddChips'
@@ -36,8 +35,9 @@ import useUtils from '~/shared/hooks/useUtils'
 import Images from './Images'
 import FormProduct from './FormProduct'
 import ChipsCategories from './ChipsCategories'
-import { useProducts } from '../fragments/context'
+import { useProductsContext } from '../fragments/context'
 import { ShippingKeys } from '../fragments/constants'
+import FormStatus from './FormStatus'
 
 const {
   firstInfo: firstInfoKey,
@@ -45,22 +45,22 @@ const {
   categories: categoriesKey,
   tags: tagsKey,
   variations: variationsKey,
-  status: statusKey,
+  status: statusKey
 } = NEW_PRODUCT_KEYS
 
 const useStyles = makeStyles(() => ({
   img: {
-    borderRadius: 5,
+    borderRadius: 5
   },
   list: {
     paddingTop: 15,
     paddingRight: 15,
-    marginTop: 0,
+    marginTop: 0
   },
   imageBar: {
     background: 'inherit !important',
-    padding: 8,
-  },
+    padding: 8
+  }
 }))
 
 const DEFAULT_VALUES = {
@@ -68,14 +68,14 @@ const DEFAULT_VALUES = {
   subtitle: '',
   value: 'R$ 0,00',
   valueUnique: 'R$ 0,00',
-  weight: '',
-  height: '',
-  length: '',
-  width: '',
-  shipping: ShippingKeys.correios,
+  weight: 0,
+  height: 0,
+  length: 0,
+  width: 0,
+  shipping: ShippingKeys.correios
 }
 
-const New = () => {
+const New = (): React.JSX.Element => {
   const [panelAccordion, setPanelAccordion] = useState(firstInfoKey)
   const [allExpanded, setAllExpanded] = useState(true)
   const [tags, setTags] = useState<TagType[]>([])
@@ -89,16 +89,15 @@ const New = () => {
     isLaunch: false,
     isSale: false,
     isBestSeller: false,
-    isPreOrder: false,
+    isPreOrder: false
   })
 
   const classes = useStyles()
-
   const { setAlert } = useAlerts()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { getAllImages, deleteImageById, createProduct } = useProductsService()
-  const { setCreating } = useProducts()
-  const { formatCurrentRequest } = useUtils()
+  const { getAllImages, deleteImageById, createProduct, updateProduct } = useProductsService()
+  const { mode, setMode, product, setProduct } = useProductsContext()
+  const { formatCurrencyRequest, formatFormCurrency, formatNumber } = useUtils()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -113,8 +112,8 @@ const New = () => {
       width: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       shipping: Yup.string().required(PREENCHIMENTO_OBRIGATORIO).test({
         test: (v) => (v === ShippingKeys.free || v === ShippingKeys.correios),
-        message: 'Tipo de frete inválido',
-      }),
+        message: 'Tipo de frete inválido'
+      })
     }),
     validateOnBlur: true,
     validateOnChange: true,
@@ -126,26 +125,41 @@ const New = () => {
         variations,
         tags,
         images,
-        value: formatCurrentRequest(data.value),
-        valueUnique: formatCurrentRequest(data.valueUnique),
+        value: formatCurrencyRequest(data.value),
+        valueUnique: formatCurrencyRequest(data.valueUnique)
       }
 
-      createProduct(payload).then(
-        () => {
-          setCreating(false)
-          setAlert({ type: 'success', message: 'Produto criado com sucesso.' })
-        },
-        (err) => {
-          const { message } = err
-          setAlert({ type: 'error', message })
-        },
-      )
-    },
+      if (mode === 'create') {
+        createProduct(payload).then(
+          () => {
+            setMode('list')
+            setAlert({ type: 'success', message: 'Produto criado com sucesso.' })
+          },
+          (err) => {
+            const { message } = err
+            setAlert({ type: 'error', message })
+          }
+        )
+      }
+
+      if (mode === 'update' && product) {
+        updateProduct(product?.id, payload).then(
+          () => {
+            setMode('list')
+            setAlert({ type: 'success', message: 'Produto atualizado com sucesso.' })
+          },
+          (err) => {
+            const { message } = err
+            setAlert({ type: 'error', message })
+          }
+        )
+      }
+    }
   })
 
   const { title: titleProduct } = formik?.values ?? {}
 
-  const handleChangeAccordion = (key: string) => {
+  const handleChangeAccordion = (key: string): void => {
     if (key === panelAccordion) {
       setPanelAccordion('')
       return
@@ -153,14 +167,9 @@ const New = () => {
     setPanelAccordion(key)
   }
 
-  const getExpanded = (key: string) => allExpanded || panelAccordion === key
+  const getExpanded = (key: string): boolean => allExpanded || panelAccordion === key
 
-  const handleChangeStatus = (checked: boolean, prop: StatusProductProps) => {
-    statusProduct[prop] = checked
-    setStatusProduct(statusProduct)
-  }
-
-  const handleAddImages = () => {
+  const handleAddImages = (): void => {
     if (titleProduct && titleProduct !== '') {
       setOpenAddImages(!openAddImages)
     } else {
@@ -177,10 +186,13 @@ const New = () => {
       (err) => {
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getAllImages, setAlert])
+
+  const onCreateImage = (image: ImageType): void => {
+    setImages([...images, image])
+  }
 
   const deleteImage = useCallback((id: string) => {
     deleteImageById(id).then(
@@ -190,18 +202,60 @@ const New = () => {
       (err) => {
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }, [deleteImageById, getImages, setAlert])
 
   useEffect(() => {
-    getImages()
-  }, [getImages])
+    if (mode === 'create') {
+      getImages()
+    }
+  }, [getImages, mode])
+
+  useEffect(() => {
+    if (product) {
+      const {
+        title,
+        subtitle,
+        height,
+        length,
+        status,
+        value,
+        valueUnique,
+        weight,
+        width,
+        tags = [],
+        images = [],
+        categories = [],
+        variations = []
+      } = product || {}
+
+      formik.setFieldValue('title', title)
+      formik.setFieldValue('subtitle', subtitle)
+      formik.setFieldValue('height', height)
+      formik.setFieldValue('length', length)
+      formik.setFieldValue('value', formatFormCurrency(formatNumber(value, 'float')))
+      formik.setFieldValue('valueUnique', formatFormCurrency(formatNumber(valueUnique, 'float')))
+      formik.setFieldValue('width', width)
+      formik.setFieldValue('weight', weight)
+
+      setCategories(categories)
+      setImages(images)
+      setStatusProduct({
+        isBestSeller: status.isBestSeller,
+        isLaunch: status.isLaunch,
+        isPreOrder: status.isPreOrder,
+        isSale: status.isSale
+      })
+      setTags(tags)
+      setVariations(variations)
+    }
+  }, [product])
 
   return (
-    <Container title="Novo produto">
+    <Container title={mode === 'create' ? 'Novo produto' : 'Editar produto'}>
       <Box display="flex" justifyContent="end">
-        <Button variant="text" onClick={() => setAllExpanded(!allExpanded)}>
+        <Button variant="text" onClick={() => { setAllExpanded(!allExpanded) }}>
           <Box display="flex" alignItems="center" gap={2} mx={1.5}>
             <Typography variant="body2" color="primary">
               Expandir todos
@@ -214,22 +268,15 @@ const New = () => {
       </Box>
 
       <Box>
-        <Accordion open={getExpanded(firstInfoKey)} title="Primeiras informações" onChange={() => handleChangeAccordion(firstInfoKey)}>
+        <Accordion open={getExpanded(firstInfoKey)} title="Primeiras informações" onChange={() => { handleChangeAccordion(firstInfoKey) }}>
           <FormProduct hasImages={images.length > 0} parentFormik={formik} />
         </Accordion>
 
-        <Accordion open={getExpanded(statusKey)} title="Status" onChange={() => handleChangeAccordion(statusKey)}>
-          <FormGroup>
-            <Box display="flex" flexWrap="wrap" justifyContent="center">
-              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isLaunch')} />} label="Lançamento" />
-              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isSale')} />} label="Promoção" />
-              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isBestSeller')} />} label="Mais Vendidos" />
-              <FormControlLabel control={<Checkbox onChange={(_, checked) => handleChangeStatus(checked, 'isPreOrder')} />} label="Pré-venda" />
-            </Box>
-          </FormGroup>
+        <Accordion open={getExpanded(statusKey)} title="Status" onChange={() => { handleChangeAccordion(statusKey) }}>
+          <FormStatus statusProduct={statusProduct} setStatusProduct={setStatusProduct} />
         </Accordion>
 
-        <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => handleChangeAccordion(imagesKey)}>
+        <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => { handleChangeAccordion(imagesKey) }}>
           <Box display="flex">
             <Box width={1} mt={0} mx={2}>
               <ImageList variant="masonry" cols={4} gap={10} className={classes.list}>
@@ -247,7 +294,7 @@ const New = () => {
                     <ImageListItemBar
                       className={classes.imageBar}
                       actionIcon={
-                        <ButtonRemove title="Remover imagem" onClick={() => deleteImage(img.id)} />
+                        <ButtonRemove title="Remover imagem" onClick={() => { deleteImage(img.id) }} />
                       }
                     />
                   </ImageListItem>
@@ -266,12 +313,12 @@ const New = () => {
             open={openAddImages}
             lengthImages={images?.length ?? 0}
             titleProduct={titleProduct}
-            callback={getImages}
-            handleClose={() => setOpenAddImages(!openAddImages)}
+            onCreateImage={onCreateImage}
+            handleClose={() => { setOpenAddImages(!openAddImages) }}
           />
         )}
 
-        <Accordion open={getExpanded(categoriesKey)} title="Categorias" onChange={() => handleChangeAccordion(categoriesKey)}>
+        <Accordion open={getExpanded(categoriesKey)} title="Categorias" onChange={() => { handleChangeAccordion(categoriesKey) }}>
           <Box display="flex">
             <Box width={1}>
               {categories.length === 0 && (<EmptyDataText text="Nenhuma categoria adicionada" />)}
@@ -288,7 +335,7 @@ const New = () => {
             </Box>
 
             <Box display="flex" alignItems="center">
-              <ButtonAdd title="Adicionar categoria" onClick={() => setOpenAddCategories(!openAddCategories)} />
+              <ButtonAdd title="Adicionar categoria" onClick={() => { setOpenAddCategories(!openAddCategories) }} />
             </Box>
           </Box>
         </Accordion>
@@ -298,14 +345,14 @@ const New = () => {
             data={categories}
             setData={setCategories}
             open={openAddCategories}
-            handleClose={() => setOpenAddCategories(!openAddCategories)}
+            handleClose={() => { setOpenAddCategories(!openAddCategories) }}
           />
         )}
 
         <Box>
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
-              <Accordion open={getExpanded(variationsKey) || getExpanded(tagsKey)} title="Variações" onChange={() => handleChangeAccordion(variationsKey)}>
+              <Accordion open={getExpanded(variationsKey) || getExpanded(tagsKey)} title="Variações" onChange={() => { handleChangeAccordion(variationsKey) }}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box width={1}>
                     {variations.length === 0 && (<EmptyDataText text="Nenhuma variação adicionada" />)}
@@ -323,13 +370,13 @@ const New = () => {
                     )}
                   </Box>
 
-                  <ButtonAdd title="Adicionar variação" onClick={() => setOpenAddVariations(!openAddVariations)} />
+                  <ButtonAdd title="Adicionar variação" onClick={() => { setOpenAddVariations(!openAddVariations) }} />
                 </Box>
               </Accordion>
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <Accordion open={getExpanded(tagsKey) || getExpanded(variationsKey)} title="Tags" onChange={() => handleChangeAccordion(tagsKey)}>
+              <Accordion open={getExpanded(tagsKey) || getExpanded(variationsKey)} title="Tags" onChange={() => { handleChangeAccordion(tagsKey) }}>
                 <AddChips text="Nome da tag" titleButton="Adicionar adicionada" data={tags} setData={setTags} />
 
                 {tags.length === 0 && (<EmptyDataText text="Nenhuma tag adicionada" />)}
@@ -344,13 +391,16 @@ const New = () => {
           data={variations}
           setData={setVariations}
           open={openAddVariations}
-          handleClose={() => setOpenAddVariations(!openAddVariations)}
+          handleClose={() => { setOpenAddVariations(!openAddVariations) }}
         />
       )}
 
       <Box display="flex" alignItems="center" justifyContent="end" position="sticky" bottom={8} right={16} pt={4} width="fit-content" ml="auto">
         <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
-          <Button variant="outlined" color="primary" onClick={() => setCreating(false)}>
+          <Button variant="outlined" color="primary" onClick={() => {
+            setProduct(undefined)
+            setMode('list')
+          }}>
             Cancelar
           </Button>
           <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>

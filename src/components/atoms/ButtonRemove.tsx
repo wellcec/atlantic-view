@@ -9,8 +9,8 @@ const useStyles = makeStyles(() => ({
     paddingRight: 12,
     minWidth: 46,
     maxWidth: 46,
-    borderRadius: '50%',
-  },
+    borderRadius: '50%'
+  }
 }))
 
 interface IProps {
@@ -18,7 +18,7 @@ interface IProps {
   onClick: () => void
 }
 
-const ButtonRemove = ({ title, onClick }: IProps) => {
+const ButtonRemove = ({ title, onClick }: IProps): React.JSX.Element => {
   const classes = useStyles()
 
   return (

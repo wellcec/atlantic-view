@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import {
   Box,
   Button,
@@ -6,7 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Typography,
+  Typography
 } from '@mui/material'
 
 interface IProps {
@@ -17,8 +17,8 @@ interface IProps {
 }
 
 const Dialog = ({
-  open, title, handleCloseConfirm, handleDelete, children,
-}: PropsWithChildren<IProps>) => (
+  open, title, handleCloseConfirm, handleDelete, children
+}: PropsWithChildren<IProps>): React.JSX.Element => (
   <ComponentDialog
     keepMounted
     open={open}

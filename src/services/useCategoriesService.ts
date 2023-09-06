@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import axios from 'axios'
-import { CategoryType, IGetAllCategoriesResponse } from 'models/categories'
-import { ISampleFilter, ISuccessResponse } from 'models'
+import { type CategoryType, type IGetAllCategoriesResponse } from 'models/categories'
+import { type ISampleFilter, type ISuccessResponse } from 'models'
 
 const useCategoriesService = () => {
   const getCategories = useCallback((filter: ISampleFilter) => axios
@@ -17,7 +17,7 @@ const useCategoriesService = () => {
     getCategories,
     createCategory,
     updateCategory,
-    deleteCategory,
+    deleteCategory
   }
 }
 

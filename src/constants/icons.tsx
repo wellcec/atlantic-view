@@ -1,4 +1,3 @@
-/* eslint-disable react/require-default-props */
 import React from 'react'
 import SVG from 'react-inlinesvg'
 
@@ -19,34 +18,34 @@ interface IColor {
   color?: string
 }
 
-export const IconEdit = ({ color = colors.primary.main }: IColor) => (
+export const IconEdit = ({ color = colors.primary.main }: IColor): React.JSX.Element => (
   <SVG src={iconEdit} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconDelete = ({ color = colors.error.main }: IColor) => (
+export const IconDelete = ({ color = colors.error.main }: IColor): React.JSX.Element => (
   <SVG src={iconDelete} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconSearch = ({ color = colors.text.quaternary }: IColor) => (
+export const IconSearch = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconSearch} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconDoubleArrowDown = ({ color = colors.text.quaternary }: IColor) => (
+export const IconDoubleArrowDown = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconDoubleArrowDown} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconSingleArrowDownCircule = ({ color = colors.text.quaternary }: IColor) => (
+export const IconSingleArrowDownCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconSingleArrowDownCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconSingleArrowUpCircule = ({ color = colors.text.quaternary }: IColor) => (
+export const IconSingleArrowUpCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconSingleArrowUpCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconCheckCircule = ({ color = colors.text.quaternary }: IColor) => (
+export const IconCheckCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconCheckCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
-export const IconUpload = ({ color = colors.text.quaternary }: IColor) => (
+export const IconUpload = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconUpload} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )

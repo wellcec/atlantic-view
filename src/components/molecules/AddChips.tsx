@@ -3,7 +3,7 @@ import { Box, Chip } from '@mui/material'
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
 import { IconDelete } from '~/constants/icons'
-import { VariationType } from '~/models/variations'
+import { type VariationType } from '~/models/variations'
 
 interface IProps {
   text: string
@@ -15,14 +15,14 @@ interface IProps {
 }
 
 const AddChips = ({
-  text, data, setData, titleButton, action = () => { }, actionDelete,
-}: IProps) => {
+  text, data, setData, titleButton, action = () => { }, actionDelete
+}: IProps): React.JSX.Element => {
   const [field, setField] = useState<string>('')
 
-  const handleAddItem = () => {
+  const handleAddItem = (): void => {
     if (field !== '') {
       const newarr = [...data, {
-        name: field,
+        name: field
       }]
 
       setData(newarr)
@@ -30,13 +30,13 @@ const AddChips = ({
     }
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === 'Enter') {
       handleAddItem()
     }
   }
 
-  const handleDeleteItem = (obj: any) => {
+  const handleDeleteItem = (obj: any): void => {
     const newarr = data.filter((item) => item.name !== obj.name)
     setData(newarr)
   }
@@ -63,8 +63,8 @@ const AddChips = ({
             key={`chip-${index}`}
             label={item?.name}
             variant="outlined"
-            onClick={() => action(item)}
-            onDelete={() => (actionDelete ? actionDelete(item) : handleDeleteItem(item))}
+            onClick={() => { action(item) }}
+            onDelete={() => { actionDelete ? actionDelete(item) : handleDeleteItem(item) }}
             deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}
           />
         ))}
@@ -75,7 +75,7 @@ const AddChips = ({
 
 AddChips.defaultProps = {
   action: () => { },
-  actionDelete: undefined,
+  actionDelete: undefined
 }
 
 export default AddChips

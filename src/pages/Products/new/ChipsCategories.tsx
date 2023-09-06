@@ -3,7 +3,7 @@ import colors from '~/shared/theme/colors'
 import { Box, Chip, Typography } from '@mui/material'
 import { IconDelete } from '~/constants/icons'
 import makeStyles from '@mui/styles/makeStyles'
-import { CategoryType, SubCategoryType } from '~/models/categories'
+import { type CategoryType, type SubCategoryType } from '~/models/categories'
 
 const useStyles = makeStyles(() => ({
   selectedCategories: {
@@ -11,9 +11,9 @@ const useStyles = makeStyles(() => ({
     border: `1px solid ${colors.text.light}`,
     borderRadius: '20px',
     '& .MuiTypography-root': {
-      padding: '0px 10px 10px 10px',
-    },
-  },
+      padding: '0px 10px 10px 10px'
+    }
+  }
 }))
 
 interface IProps {
@@ -21,7 +21,7 @@ interface IProps {
   handleRemove?: (cat: CategoryType, subCat: SubCategoryType) => void
 }
 
-const ChipsCategories = ({ category, handleRemove }: IProps) => {
+const ChipsCategories = ({ category, handleRemove }: IProps): React.JSX.Element => {
   const classes = useStyles()
 
   return (
@@ -36,7 +36,7 @@ const ChipsCategories = ({ category, handleRemove }: IProps) => {
             key={`chip-subCategories-${indexSubCat}`}
             label={subCat?.name}
             variant="outlined"
-            onDelete={handleRemove ? () => handleRemove(category, subCat) : () => { }}
+            onDelete={handleRemove ? () => { handleRemove(category, subCat) } : () => { }}
             deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}
           />
         ))}
@@ -46,7 +46,7 @@ const ChipsCategories = ({ category, handleRemove }: IProps) => {
 }
 
 ChipsCategories.defaultProps = {
-  handleRemove: null,
+  handleRemove: null
 }
 
 export default ChipsCategories

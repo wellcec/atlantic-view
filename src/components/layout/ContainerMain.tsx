@@ -1,6 +1,6 @@
-import React, { PropsWithChildren } from 'react'
+import React, { type PropsWithChildren } from 'react'
 import {
-  Typography, Box,
+  Typography, Box
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 import Paper from './Paper'
@@ -11,16 +11,16 @@ const useStyles = makeStyles(() => ({
     boxSizing: 'border-box',
     maxHeight: '100%',
     height: '100%',
-    position: 'relative',
-  },
+    position: 'relative'
+  }
 }))
 
 interface IProps {
-  title: string,
+  title: string
   fullCard?: boolean
 }
 
-const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>) => {
+const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>): React.JSX.Element => {
   const classes = useStyles()
 
   return (
@@ -45,7 +45,7 @@ const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>)
 }
 
 ContainerMain.defaultProps = {
-  fullCard: true,
+  fullCard: true
 }
 
 export default ContainerMain

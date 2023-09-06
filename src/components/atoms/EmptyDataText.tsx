@@ -5,7 +5,7 @@ interface IProps {
   text: string
 }
 
-const EmptyDataText = ({ text }: IProps) => (
+const EmptyDataText = ({ text }: IProps): React.JSX.Element => (
   <Box width={1} textAlign="center">
     <Typography variant="body2" color="primary">
       <i>{text}</i>

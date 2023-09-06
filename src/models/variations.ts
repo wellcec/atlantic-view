@@ -1,9 +1,9 @@
-import { AxiosResponse } from 'axios'
+import { type AxiosResponse } from 'axios'
 
-export type VariationType = {
-  id?: string,
-  name: string,
-  createdDate?: Date,
+export interface VariationType {
+  id?: string
+  name: string
+  createdDate?: Date
 }
 
 export interface IGetAllVariationsResponse {

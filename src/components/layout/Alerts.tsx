@@ -7,11 +7,11 @@ import { isEmpty } from 'lodash'
 
 import { useAlerts } from '~/shared/alerts/AlertContext'
 
-const Alerts = () => {
+const Alerts = (): React.JSX.Element => {
   const [open, setOpen] = useState<boolean>(false)
   const { alert, setAlert } = useAlerts()
 
-  const handleClose = (_?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_?: React.SyntheticEvent | Event, reason?: string): void => {
     if (reason === 'clickaway') {
       return
     }

@@ -19,8 +19,8 @@ const useStyles = makeStyles(() => ({
     top: 0,
     width: '100%',
     zIndex: 2000,
-    background: '#ffffff7d',
-  },
+    background: '#ffffff7d'
+  }
 }))
 
 const emitter = new EventEmitter()
@@ -31,11 +31,11 @@ const LOADER_ENABLE = 'loader.enable'
 const LOADER_DISABLE = 'loader.disable'
 
 interface IProps {
-  show: boolean,
+  show: boolean
   setLoading: (loading: boolean) => void
 }
 
-const Loader = ({ show, setLoading }: IProps) => {
+const Loader = ({ show, setLoading }: IProps): React.JSX.Element | boolean => {
   const classes = useStyles()
   const [disabled, setDisabled] = useState<number>(0)
   const [showByEvent, setShowByEvent] = useState<boolean>(false)
@@ -50,23 +50,23 @@ const Loader = ({ show, setLoading }: IProps) => {
   ), [])
 
   useEffect(() => {
-    const showLoader = () => {
+    const showLoader = (): void => {
       setShowByEvent(true)
     }
 
     emitter.on(LOADER_SHOW, showLoader)
 
-    const hideLoader = () => setShowByEvent(false)
+    const hideLoader = (): void => { setShowByEvent(false) }
     emitter.on(LOADER_HIDE, hideLoader)
 
-    const enableLoader = () => {
+    const enableLoader = (): void => {
       setLoading(false)
       setDisabled((count) => (count > 0 ? count - 1 : 0))
     }
 
     emitter.on(LOADER_ENABLE, enableLoader)
 
-    const disableLoader = () => setDisabled((count) => ++count)
+    const disableLoader = (): void => { setDisabled((count) => ++count) }
     emitter.on(LOADER_DISABLE, disableLoader)
 
     return () => {
@@ -75,7 +75,6 @@ const Loader = ({ show, setLoading }: IProps) => {
       emitter.removeListener(LOADER_ENABLE, enableLoader)
       emitter.removeListener(LOADER_DISABLE, disableLoader)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

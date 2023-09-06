@@ -3,11 +3,11 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles'
 
 import { createTheme } from '~/shared/theme'
 
-const AppTheme = ({ children }: { children: React.ReactNode }) => {
+const AppTheme = ({ children }: { children: React.ReactNode }): React.JSX.Element => {
   const theme = useMemo(() => createTheme(), [])
 
   useEffect(() => {
-    const appTheme = (event: any) => {
+    const appTheme = (event: any): void => {
       const { resolve } = event.detail
       resolve(theme)
     }

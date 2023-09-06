@@ -1,26 +1,26 @@
 import React, { useContext } from 'react'
-import { IProductsContext } from 'models/products'
+import { type IProductsContext } from 'models/products'
 
 const productsContext = React.createContext<IProductsContext>({
-  creating: false,
-  setCreating: () => { },
+  mode: 'create',
+  setMode: () => { },
   product: undefined,
-  setProduct: () => { },
+  setProduct: () => { }
 })
 
-export const useProducts = () => {
+export const useProductsContext = (): IProductsContext => {
   const {
-    creating,
-    setCreating,
+    mode,
+    setMode,
     product,
-    setProduct,
+    setProduct
   } = useContext(productsContext)
 
   return {
-    creating,
-    setCreating,
+    mode,
+    setMode,
     product,
-    setProduct,
+    setProduct
   }
 }
 

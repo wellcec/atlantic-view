@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Box, Grid, IconButton, Typography,
+  Box, Grid, IconButton, Typography
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
@@ -8,20 +8,20 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import colors from '~/shared/theme/colors'
 import Container from '~/components/layout/ContainerMain'
 import useUsersService from '~/services/useUsersService'
-import { UserType, GetAllUsersType } from '~/models/users'
+import { type UserType, type GetAllUsersType } from '~/models/users'
 import Paper from '~/components/layout/Paper'
 
 const useStyles = makeStyles(() => ({
   item: {
-    borderBottom: `1px solid ${colors.text.light}`,
+    borderBottom: `1px solid ${colors.text.light}`
   },
   paperList: {
     width: '100%',
-    overflow: 'auto',
-  },
+    overflow: 'auto'
+  }
 }))
 
-const Users = () => {
+const Users = (): React.JSX.Element => {
   const [users, setUsers] = useState<UserType[]>([])
 
   const classes = useStyles()
@@ -36,9 +36,8 @@ const Users = () => {
       },
       () => {
         // alert(error)
-      },
+      }
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

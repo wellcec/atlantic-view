@@ -1,16 +1,16 @@
-import { AxiosResponse } from 'axios'
+import { type AxiosResponse } from 'axios'
 
-export type SubCategoryType = {
-  id?: string,
-  name: string,
-  createdDate?: Date,
+export interface SubCategoryType {
+  id?: string
+  name: string
+  createdDate?: Date
 }
 
-export type CategoryType = {
-  id?: string,
-  name: string,
-  subCategories: SubCategoryType[],
-  createdDate?: Date,
+export interface CategoryType {
+  id?: string
+  name: string
+  subCategories: SubCategoryType[]
+  createdDate?: Date
 }
 
 export interface IGetAllCategoriesResponse {

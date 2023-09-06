@@ -5,12 +5,12 @@ import React from 'react'
 const useStyles = makeStyles(() => ({
   input: {
     '& .MuiInputBase-root': {
-      borderRadius: '20px',
-    },
-  },
+      borderRadius: '20px'
+    }
+  }
 }))
 
-const InputHarmonic = ({ ...rest }) => {
+const InputHarmonic = ({ ...rest }): React.JSX.Element => {
   const classes = useStyles()
 
   return (

@@ -8,7 +8,7 @@ import Products from '~/pages/Products'
 import Categories from '~/pages/Categories'
 import WithLayoutRoute from './WithLayoutRoute'
 
-const SwitchRoutes = () => (
+const SwitchRoutes = (): React.JSX.Element => (
   <Routes>
     <Route path="/" element={<WithLayoutRoute layout={BaseLayout} component={Home} />} />
     <Route path="/home" element={<WithLayoutRoute layout={BaseLayout} component={Home} />} />

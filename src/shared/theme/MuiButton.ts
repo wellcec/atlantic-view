@@ -6,9 +6,9 @@ export const buttonStyle = {
   lineHeight: '14px',
   padding: '9px 30px',
   minHeight: 45,
-  maxHeight: 45,
+  maxHeight: 45
 }
 export const buttonPrimaryStyle = {
   ...buttonStyle,
-  boxShadow: '0px 3px 6px #00000029',
+  boxShadow: '0px 3px 6px #00000029'
 }

@@ -5,7 +5,7 @@ interface IProps {
   component: React.FunctionComponent<any>
 }
 
-const WithLayoutRoute = (props: IProps) => {
+const WithLayoutRoute = (props: IProps): React.JSX.Element => {
   const { layout: Layout, component: Component } = props
 
   return (

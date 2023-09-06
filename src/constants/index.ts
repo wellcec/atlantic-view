@@ -1,8 +1,8 @@
-import { IDefaultTheme } from 'models'
+import { type IDefaultTheme } from 'models'
 
 export const DEFAULT_THEME: IDefaultTheme = {
   id: 'default',
-  primary: '#4d4cac',
+  primary: '#4d4cac'
 }
 
 export const NEW_PRODUCT_KEYS = {
@@ -11,7 +11,7 @@ export const NEW_PRODUCT_KEYS = {
   categories: 'categories',
   variations: 'variations',
   tags: 'tags',
-  status: 'status',
+  status: 'status'
 }
 
 export const DEFAULT_PAGESIZE = 10

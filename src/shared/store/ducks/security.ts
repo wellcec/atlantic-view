@@ -6,20 +6,47 @@ import storage from 'redux-persist/lib/storage'
 
 const INITIAL_STATE = {
   user: {},
-  credential: '',
+  credential: ''
 }
 
 export const Types = {
   USER: 'security/USER',
-  CREDENTIAL: 'security/CREDENTIAL',
+  CREDENTIAL: 'security/CREDENTIAL'
 }
 
-type ActionType = {
-  type: string,
+interface ActionType {
+  type: string
   payload: any
 }
 
-const reducer = (state = INITIAL_STATE, action: ActionType) => {
+interface ISecurityAction {
+  setUser: (user: any) => {
+    type: string
+    payload: {
+      user: any
+    }
+  }
+  setCredential: (credential: string) => {
+    type: string
+    payload: {
+      credential: string
+    }
+  }
+  cleanUser: () => {
+    type: string
+    payload: {
+      user: any
+    }
+  }
+  cleanCredential: () => {
+    type: string
+    payload: {
+      credential: string
+    }
+  }
+}
+
+const reducer = (state = INITIAL_STATE, action: ActionType): any => {
   switch (action.type) {
     case Types.USER: {
       const { user } = action.payload
@@ -43,52 +70,52 @@ const reducer = (state = INITIAL_STATE, action: ActionType) => {
   }
 }
 
-export const useSecurityAction = () => {
+export const useSecurityAction = (): ISecurityAction => {
   const dispatch = useDispatch()
   const setUser = useCallback(
     (user: any) => dispatch({
       type: Types.USER,
-      payload: { user },
+      payload: { user }
     }),
-    [dispatch],
+    [dispatch]
   )
 
   const setCredential = useCallback(
     (credential: string) => dispatch({
       type: Types.CREDENTIAL,
-      payload: { credential },
+      payload: { credential }
     }),
-    [dispatch],
+    [dispatch]
   )
 
   const cleanUser = useCallback(
     () => dispatch({
       type: Types.USER,
-      payload: { user: {} },
+      payload: { user: {} }
     }),
-    [dispatch],
+    [dispatch]
   )
 
   const cleanCredential = useCallback(
     () => dispatch({
       type: Types.CREDENTIAL,
-      payload: { credential: '' },
+      payload: { credential: '' }
     }),
-    [dispatch],
+    [dispatch]
   )
 
   return {
     setUser,
     setCredential,
     cleanUser,
-    cleanCredential,
+    cleanCredential
   }
 }
 
 export default persistReducer(
   {
     key: 'security',
-    storage,
+    storage
   },
-  reducer,
+  reducer
 )

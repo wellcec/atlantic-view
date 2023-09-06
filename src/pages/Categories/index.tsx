@@ -6,7 +6,7 @@ import {
   Button,
   MenuItem,
   Typography,
-  IconButton,
+  IconButton
 } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import AddIcon from '@mui/icons-material/Add'
@@ -14,7 +14,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 import Container from '~/components/layout/ContainerMain'
-import { CategoryType, GetAllCategoriesType, SubCategoryType } from 'models/categories'
+import { type CategoryType, type GetAllCategoriesType, type SubCategoryType } from 'models/categories'
 import Paper from '~/components/layout/Paper'
 import Modal from '~/components/molecules/Modal'
 import Menu from '~/components/atoms/Menu'
@@ -24,7 +24,7 @@ import { useAlerts } from '~/shared/alerts/AlertContext'
 import useDebounce from '~/shared/hooks/useDebounce'
 import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
-import { ISampleFilter } from '~/models'
+import { type ISampleFilter } from '~/models'
 import { IconDelete, IconEdit } from '~/constants/icons'
 import InputForm from '~/components/atoms/Inputs/InputForm'
 import AddChips from '~/components/molecules/AddChips'
@@ -33,16 +33,16 @@ import InputText from '~/components/atoms/Inputs/InputText'
 import { DEFAULT_PAGESIZE } from '~/constants'
 
 const DEFAULT_VALUES = {
-  name: '',
+  name: ''
 }
 
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: DEFAULT_PAGESIZE,
+  pageSize: DEFAULT_PAGESIZE
 }
 
-const Categories = () => {
+const Categories = (): React.JSX.Element => {
   const [action, setAction] = useState<'create' | 'update'>('create')
   const [objToAction, setObjToAction] = useState<CategoryType>()
   const [categories, setCategories] = useState<CategoryType[]>([])
@@ -54,13 +54,13 @@ const Categories = () => {
   const openMenu = Boolean(anchorEl)
 
   const {
-    getCategories, createCategory, updateCategory, deleteCategory: deleteCat,
+    getCategories, createCategory, updateCategory, deleteCategory: deleteCat
   } = useCategoriesService()
   const { setAlert } = useAlerts()
   const { debounceWait } = useDebounce()
 
   const getAllCategories = useCallback((newFilter?: ISampleFilter) => {
-    getCategories(newFilter || filter).then(
+    getCategories(newFilter ?? filter).then(
       (response: GetAllCategoriesType) => {
         const { data = [] } = response.data ?? {}
         setSubCategories([])
@@ -69,7 +69,7 @@ const Categories = () => {
       (err) => {
         const { message } = err
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }, [getCategories, setAlert, filter])
 
@@ -86,14 +86,14 @@ const Categories = () => {
         const { message } = error
         setAnchorEl(null)
         setAlert({ type: 'error', message })
-      },
+      }
     )
   }, [deleteCat, objToAction, getAllCategories, setAlert])
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
     validationSchema: Yup.object({
-      name: Yup.string().required(PREENCHIMENTO_OBRIGATORIO),
+      name: Yup.string().required(PREENCHIMENTO_OBRIGATORIO)
     }),
     validateOnBlur: true,
     validateOnChange: true,
@@ -101,7 +101,7 @@ const Categories = () => {
       if (action === 'create') {
         const category: CategoryType = {
           name: data.name,
-          subCategories,
+          subCategories
         }
 
         createCategory(category).then(
@@ -114,21 +114,21 @@ const Categories = () => {
             const { message } = err
             setAlert({ type: 'error', message })
             setOpenModal(false)
-          },
+          }
         )
       }
 
       if (action === 'update') {
         const category: CategoryType = {
           name: data.name,
-          subCategories,
+          subCategories
         }
 
         updateCategory(objToAction?.id ?? '', category).then(
           () => {
             setAlert({ type: 'success', message: 'Categoria atualizada com sucesso.' })
             setAction('create')
-            setObjToAction(undefined,)
+            setObjToAction(undefined)
             setOpenModal(false)
             getAllCategories()
           },
@@ -136,20 +136,20 @@ const Categories = () => {
             const { message } = err
             setAlert({ type: 'error', message })
             setOpenModal(false)
-          },
+          }
         )
       }
-    },
+    }
   })
 
-  const handleNewCategory = () => {
+  const handleNewCategory = (): void => {
     formik.resetForm()
     setSubCategories([])
     setAction('create')
     setOpenModal(true)
   }
 
-  const handleEditCategory = () => {
+  const handleEditCategory = (): void => {
     const { setValues } = formik
     setValues({ name: objToAction?.name ?? '' })
     setSubCategories(objToAction?.subCategories ?? [])
@@ -158,36 +158,35 @@ const Categories = () => {
     setAction('update')
   }
 
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, obj: CategoryType) => {
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, obj: CategoryType): void => {
     setAnchorEl(event.currentTarget)
     setObjToAction(obj)
   }
 
-  const handleCloseMenu = () => {
+  const handleCloseMenu = (): void => {
     setAnchorEl(null)
     setObjToAction(undefined)
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (): void => {
     setAnchorEl(null)
     setConfirmatioOpen(true)
   }
 
-  const handleCloseDelete = () => {
+  const handleCloseDelete = (): void => {
     setConfirmatioOpen(false)
   }
 
-  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { value } = event.target
     const newFilter = { ...filter, term: value }
     setFilter(newFilter)
 
-    debounceWait(() => getAllCategories(newFilter))
+    debounceWait(() => { getAllCategories(newFilter) })
   }
 
   useEffect(() => {
     getAllCategories()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -241,7 +240,7 @@ const Categories = () => {
                   </Grid>
 
                   <Grid item xs={12} md={4} display="flex" alignItems="flex-end" justifyContent="flex-end">
-                    <IconButton onClick={(event) => handleOpenMenu(event, item)}>
+                    <IconButton onClick={(event) => { handleOpenMenu(event, item) }}>
                       <MoreVertIcon />
                     </IconButton>
                   </Grid>
@@ -285,7 +284,7 @@ const Categories = () => {
         </Dialog>
       )}
 
-      <Modal title={action === 'create' ? 'Nova Categoria' : 'Atualizar Categoria'} open={openModal} handleClose={() => setOpenModal(false)}>
+      <Modal title={action === 'create' ? 'Nova Categoria' : 'Atualizar Categoria'} open={openModal} handleClose={() => { setOpenModal(false) }}>
         <Box minWidth={600} maxWidth={900} mb={3}>
           <Box mb={4}>
             <InputForm fullWidth title="Nome da categoria*" helperText formik={formik} propField="name">
@@ -305,7 +304,7 @@ const Categories = () => {
         </Box>
 
         <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
-          <Button variant="outlined" color="primary" onClick={() => setOpenModal(false)}>
+          <Button variant="outlined" color="primary" onClick={() => { setOpenModal(false) }}>
             Cancelar
           </Button>
           <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>

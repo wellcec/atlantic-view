@@ -1,7 +1,7 @@
-import { InputAdornment, OutlinedInput } from '@mui/material'
 import React from 'react'
+import { InputAdornment, OutlinedInput } from '@mui/material'
 
-const InputSufix = ({ ...rest }) => (
+const InputSufix = ({ ...rest }): React.JSX.Element => (
   <OutlinedInput
     fullWidth
     size="small"

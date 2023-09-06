@@ -1,17 +1,17 @@
 export const ShippingKeys = {
   free: 'free',
-  correios: 'correios',
+  correios: 'correios'
 }
 
 export const ShipingOptions = [
   {
     label: 'Grátis',
-    key: ShippingKeys.free,
+    key: ShippingKeys.free
   },
   {
     label: 'Correios',
-    key: ShippingKeys.correios,
-  },
+    key: ShippingKeys.correios
+  }
 ]
 
 export default ShipingOptions

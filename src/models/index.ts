@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 
 export interface IDefaultTheme {
-  id: string,
+  id: string
   primary: string
 }
 
 export interface IMenuItem {
-  title: string,
-  path: string,
-  icon: any,
+  title: string
+  path: string
+  icon: any
   paths: string[]
 }
 
@@ -21,17 +21,17 @@ export interface INoLoading {
 }
 
 export interface ISampleFilter {
-  term: string,
-  page: number,
+  term: string
+  page: number
   pageSize: number
 }
 
-export type AlertType = {
-  type: 'success' | 'error' | 'warning' | 'info',
-  message: string,
+export interface AlertType {
+  type: 'success' | 'error' | 'warning' | 'info'
+  message: string
 }
 
 export interface IAlerts {
-  alert: AlertType,
+  alert: AlertType
   setAlert: (alert: AlertType) => void
 }

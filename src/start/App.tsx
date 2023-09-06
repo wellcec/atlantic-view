@@ -8,11 +8,11 @@ import SwitchRoutes from '~/routes/SwitchRoutes'
 import AxiosSettings from '~/helpers/Axios'
 import { store, persist } from '~/shared/store'
 import AlertsContext from '~/shared/alerts/AlertContext'
-import { AlertType } from '~/models'
+import { type AlertType } from '~/models'
 import Loader from '~/components/layout/Loader'
 import Alerts from '~/components/layout/Alerts'
 
-const App = () => {
+const App = (): React.JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false)
   const [showLoading, setShowLoading] = useState<boolean>(true)
 
@@ -30,11 +30,11 @@ const App = () => {
               <Alerts />
 
               <AxiosSettings
-                handleShowLoading={(state) => setShowLoading(state)}
+                handleShowLoading={(state) => { setShowLoading(state) }}
                 onStartRequest={() => {
                   if (showLoading) setLoading(true)
                 }}
-                onStopRequest={() => setLoading(false)}
+                onStopRequest={() => { setLoading(false) }}
               />
 
               <SwitchRoutes />

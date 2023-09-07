@@ -20,14 +20,14 @@ interface IProps {
 }
 
 const Paper = ({ children, fullWidth, ...rest }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
-  const fullWidthClass = fullWidth ? classes.fullWidth : ''
+  const fullWidthClass = fullWidth ? styles.fullWidth : ''
   const className = rest?.className ?? ''
   delete rest?.className
 
   return (
-    <PaperCustomer className={`${classes.paper} ${className} ${fullWidthClass}`}>
+    <PaperCustomer className={`${styles.paper} ${className} ${fullWidthClass}`}>
       {children}
     </PaperCustomer>
   )

@@ -22,10 +22,10 @@ interface IProps {
 }
 
 const ChipsCategories = ({ category, handleRemove }: IProps): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
-    <Box className={classes.selectedCategories}>
+    <Box className={styles.selectedCategories}>
       <Typography variant="body2" color="primary" fontWeight={600}>
         {category?.name}
       </Typography>

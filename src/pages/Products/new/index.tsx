@@ -38,6 +38,7 @@ import ChipsCategories from './ChipsCategories'
 import { useProductsContext } from '../fragments/context'
 import { ShippingKeys } from '../fragments/constants'
 import FormStatus from './FormStatus'
+import useError from '~/shared/hooks/useError'
 
 const {
   firstInfo: firstInfoKey,
@@ -92,12 +93,13 @@ const New = (): React.JSX.Element => {
     isPreOrder: false
   })
 
-  const classes = useStyles()
+  const styles = useStyles()
   const { setAlert } = useAlerts()
+  const { showErrorMsg } = useError()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { getAllImages, deleteImageById, createProduct, updateProduct } = useProductsService()
+  const { getAllImages, deleteTempImageById, deleteImageById, createProduct, updateProduct } = useProductsService()
   const { mode, setMode, product, setProduct } = useProductsContext()
-  const { formatCurrencyRequest, formatFormCurrency, formatNumber } = useUtils()
+  const { formatCurrencyRequest, formatCurrencyString } = useUtils()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -132,26 +134,22 @@ const New = (): React.JSX.Element => {
       if (mode === 'create') {
         createProduct(payload).then(
           () => {
+            setProduct(undefined)
             setMode('list')
             setAlert({ type: 'success', message: 'Produto criado com sucesso.' })
           },
-          (err) => {
-            const { message } = err
-            setAlert({ type: 'error', message })
-          }
+          showErrorMsg
         )
       }
 
       if (mode === 'update' && product) {
         updateProduct(product?.id, payload).then(
           () => {
+            setProduct(undefined)
             setMode('list')
             setAlert({ type: 'success', message: 'Produto atualizado com sucesso.' })
           },
-          (err) => {
-            const { message } = err
-            setAlert({ type: 'error', message })
-          }
+          showErrorMsg
         )
       }
     }
@@ -177,16 +175,13 @@ const New = (): React.JSX.Element => {
     }
   }
 
-  const getImages = useCallback(() => {
+  const getTempImages = useCallback(() => {
     getAllImages().then(
       (response) => {
         const { data = [] } = response?.data || {}
         setImages(data)
       },
-      (err) => {
-        const { message } = err
-        setAlert({ type: 'error', message })
-      }
+      showErrorMsg
     )
   }, [getAllImages, setAlert])
 
@@ -195,22 +190,31 @@ const New = (): React.JSX.Element => {
   }
 
   const deleteImage = useCallback((id: string) => {
-    deleteImageById(id).then(
-      () => {
-        getImages()
-      },
-      (err) => {
-        const { message } = err
-        setAlert({ type: 'error', message })
-      }
-    )
-  }, [deleteImageById, getImages, setAlert])
+    if (mode === 'create') {
+      deleteTempImageById(id).then(
+        () => {
+          getTempImages()
+        },
+        showErrorMsg
+      )
+    }
+
+    if (mode === 'update') {
+      deleteImageById(product?.id ?? '', id).then(
+        () => {
+          const newArrImages = images.filter((img) => img.id !== id)
+          setImages([...newArrImages])
+        },
+        showErrorMsg
+      )
+    }
+  }, [deleteTempImageById, deleteImageById, getTempImages, setAlert, mode, product, images])
 
   useEffect(() => {
     if (mode === 'create') {
-      getImages()
+      getTempImages()
     }
-  }, [getImages, mode])
+  }, [getTempImages, mode])
 
   useEffect(() => {
     if (product) {
@@ -234,8 +238,8 @@ const New = (): React.JSX.Element => {
       formik.setFieldValue('subtitle', subtitle)
       formik.setFieldValue('height', height)
       formik.setFieldValue('length', length)
-      formik.setFieldValue('value', formatFormCurrency(formatNumber(value, 'float')))
-      formik.setFieldValue('valueUnique', formatFormCurrency(formatNumber(valueUnique, 'float')))
+      formik.setFieldValue('value', formatCurrencyString(value))
+      formik.setFieldValue('valueUnique', formatCurrencyString(valueUnique))
       formik.setFieldValue('width', width)
       formik.setFieldValue('weight', weight)
 
@@ -279,12 +283,12 @@ const New = (): React.JSX.Element => {
         <Accordion open={getExpanded(imagesKey)} title="Imagens" onChange={() => { handleChangeAccordion(imagesKey) }}>
           <Box display="flex">
             <Box width={1} mt={0} mx={2}>
-              <ImageList variant="masonry" cols={4} gap={10} className={classes.list}>
+              <ImageList variant="masonry" cols={4} gap={10} className={styles.list}>
                 {images.map((img, index) => (
                   <ImageListItem key={`image-temp-${index}`}>
                     <img
                       key={`temp-image-temp-${index}`}
-                      className={classes.img}
+                      className={styles.img}
                       src={`images/${img.fileName}`}
                       srcSet={`images/${img.fileName}`}
                       alt={img.fileName}
@@ -292,7 +296,7 @@ const New = (): React.JSX.Element => {
                     />
 
                     <ImageListItemBar
-                      className={classes.imageBar}
+                      className={styles.imageBar}
                       actionIcon={
                         <ButtonRemove title="Remover imagem" onClick={() => { deleteImage(img.id) }} />
                       }

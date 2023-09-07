@@ -36,10 +36,10 @@ interface IProps {
 }
 
 const Loader = ({ show, setLoading }: IProps): React.JSX.Element | boolean => {
-  const classes = useStyles()
+  const styles = useStyles()
   const [disabled, setDisabled] = useState<number>(0)
   const [showByEvent, setShowByEvent] = useState<boolean>(false)
-  const [message, setMessage] = useState<JSX.Element>(<SlashScreen><></></SlashScreen>)
+  const [message, setMessage] = useState<React.JSX.Element>(<SlashScreen><></></SlashScreen>)
 
   const textMessage = useMemo(() => (
     <Box fontSize={15} mt={1.2} p={3} borderRadius={2.6} bgcolor="#fff">
@@ -84,7 +84,7 @@ const Loader = ({ show, setLoading }: IProps): React.JSX.Element | boolean => {
   }, [disabled, show, showByEvent, textMessage])
 
   return (disabled === 0 && (show || showByEvent) && (
-    <Box className={classes.root}>
+    <Box className={styles.root}>
       <Box p={1}>
         <Typography align="center" variant="h6" color="primary">
           {message}

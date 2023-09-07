@@ -11,14 +11,14 @@ const useStyles = makeStyles(() => ({
 }))
 
 const InputHarmonic = ({ ...rest }): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <TextField
       fullWidth
       variant="outlined"
       size="small"
-      className={classes.input}
+      className={styles.input}
       {...rest}
     />
   )

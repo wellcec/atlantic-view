@@ -19,10 +19,10 @@ interface IProps {
 }
 
 const ButtonRemove = ({ title, onClick }: IProps): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
-    <Button variant="contained" color="error" title={title} className={classes.buttonAdd} onClick={onClick}>
+    <Button variant="contained" color="error" title={title} className={styles.buttonAdd} onClick={onClick}>
       <Box display="flex" alignItems="center">
         <IconDelete color="#fff" />
       </Box>

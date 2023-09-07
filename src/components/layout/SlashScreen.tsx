@@ -18,10 +18,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const SlashScreen = ({ children }: PropsWithChildren): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
-    <Box className={classes.root} width={150}>
+    <Box className={styles.root} width={150}>
       <Player
         src={Loading}
         className="player"

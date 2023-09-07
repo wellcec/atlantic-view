@@ -21,7 +21,7 @@ interface IProps {
 const Menu = ({
   open, anchorEl, handleCloseMenu, children
 }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <ComponentMenu
@@ -31,7 +31,7 @@ const Menu = ({
       open={open}
       anchorEl={anchorEl}
       onClose={handleCloseMenu}
-      className={classes.menu}
+      className={styles.menu}
     >
       {children}
     </ComponentMenu>

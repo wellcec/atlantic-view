@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { type Mode, type ProductType } from 'models/products'
 import { Provider } from './fragments/context'
 import New from './new'
-import List from './List'
+import List from './list'
 
 const Products = (): React.JSX.Element => {
   const [product, setProduct] = useState<ProductType | undefined>()

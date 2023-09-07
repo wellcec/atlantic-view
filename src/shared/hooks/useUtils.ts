@@ -5,6 +5,7 @@ interface IUtils {
   base64ToImage: (dataurl: any, filename: any) => File
   normalize: (str: string) => string
   formatCurrencyRequest: (value: string) => number
+  formatCurrencyString: (value: number | undefined) => string
 }
 
 const useUtils = (): IUtils => {
@@ -31,6 +32,13 @@ const useUtils = (): IUtils => {
   const formatCurrencyRequest = (value: string): number => {
     const cleared = value.replace('R$ ', '')
     return formatNumber(cleared, 'float') / 100
+  }
+
+  const formatCurrencyString = (value: number | undefined): string => {
+    if (!value) {
+      return 'R$ 0,00'
+    }
+    return formatFormCurrency(formatNumber(value, 'float'))
   }
 
   const imageToBase64 = (image: any, crop: any): string => {
@@ -80,7 +88,7 @@ const useUtils = (): IUtils => {
   }
 
   return {
-    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrencyRequest
+    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrencyRequest, formatCurrencyString
   }
 }
 

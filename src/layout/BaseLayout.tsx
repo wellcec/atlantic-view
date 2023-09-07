@@ -1,6 +1,6 @@
 import React, { type PropsWithChildren, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import ArrowIcon from '@mui/icons-material/KeyboardArrowLeftOutlined'
+
 import {
   Box,
   Divider,
@@ -10,21 +10,49 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography
+  type Theme,
+  Typography,
+  useTheme,
+  useMediaQuery,
+  AppBar,
+  Toolbar
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { styled, type CSSObject } from '@mui/material/styles'
 import makeStyles from '@mui/styles/makeStyles'
 
 import iconLogo from '~/assets/images/logo64.png'
 import colors from '~/shared/theme/colors'
 import { DEFAULT_THEME } from '~/constants'
 import { MenuItems } from '~/constants/menus'
+import { IconMenuHamburguer, IconSingleArrowLeftCircule } from '~/constants/icons'
 
 const drawerWidth = 240
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: drawerWidth,
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen
+  }),
+  overflowX: 'hidden'
+})
+
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen
+  }),
+  overflowX: 'hidden',
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up('sm')]: {
+    width: `calc(${theme.spacing(8)} + 1px)`
+  }
+})
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && prop !== 'mobile' })<{
   open?: boolean
-}>(({ theme, open }) => ({
+  mobile?: boolean
+}>(({ theme, open, mobile }) => ({
   backgroundColor: colors.background.container,
   display: 'flex',
   flexDirection: 'column',
@@ -34,19 +62,20 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen
   }),
-  marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen
     }),
     marginLeft: 0
+  }),
+  ...(mobile && {
+    marginTop: 75
   })
 }))
 
 const useStyles = makeStyles(() => ({
   buttonList: {
-    paddingLeft: 40,
     paddingTop: 15,
     paddingBottom: 15
   },
@@ -86,39 +115,90 @@ const useStyles = makeStyles(() => ({
 }))
 
 const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
   const navigate = useNavigate()
   const location = useLocation()
+  const theme = useTheme()
 
   const [openDrawer, setOpenDrawer] = useState<boolean>(true)
 
-  const switchRoute = (path: string): void => { navigate(path) }
+  const switchRoute = (path: string): void => {
+    if (downSM) {
+      setOpenDrawer(false)
+    }
+    navigate(path)
+  }
 
   const isCurrentPath = (paths: string[]): boolean => paths.includes(location.pathname)
 
+  const downSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
+
   return (
     <Box display="flex" height={1} overflow="auto" style={{ overflowX: 'hidden' }}>
+      {downSM && (
+        <AppBar position="fixed" color="default">
+          <Toolbar>
+            <Box display="flex" justifyContent="space-between" width={1}>
+              <Box p={2.1} >
+                <IconButton onClick={() => { setOpenDrawer(!openDrawer) }}>
+                  <IconMenuHamburguer color={colors.primary.main} />
+                </IconButton>
+              </Box>
+
+              <Box display="flex" alignItems="center" maxWidth={50}>
+                <img src={iconLogo} alt="Logo" />
+              </Box>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      )}
+
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box'
-          }
+          boxSizing: 'border-box',
+          ...(openDrawer && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': {
+              ...openedMixin(theme),
+              border: 'none !important'
+            }
+          }),
+          ...(!openDrawer && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': {
+              ...closedMixin(theme),
+              border: 'none !important'
+            }
+          })
         }}
-        className={classes.drawer}
-        variant="persistent"
+        className={styles.drawer}
+        variant={downSM ? 'temporary' : 'persistent'}
         anchor="left"
-        open={openDrawer}
+        open={downSM ? openDrawer : true}
       >
-        <Box display="flex" alignItems="center" justifyContent="space-between" p={2.1}>
-          <Box display="flex" gap="10px" alignItems="center" ml={8}>
-            <img src={iconLogo} alt="Logo" />
-          </Box>
+        <Box
+          p={2.1}
+          display="flex"
+          minHeight={100}
+          alignItems="center"
+          justifyContent={openDrawer ? 'space-between' : 'center'}
+        >
+          {openDrawer && (
+            <Box display="flex" gap="10px" alignItems="center" ml={8}>
+              <img src={iconLogo} alt="Logo" />
+            </Box>
+          )}
 
           <IconButton onClick={() => { setOpenDrawer(!openDrawer) }}>
-            <ArrowIcon />
+            {openDrawer && (
+              <IconSingleArrowLeftCircule />
+            )}
+
+            {!openDrawer && (
+              <IconMenuHamburguer />
+            )}
           </IconButton>
         </Box>
 
@@ -127,20 +207,23 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
             <ListItem
               disablePadding
               key={`${menuItem.title}-${index}`}
-              className={`${isCurrentPath(menuItem.paths) ? classes.selected : classes.notSelected}`}
+              className={`${isCurrentPath(menuItem.paths) ? styles.selected : styles.notSelected}`}
               onClick={() => { switchRoute(menuItem.path) }}
             >
-              <ListItemButton className={classes.buttonList}>
-                <ListItemIcon>
+              <ListItemButton className={styles.buttonList} style={{ paddingLeft: openDrawer ? 40 : 16 }}>
+                <ListItemIcon style={{ minWidth: openDrawer ? 56 : 35 }}>
                   {menuItem.icon()}
                 </ListItemIcon>
-                <ListItemText primary={
-                  <Typography variant="body1" color="primary" fontWeight={400}>{menuItem.title}</Typography>
-                }
-                />
+
+                {openDrawer && (
+                  <ListItemText primary={
+                    <Typography variant="body1" color="primary" fontWeight={400}>{menuItem.title}</Typography>
+                  }
+                  />
+                )}
 
                 {isCurrentPath(menuItem.paths) && (
-                  <Divider orientation="vertical" className={classes.divider} />
+                  <Divider orientation="vertical" className={styles.divider} />
                 )}
               </ListItemButton>
             </ListItem>
@@ -148,7 +231,7 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
         </List>
       </Drawer>
 
-      <Main open={openDrawer}>
+      <Main open={openDrawer} mobile={downSM}>
         {children}
       </Main>
     </Box>

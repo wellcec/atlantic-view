@@ -185,7 +185,7 @@ const AddCategories = ({
 
           <Box mb={2}>
             {data?.length === 0 && (
-              <EmptyDataText text="Nenhuma categorias/Subcategorias selecionada" />
+              <EmptyDataText text="Nenhuma categoria/subcategoria selecionada" />
             )}
 
             {data?.length > 0 && (

@@ -52,7 +52,7 @@ interface IProps {
 const Modal = ({
   open, title, handleClose, children
 }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <ComponentModal
@@ -61,17 +61,17 @@ const Modal = ({
       closeAfterTransition
     >
       <Fade in={open}>
-        <Box className={classes.modal}>
-          <Paper className={classes.paper}>
+        <Box className={styles.modal}>
+          <Paper className={styles.paper}>
             {title && (
-              <Typography variant="subtitle1" color="text.main" className={classes.titulo}>
+              <Typography variant="subtitle1" color="text.main" className={styles.titulo}>
                 {title}
               </Typography>
             )}
 
             <IconButton
               title="Fechar"
-              className={classes.close}
+              className={styles.close}
               onClick={handleClose}
             >
               <CloseIcon />

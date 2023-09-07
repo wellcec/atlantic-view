@@ -1,9 +1,16 @@
 import { useCallback } from 'react'
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import { type CategoryType, type IGetAllCategoriesResponse } from 'models/categories'
 import { type ISampleFilter, type ISuccessResponse } from 'models'
 
-const useCategoriesService = () => {
+interface ICategoriesService {
+  getCategories: (filter: ISampleFilter) => Promise<AxiosResponse<IGetAllCategoriesResponse, any>>
+  createCategory: (data: CategoryType) => Promise<AxiosResponse<ISuccessResponse, any>>
+  updateCategory: (id: string, data: CategoryType) => Promise<AxiosResponse<ISuccessResponse, any>>
+  deleteCategory: (id: string) => Promise<AxiosResponse<ISuccessResponse, any>>
+}
+
+const useCategoriesService = (): ICategoriesService => {
   const getCategories = useCallback((filter: ISampleFilter) => axios
     .get<IGetAllCategoriesResponse>(`api/categories?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
 

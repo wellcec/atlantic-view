@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 const Users = (): React.JSX.Element => {
   const [users, setUsers] = useState<UserType[]>([])
 
-  const classes = useStyles()
+  const styles = useStyles()
   const { getUsers } = useUsersService()
 
   useEffect(() => {
@@ -58,9 +58,9 @@ const Users = (): React.JSX.Element => {
         </Box>
 
         <Box display="flex" height={1} overflow="auto" flexGrow={1}>
-          <Paper className={classes.paperList}>
+          <Paper className={styles.paperList}>
             {users.map((item, index) => (
-              <Box key={index} className={classes.item} pb={1} mb={2}>
+              <Box key={index} className={styles.item} pb={1} mb={2}>
                 <Grid container display="flex" alignItems="center">
                   <Grid item xs={12} md={4}>
                     <Typography variant="body2">{item.name}</Typography>

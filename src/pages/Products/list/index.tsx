@@ -4,17 +4,10 @@ import {
   Typography,
   Button,
   MenuItem,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
   Grid,
-  Switch,
-  IconButton,
   Pagination
 } from '@mui/material'
-import makeStyles from '@mui/styles/makeStyles'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
+
 import AddIcon from '@mui/icons-material/Add'
 import Container from '~/components/layout/ContainerMain'
 import Paper from '~/components/layout/Paper'
@@ -27,14 +20,9 @@ import { type GetAllProductsType, type ProductType, type StatusProductType } fro
 import useProductsService from '~/services/useProductsService'
 import { type ISampleFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
-import { useProductsContext } from './fragments/context'
+import { useProductsContext } from '../fragments/context'
 import { DEFAULT_PAGESIZE } from '~/constants'
-
-const useStyles = makeStyles(() => ({
-  actions: {
-    justifyContent: 'space-between'
-  }
-}))
+import CardProduct from './CardProduct'
 
 const emptyFilter: ISampleFilter = {
   term: '',
@@ -51,7 +39,6 @@ const List = (): React.JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(anchorEl)
 
-  const classes = useStyles()
   const { setAlert } = useAlerts()
   const { mode, setMode, setProduct } = useProductsContext()
   const { getProducts: getAllProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
@@ -166,7 +153,7 @@ const List = (): React.JSX.Element => {
         <Box display="flex" flexGrow={0} justifyContent="end" mb={2}>
           <Paper fullWidth>
             <Box display="flex" flexWrap="wrap" gap={2} alignItems="center">
-              <Box flexGrow={1} minWidth={500}>
+              <Box flexGrow={1}>
                 <InputSearch placeholder="Procure por título ou subtítulo..." onChange={handleChangeSearch} />
               </Box>
 
@@ -199,55 +186,13 @@ const List = (): React.JSX.Element => {
           <Grid container spacing={2}>
             {products.map((product, index) => (
               <Grid item xs={12} md={4} lg={3} key={`products-${index}`}>
-                <Card>
-                  <CardMedia
-                    sx={{ height: 200, cursor: 'pointer' }}
-                    image={`images/${product.images[0].fileName}`}
-                    title={product.title}
-                    onClick={() => { handleEdit(product.id) }}
-                  />
-
-                  <CardContent>
-                    <Typography gutterBottom variant="body1">
-                      {product.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.quaternary">
-                      {product.subtitle}
-                    </Typography>
-                  </CardContent>
-
-                  <CardActions className={classes.actions}>
-                    <Box display="flex" gap={2}>
-                      <Box display="flex" alignItems="center" flexDirection="column">
-                        <Typography variant="body2" color="text.primary">
-                          Ativo
-                        </Typography>
-                        <Switch
-                          size="small"
-                          checked={product?.status?.isActive ?? false}
-                          onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isActive: checked }) }}
-                        />
-                      </Box>
-
-                      <Box display="flex" alignItems="center" flexDirection="column">
-                        <Typography variant="body2" color="text.primary">
-                          Destaque
-                        </Typography>
-                        <Switch
-                          size="small"
-                          checked={product?.status?.isHighlighted ?? false}
-                          onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isHighlighted: checked }) }}
-                        />
-                      </Box>
-                    </Box>
-
-                    <Box>
-                      <IconButton onClick={(event) => { handleOpenMenu(event, product) }}>
-                        <MoreVertIcon color="primary" />
-                      </IconButton>
-                    </Box>
-                  </CardActions>
-                </Card>
+                <CardProduct
+                  index={index}
+                  product={product}
+                  handleEdit={handleEdit}
+                  handleOpenMenu={handleOpenMenu}
+                  handleUpdateStatus={handleUpdateStatus}
+                />
               </Grid>
             ))}
           </Grid>

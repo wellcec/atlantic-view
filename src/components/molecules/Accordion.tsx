@@ -29,7 +29,7 @@ interface IProps {
 const Accordion = ({
   open, title, onChange, hasControl, Control, children
 }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <ComponentAccordion
@@ -37,7 +37,7 @@ const Accordion = ({
       onChange={onChange}
       square
       disableGutters
-      className={classes.accordion}
+      className={styles.accordion}
     >
       <AccordionSummary expandIcon={<IconDoubleArrowDown />}>
         <Divider title={title} />

@@ -1,6 +1,5 @@
 #root {
   height: inherit;
-  /* display: grid; */
 }
 
 html {
@@ -36,6 +35,10 @@ code {
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+img {
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {

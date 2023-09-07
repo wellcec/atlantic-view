@@ -19,14 +19,14 @@ interface IProps {
 }
 
 const Divider = ({ title, hasControl }: IProps): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <ComponentDivider
       flexItem
       textAlign="left"
       orientation="horizontal"
-      className={classes.divider}
+      className={styles.divider}
       sx={{
         '&.MuiDivider-root::after': {
           width: '98%'

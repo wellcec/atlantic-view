@@ -25,14 +25,14 @@ interface IProps {
 const InputForm = ({
   title, fullWidth, formik, helperText, propField, children
 }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
   const field = propField ?? ''
 
   return (
     <>
       <FormControl fullWidth={fullWidth}>
         <Box mb={1}>
-          <FormLabel className={classes.color}>{title}</FormLabel>
+          <FormLabel className={styles.color}>{title}</FormLabel>
         </Box>
 
         {children}

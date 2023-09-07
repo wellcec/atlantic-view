@@ -1,8 +1,12 @@
 import { useCallback } from 'react'
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import { type IGetAllUsersResponse } from 'models/users'
 
-const useUsersService = () => {
+interface IUsersService {
+  getUsers: () => Promise<AxiosResponse<IGetAllUsersResponse, any>>
+}
+
+const useUsersService = (): IUsersService => {
   const getUsers = useCallback(() => axios.get<IGetAllUsersResponse>('api/users'), [])
 
   return {

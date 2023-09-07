@@ -195,7 +195,7 @@ const Categories = (): React.JSX.Element => {
         <Box display="flex" flexGrow={0} justifyContent="end" mb={2}>
           <Paper fullWidth>
             <Box display="flex" flexWrap="wrap" gap={2} alignItems="center">
-              <Box flexGrow={1} minWidth={500}>
+              <Box flexGrow={1}>
                 <InputSearch placeholder="Procure por nome e subcagetoria..." onChange={handleChangeSearch} />
               </Box>
 

@@ -7,12 +7,14 @@ import iconSearch from '~/assets/icons/icon-search.svg'
 import iconDoubleArrowDown from '~/assets/icons/icon-double-arrow-down.svg'
 import iconSingleArrowDownCircule from '~/assets/icons/icon-single-arrow-circule.svg'
 import iconSingleArrowUpCircule from '~/assets/icons/icon-single-arrow-up-circule.svg'
+import iconSingleArrowLeftCircule from '~/assets/icons/icon-single-arrow-left-circule.svg'
 import iconCheckCircule from '~/assets/icons/icon-check-circule.svg'
+import iconMenuHamburguer from '~/assets/icons/icon-menu-hambuguer.svg'
 import iconUpload from '~/assets/icons/icon-upload.svg'
 
 import colors from '~/shared/theme/colors'
 
-const SIZE_ICONS = 20
+const SIZE_ICONS = 25
 
 interface IColor {
   color?: string
@@ -42,10 +44,18 @@ export const IconSingleArrowUpCircule = ({ color = colors.text.quaternary }: ICo
   <SVG src={iconSingleArrowUpCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
+export const IconSingleArrowLeftCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
+  <SVG src={iconSingleArrowLeftCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+)
+
 export const IconCheckCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconCheckCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )
 
 export const IconUpload = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
   <SVG src={iconUpload} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+)
+
+export const IconMenuHamburguer = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
+  <SVG src={iconMenuHamburguer} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
 )

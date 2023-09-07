@@ -22,12 +22,12 @@ interface IProps {
 }
 
 const InputSearch = ({ placeholder, onChange }: IProps): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <FormControl variant="outlined" fullWidth>
       <OutlinedInput
-        className={classes.inputSearch}
+        className={styles.inputSearch}
         fullWidth
         placeholder={placeholder}
         color="secondary"

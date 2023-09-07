@@ -21,7 +21,7 @@ interface IProps {
 }
 
 const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>): React.JSX.Element => {
-  const classes = useStyles()
+  const styles = useStyles()
 
   return (
     <>
@@ -33,7 +33,7 @@ const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>)
 
       {fullCard && (
         <Box overflow="auto" height={1}>
-          <Paper className={classes.paper}>
+          <Paper className={styles.paper}>
             {children}
           </Paper>
         </Box>

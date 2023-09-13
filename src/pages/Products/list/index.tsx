@@ -138,14 +138,10 @@ const List = (): React.JSX.Element => {
   }
 
   useEffect(() => {
-    getProducts(filter)
-  }, [filter.page])
-
-  useEffect(() => {
     if (mode === 'list') {
-      getProducts()
+      getProducts(filter)
     }
-  }, [mode])
+  }, [filter, getProducts, mode])
 
   return (
     <>

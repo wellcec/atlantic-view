@@ -14,7 +14,7 @@ import iconUpload from '~/assets/icons/icon-upload.svg'
 
 import colors from '~/shared/theme/colors'
 
-const SIZE_ICONS = 25
+const SIZE_ICONS = 20
 
 interface IColor {
   color?: string

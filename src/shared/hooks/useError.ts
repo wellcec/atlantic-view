@@ -1,21 +1,21 @@
 import { useCallback } from 'react'
-import { useAlerts } from '../alerts/AlertContext'
+import useAlerts from '../alerts/useAlerts'
 
 interface IUseError {
   showErrorMsg: (err: any) => void
 }
 
 const useError = (): IUseError => {
-  const { setAlert } = useAlerts()
+  const { notifyError, notifyWarning } = useAlerts()
 
   const showErrorMsg = useCallback((err: any): void => {
     const { message } = err?.data ?? {}
     if (err?.status === 400) {
-      setAlert({ type: 'warning', message })
+      notifyWarning(message)
     } else {
-      setAlert({ type: 'error', message })
+      notifyError(message)
     }
-  }, [setAlert])
+  }, [notifyWarning, notifyError])
 
   return { showErrorMsg }
 }

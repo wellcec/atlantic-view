@@ -6,7 +6,7 @@ import Divider from '~/components/atoms/Divider'
 import Modal from '~/components/molecules/Modal'
 import { type CategoryType, type GetAllCategoriesType, type SubCategoryType } from '~/models/categories'
 import useCategoriesService from '~/services/useCategoriesService'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import { type ISampleFilter } from '~/models'
 import colors from '~/shared/theme/colors'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
@@ -38,7 +38,7 @@ const AddCategories = ({
   const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
 
   const { getCategories } = useCategoriesService()
-  const { setAlert } = useAlerts()
+  const { notifyError } = useAlerts()
 
   const getAllCategories = useCallback(() => {
     getCategories(emptyFilter).then(
@@ -48,10 +48,10 @@ const AddCategories = ({
       },
       (err) => {
         const { message } = err
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     )
-  }, [getCategories, setAlert])
+  }, [getCategories, notifyError])
 
   const handleChange = (_: React.SyntheticEvent<Element, Event>, value: CategoryType | null): void => { setSelected(value) }
 

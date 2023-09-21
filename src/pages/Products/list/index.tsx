@@ -12,11 +12,11 @@ import AddIcon from '@mui/icons-material/Add'
 import Container from '~/components/layout/ContainerMain'
 import Paper from '~/components/layout/Paper'
 import Menu from '~/components/atoms/Menu'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
 import { IconDelete, IconEdit } from '~/constants/icons'
-import { type GetAllProductsType, type ProductType, type StatusProductType } from '~/models/products'
+import { MODES, type GetAllProductsType, type ProductType, type StatusProductType } from '~/models/products'
 import useProductsService from '~/services/useProductsService'
 import { type ISampleFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
@@ -39,7 +39,7 @@ const List = (): React.JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(anchorEl)
 
-  const { setAlert } = useAlerts()
+  const { notifyError, notifyWarning, notifySuccess } = useAlerts()
   const { mode, setMode, setProduct } = useProductsContext()
   const { getProducts: getAllProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
   const { debounceWait } = useDebounce()
@@ -47,10 +47,6 @@ const List = (): React.JSX.Element => {
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, product: ProductType): void => {
     setAnchorEl(event.currentTarget)
     setObjToAction(product)
-  }
-
-  const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
-    setFilter({ ...filter, page })
   }
 
   const getProducts = useCallback((newFilter?: ISampleFilter) => {
@@ -64,10 +60,16 @@ const List = (): React.JSX.Element => {
         setProducts([])
         setTotalProducts(0)
         const { message } = err
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     )
-  }, [filter, getAllProducts, setAlert])
+  }, [filter, getAllProducts, notifyError])
+
+  const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
+    const newFilter = { ...filter, page }
+    setFilter(newFilter)
+    getProducts(newFilter)
+  }
 
   const handleCloseMenu = (): void => {
     setAnchorEl(null)
@@ -102,7 +104,7 @@ const List = (): React.JSX.Element => {
       () => { },
       (err) => {
         const { message } = err?.data ?? {}
-        setAlert({ type: 'warning', message })
+        notifyWarning(message)
       }
     )
   }
@@ -111,11 +113,11 @@ const List = (): React.JSX.Element => {
     deleteProduct(objToAction?.id ?? '').then(
       () => {
         getProducts()
-        setAlert({ type: 'success', message: 'Produto excluído com sucesso.' })
+        notifySuccess('Produto excluído com sucesso.')
       },
       (err) => {
         const { message } = err?.data ?? {}
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     ).finally(() => {
       setConfirmatioOpen(false)
@@ -128,20 +130,20 @@ const List = (): React.JSX.Element => {
     getProductById(id).then(
       (response) => {
         setProduct(response?.data ?? undefined)
-        setMode('update')
+        setMode(MODES.update)
       },
       (err) => {
         const { message } = err?.data ?? {}
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     )
   }
 
   useEffect(() => {
-    if (mode === 'list') {
-      getProducts(filter)
+    if (mode === MODES.list) {
+      getProducts()
     }
-  }, [filter, getProducts, mode])
+  }, [mode, getProducts])
 
   return (
     <>
@@ -154,7 +156,7 @@ const List = (): React.JSX.Element => {
               </Box>
 
               <Box>
-                <Button variant="contained" color="success" onClick={() => { setMode('create') }}>
+                <Button variant="contained" color="success" onClick={() => { setMode(MODES.create) }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Box>
                       <AddIcon />

@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
-import { type Mode, type ProductType } from 'models/products'
+import { MODES, type Mode, type ProductType } from '~/models/products'
 import { Provider } from './fragments/context'
 import New from './new'
 import List from './list'
 
 const Products = (): React.JSX.Element => {
+  const { create, update, list } = MODES
+
   const [product, setProduct] = useState<ProductType | undefined>()
-  const [mode, setMode] = useState<Mode>('list')
+  const [mode, setMode] = useState<Mode>(list)
 
   return (
     <>
@@ -18,8 +20,8 @@ const Products = (): React.JSX.Element => {
       }}
       >
         <>
-          {(mode === 'create' || mode === 'update') && (<New />)}
-          {(mode === 'list') && (<List />)}
+          {(mode === create || mode === update) && (<New />)}
+          {(mode === list) && (<List />)}
         </>
       </Provider>
     </>

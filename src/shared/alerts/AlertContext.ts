@@ -1,14 +1,14 @@
 import React, { useContext } from 'react'
-import { type IAlerts } from 'models'
+import { ALERT_TYPES, type IAlerts } from '~/models'
 
 const defaultAlert: IAlerts = {
-  alert: { type: 'info', message: '' },
+  alert: { type: ALERT_TYPES.info, message: '' },
   setAlert: () => { }
 }
 
 const AlertsContext = React.createContext(defaultAlert)
 
-export const useAlerts = (): IAlerts => {
+export const useAlertsContext = (): IAlerts => {
   const {
     alert,
     setAlert

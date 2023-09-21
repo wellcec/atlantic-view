@@ -18,44 +18,45 @@ const SIZE_ICONS = 20
 
 interface IColor {
   color?: string
+  size?: number
 }
 
-export const IconEdit = ({ color = colors.primary.main }: IColor): React.JSX.Element => (
-  <SVG src={iconEdit} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconEdit = ({ color = colors.primary.main, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconEdit} width={size} height={size} fill={color} />
 )
 
-export const IconDelete = ({ color = colors.error.main }: IColor): React.JSX.Element => (
-  <SVG src={iconDelete} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconDelete = ({ color = colors.error.main, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconDelete} width={size} height={size} fill={color} />
 )
 
-export const IconSearch = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconSearch} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconSearch = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconSearch} width={size} height={size} fill={color} />
 )
 
-export const IconDoubleArrowDown = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconDoubleArrowDown} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconDoubleArrowDown = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconDoubleArrowDown} width={size} height={size} fill={color} />
 )
 
-export const IconSingleArrowDownCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconSingleArrowDownCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconSingleArrowDownCircule = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconSingleArrowDownCircule} width={size} height={size} fill={color} />
 )
 
-export const IconSingleArrowUpCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconSingleArrowUpCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconSingleArrowUpCircule = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconSingleArrowUpCircule} width={size} height={size} fill={color} />
 )
 
-export const IconSingleArrowLeftCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconSingleArrowLeftCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconSingleArrowLeftCircule = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconSingleArrowLeftCircule} width={size} height={size} fill={color} />
 )
 
-export const IconCheckCircule = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconCheckCircule} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconCheckCircule = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconCheckCircule} width={size} height={size} fill={color} />
 )
 
-export const IconUpload = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconUpload} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconUpload = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconUpload} width={size} height={size} fill={color} />
 )
 
-export const IconMenuHamburguer = ({ color = colors.text.quaternary }: IColor): React.JSX.Element => (
-  <SVG src={iconMenuHamburguer} width={SIZE_ICONS} height={SIZE_ICONS} fill={color} />
+export const IconMenuHamburguer = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconMenuHamburguer} width={size} height={size} fill={color} />
 )

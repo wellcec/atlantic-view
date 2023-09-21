@@ -4,11 +4,11 @@ import {
   Chip,
   Grid,
   Button,
-  MenuItem,
   Typography,
-  IconButton
+  IconButton,
+  Pagination,
+  Hidden
 } from '@mui/material'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
 import AddIcon from '@mui/icons-material/Add'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -17,20 +17,21 @@ import Container from '~/components/layout/ContainerMain'
 import { type CategoryType, type GetAllCategoriesType, type SubCategoryType } from 'models/categories'
 import Paper from '~/components/layout/Paper'
 import Modal from '~/components/molecules/Modal'
-import Menu from '~/components/atoms/Menu'
 import useCategoriesService from '~/services/useCategoriesService'
+import useProductsService from '~/services/useProductsService'
 import { PREENCHIMENTO_OBRIGATORIO } from '~/constants/messages'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import useDebounce from '~/shared/hooks/useDebounce'
 import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
-import { type ISampleFilter } from '~/models'
+import { ACTIONS, type ActionsType, type ISampleFilter } from '~/models'
 import { IconDelete, IconEdit } from '~/constants/icons'
 import InputForm from '~/components/atoms/Inputs/InputForm'
 import AddChips from '~/components/molecules/AddChips'
 import Divider from '~/components/atoms/Divider'
 import InputText from '~/components/atoms/Inputs/InputText'
-import { DEFAULT_PAGESIZE } from '~/constants'
+import { DEFAULT_CATEGORY_PAGESIZE as DEFAULT_PAGESIZE } from '~/constants'
+import { type ProductType } from '~/models/products'
 
 const DEFAULT_VALUES = {
   name: ''
@@ -43,52 +44,24 @@ const emptyFilter: ISampleFilter = {
 }
 
 const Categories = (): React.JSX.Element => {
-  const [action, setAction] = useState<'create' | 'update'>('create')
+  const [action, setAction] = useState<ActionsType>(ACTIONS.create)
   const [objToAction, setObjToAction] = useState<CategoryType>()
   const [categories, setCategories] = useState<CategoryType[]>([])
   const [subCategories, setSubCategories] = useState<SubCategoryType[]>([])
+  const [productsByCategory, setProductsByCategory] = useState<ProductType[]>([])
+  const [totalByCategory, setTotalByCategory] = useState<number>(0)
+  const [totalCategories, setTotalCategories] = useState<number>(0)
   const [openModal, setOpenModal] = useState<boolean>(false)
-  const [confirmatioOpen, setConfirmatioOpen] = useState<boolean>(false)
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false)
+  const [confirmUpdateOpen, setConfirmUpdateOpen] = useState<boolean>(false)
   const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const openMenu = Boolean(anchorEl)
 
   const {
-    getCategories, createCategory, updateCategory, deleteCategory: deleteCat
+    getCategories, createCategory, updateCategory: updateCat, deleteCategory: deleteCat
   } = useCategoriesService()
-  const { setAlert } = useAlerts()
+  const { getProductsByCategory } = useProductsService()
+  const { notifyError, notifySuccess } = useAlerts()
   const { debounceWait } = useDebounce()
-
-  const getAllCategories = useCallback((newFilter?: ISampleFilter) => {
-    getCategories(newFilter ?? filter).then(
-      (response: GetAllCategoriesType) => {
-        const { data = [] } = response.data ?? {}
-        setSubCategories([])
-        setCategories(data)
-      },
-      (err) => {
-        const { message } = err
-        setAlert({ type: 'error', message })
-      }
-    )
-  }, [getCategories, setAlert, filter])
-
-  const deleteCategory = useCallback(() => {
-    deleteCat(objToAction?.id ?? '').then(
-      () => {
-        setAlert({ type: 'success', message: 'Categoria excluída com sucesso.' })
-        setConfirmatioOpen(false)
-        setAnchorEl(null)
-        setObjToAction(undefined)
-        getAllCategories()
-      },
-      (error) => {
-        const { message } = error
-        setAnchorEl(null)
-        setAlert({ type: 'error', message })
-      }
-    )
-  }, [deleteCat, objToAction, getAllCategories, setAlert])
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -98,7 +71,7 @@ const Categories = (): React.JSX.Element => {
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: (data) => {
-      if (action === 'create') {
+      if (action === ACTIONS.create) {
         const category: CategoryType = {
           name: data.name,
           subCategories
@@ -106,41 +79,103 @@ const Categories = (): React.JSX.Element => {
 
         createCategory(category).then(
           () => {
-            setAlert({ type: 'success', message: 'Categoria criada com sucesso.' })
+            notifySuccess('Categoria criada com sucesso.')
             setOpenModal(false)
             getAllCategories()
           },
           (err) => {
             const { message } = err
-            setAlert({ type: 'error', message })
+            notifyError(message)
             setOpenModal(false)
           }
         )
       }
 
-      if (action === 'update') {
-        const category: CategoryType = {
-          name: data.name,
-          subCategories
-        }
-
-        updateCategory(objToAction?.id ?? '', category).then(
-          () => {
-            setAlert({ type: 'success', message: 'Categoria atualizada com sucesso.' })
-            setAction('create')
-            setObjToAction(undefined)
-            setOpenModal(false)
-            getAllCategories()
+      if (action === ACTIONS.update) {
+        getProductsByCategory(objToAction?.id ?? '').then(
+          (response) => {
+            const { data = [], count } = response.data || {}
+            if (count > 0) {
+              setTotalByCategory(count)
+              setConfirmUpdateOpen(true)
+              setProductsByCategory(data)
+            } else {
+              updateCategory()
+            }
           },
           (err) => {
             const { message } = err
-            setAlert({ type: 'error', message })
-            setOpenModal(false)
+            notifyError(message)
+            setTotalByCategory(0)
+            setConfirmUpdateOpen(false)
+            setProductsByCategory([])
           }
         )
       }
     }
   })
+
+  const getAllCategories = useCallback((newFilter?: ISampleFilter) => {
+    getCategories(newFilter ?? filter).then(
+      (response: GetAllCategoriesType) => {
+        const { data = [], count } = response.data ?? {}
+        setTotalCategories(count)
+        setCategories(data)
+      },
+      (err) => {
+        setTotalCategories(0)
+        setCategories([])
+        const { message } = err
+        notifyError(message)
+      }
+    )
+  }, [getCategories, notifyError, filter])
+
+  const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
+    const newFilter = { ...filter, page }
+    setFilter(newFilter)
+    getAllCategories(newFilter)
+  }
+
+  const deleteCategory = useCallback(() => {
+    deleteCat(objToAction?.id ?? '').then(
+      () => {
+        notifySuccess('Categoria excluída com sucesso.')
+        setConfirmOpen(false)
+        setObjToAction(undefined)
+        getAllCategories()
+      },
+      (error) => {
+        const { message } = error
+        notifyError(message)
+      }
+    )
+  }, [deleteCat, objToAction, getAllCategories, notifyError, notifySuccess])
+
+  const updateCategory = useCallback(() => {
+    const category: CategoryType = {
+      name: formik.values.name,
+      subCategories
+    }
+
+    updateCat(objToAction?.id ?? '', category).then(
+      () => {
+        notifySuccess('Categoria atualizada com sucesso.')
+        setAction(ACTIONS.create)
+        setObjToAction(undefined)
+        setOpenModal(false)
+        setProductsByCategory([])
+        setConfirmUpdateOpen(false)
+        setTotalByCategory(0)
+        getAllCategories()
+      },
+      (err) => {
+        const { message } = err
+        notifyError(message)
+        setOpenModal(false)
+      }
+    )
+  }, [formik.values.name, getAllCategories, objToAction?.id, notifySuccess, notifyError, subCategories, updateCat])
 
   const handleNewCategory = (): void => {
     formik.resetForm()
@@ -149,33 +184,24 @@ const Categories = (): React.JSX.Element => {
     setOpenModal(true)
   }
 
-  const handleEditCategory = (): void => {
+  const handleEditCategory = (obj: CategoryType): void => {
     const { setValues } = formik
-    setValues({ name: objToAction?.name ?? '' })
-    setSubCategories(objToAction?.subCategories ?? [])
+
+    setValues({ name: obj?.name ?? '' })
+    setSubCategories(obj?.subCategories ?? [])
     setOpenModal(true)
-    setAnchorEl(null)
-    setAction('update')
-  }
-
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, obj: CategoryType): void => {
-    setAnchorEl(event.currentTarget)
     setObjToAction(obj)
+    setAction(ACTIONS.update)
   }
 
-  const handleCloseMenu = (): void => {
-    setAnchorEl(null)
-    setObjToAction(undefined)
+  const handleConfirmDelete = (obj: CategoryType): void => {
+    setObjToAction(obj)
+    setConfirmOpen(true)
   }
 
-  const handleConfirmDelete = (): void => {
-    setAnchorEl(null)
-    setConfirmatioOpen(true)
-  }
+  const handleCloseDelete = (): void => { setConfirmOpen(false) }
 
-  const handleCloseDelete = (): void => {
-    setConfirmatioOpen(false)
-  }
+  const handleCloseConfirmUpdate = (): void => { setConfirmUpdateOpen(false) }
 
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { value } = event.target
@@ -216,6 +242,22 @@ const Categories = (): React.JSX.Element => {
           </Paper>
         </Box>
 
+        <Hidden mdDown>
+          <Box mb={2} flexGrow={0}>
+            <Paper>
+              <Grid container display="flex" alignItems="center">
+                <Grid item xs={2}>
+                  <Typography variant="body1" fontWeight={600}>Categoria</Typography>
+                </Grid>
+
+                <Grid item xs={7}>
+                  <Typography variant="body1" fontWeight={600}>Sub categorias</Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Box>
+        </Hidden>
+
         <Box overflow="auto" flexGrow={1}>
           {categories.length === 0 && (
             <Box pb={1} mb={2} textAlign="center">
@@ -229,48 +271,57 @@ const Categories = (): React.JSX.Element => {
             <Box key={index} pb={1} mb={2}>
               <Paper>
                 <Grid container display="flex" alignItems="center">
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={2}>
                     <Typography variant="body2">{item.name}</Typography>
+
+                    <Hidden mdUp>
+                      <Box mb={2} />
+                    </Hidden>
                   </Grid>
 
-                  <Grid item xs={12} md={4} display="flex" flexWrap="wrap" gap={2}>
+                  <Grid item xs={12} md={7} display="flex" flexWrap="wrap" gap={2}>
                     {item.subCategories.map((itemsc, indexsc) => (
                       <Chip key={`subcat-${indexsc}`} label={itemsc?.name} variant="outlined" />
                     ))}
                   </Grid>
 
-                  <Grid item xs={12} md={4} display="flex" alignItems="flex-end" justifyContent="flex-end">
-                    <IconButton onClick={(event) => { handleOpenMenu(event, item) }}>
-                      <MoreVertIcon />
-                    </IconButton>
+                  <Grid item xs={12} md={3} display="flex" alignItems="flex-end" justifyContent="flex-end" gap={1}>
+                    <Box>
+                      <IconButton title="Editar" onClick={() => { handleEditCategory(item) }}>
+                        <IconEdit size={25} />
+                      </IconButton>
+                    </Box>
+
+                    <Box>
+                      <IconButton title="Excluir" onClick={() => { handleConfirmDelete(item) }}>
+                        <IconDelete size={25} />
+                      </IconButton>
+                    </Box>
                   </Grid>
                 </Grid>
               </Paper>
             </Box>
           ))}
         </Box>
+
+        {totalCategories > DEFAULT_PAGESIZE && (
+          <Box display="flex" justifyContent="center">
+            <Pagination
+              page={filter.page}
+              count={Math.ceil(totalCategories / DEFAULT_PAGESIZE)}
+              showFirstButton
+              showLastButton
+              color="primary"
+              onChange={handleChangePage}
+            />
+          </Box>
+        )}
       </Container>
 
-      <Menu open={openMenu} anchorEl={anchorEl} handleCloseMenu={handleCloseMenu}>
-        <MenuItem onClick={handleEditCategory}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <IconEdit />
-            <Typography variant="body1" color="primary">Editar</Typography>
-          </Box>
-        </MenuItem>
-
-        <MenuItem onClick={handleConfirmDelete}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <IconDelete />
-            <Typography variant="body1" color="primary">Excluir</Typography>
-          </Box>
-        </MenuItem>
-      </Menu>
-
-      {confirmatioOpen && (
+      {confirmOpen && (
         <Dialog
           title="Excluir categoria"
-          open={confirmatioOpen}
+          open={confirmOpen}
           handleCloseConfirm={handleCloseDelete}
           handleDelete={deleteCategory}
         >
@@ -279,8 +330,43 @@ const Categories = (): React.JSX.Element => {
             {' '}
             <b>{objToAction?.name}</b>
             {' '}
-            e suas subcategorias?
+            e suas sub categorias?
           </Typography>
+        </Dialog>
+      )}
+
+      {confirmUpdateOpen && (
+        <Dialog
+          title="Alterar categoria"
+          open={confirmUpdateOpen}
+          handleCloseConfirm={handleCloseConfirmUpdate}
+          handleDelete={updateCategory}
+        >
+          <Typography variant="body1" color="primary">
+            Esses produtos possuem essa categoria?
+          </Typography>
+
+          <Box mb={2}>
+            <Box component="ul">
+              {productsByCategory.map((item, index) => (
+                <>
+                  {index < 9 && (
+                    <Box key={`productsByCategory-${index}`} component="li">
+                      {item.title}
+                    </Box>
+                  )}
+                </>
+              ))}
+
+              {totalByCategory > 10 && ` ... mais ${totalByCategory - 10} produtos.`}
+            </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="body1" color="primary">
+              Deseja continuar?
+            </Typography>
+          </Box>
         </Dialog>
       )}
 

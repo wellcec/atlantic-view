@@ -16,4 +16,6 @@ export const NEW_PRODUCT_KEYS = {
 
 export const DEFAULT_PAGESIZE = 10
 
+export const DEFAULT_CATEGORY_PAGESIZE = 5
+
 export default DEFAULT_THEME

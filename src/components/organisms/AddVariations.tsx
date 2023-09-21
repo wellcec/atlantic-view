@@ -10,7 +10,7 @@ import AddChips from '~/components/molecules/AddChips'
 import { type ISampleFilter } from '~/models'
 import { type GetAllVariationsType, type VariationType } from '~/models/variations'
 import useVariationsService from '~/services/useVariationsService'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import { IconDelete } from '~/constants/icons'
 
 const MAX_REGISTERS = 10000
@@ -33,7 +33,7 @@ const AddVariations = ({
   const [variations, setVariations] = useState<VariationType[]>([])
 
   const { getVariations, createVariation, deleteVariation } = useVariationsService()
-  const { setAlert } = useAlerts()
+  const { notifyError } = useAlerts()
 
   const getAllVariations = useCallback(() => {
     getVariations(emptyFilter).then(
@@ -43,10 +43,10 @@ const AddVariations = ({
       },
       (err) => {
         const { message } = err
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     )
-  }, [getVariations, setAlert])
+  }, [getVariations, notifyError])
 
   const handleAddVariation = (variationAdded: VariationType[]): void => {
     const last: VariationType | undefined = getLast(variationAdded)
@@ -58,7 +58,7 @@ const AddVariations = ({
         },
         (err) => {
           const { message } = err
-          setAlert({ type: 'error', message })
+          notifyError(message)
         }
       )
     }
@@ -72,7 +72,7 @@ const AddVariations = ({
       },
       (err) => {
         const { message } = err
-        setAlert({ type: 'error', message })
+        notifyError(message)
       }
     )
   }

@@ -88,7 +88,9 @@ const AxiosSettings = ({ onStopRequest: stopRequest, onStartRequest: startReques
 
   useEffect(() => {
     if (count === 1) {
-      startRequest()
+      setTimeout(() => {
+        startRequest()
+      }, 1000)
     }
 
     if (count === 0) {

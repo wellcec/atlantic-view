@@ -25,6 +25,7 @@ interface IUseProductsService {
   updateStatusProduct: (id: string, status: StatusProductType) => Promise<AxiosResponse<any, any>>
   getProductById: (id: string) => Promise<AxiosResponse<ProductType, any>>
   deleteTempImageById: (id: string) => Promise<AxiosResponse<ISuccessResponse, any>>
+  getProductsByCategory: (id: string) => Promise<AxiosResponse<IGetAllProductsResponse, any>>
 }
 
 const useProductsService = (): IUseProductsService => {
@@ -59,6 +60,8 @@ const useProductsService = (): IUseProductsService => {
 
   const deleteProduct = useCallback((id: string) => axios.delete<ISuccessResponse | any>(`api/products/${id}`), [])
 
+  const getProductsByCategory = useCallback((id: string) => axios.get<IGetAllProductsResponse>(`api/products/byCategory/${id}`), [])
+
   return {
     getProducts,
     createProduct,
@@ -69,7 +72,8 @@ const useProductsService = (): IUseProductsService => {
     deleteImageById,
     updateStatusProduct,
     getProductById,
-    deleteTempImageById
+    deleteTempImageById,
+    getProductsByCategory
   }
 }
 

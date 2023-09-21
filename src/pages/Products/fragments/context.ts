@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
-import { type IProductsContext } from 'models/products'
+import { MODES, type IProductsContext } from '~/models/products'
 
 const productsContext = React.createContext<IProductsContext>({
-  mode: 'create',
+  mode: MODES.create,
   setMode: () => { },
   product: undefined,
   setProduct: () => { }

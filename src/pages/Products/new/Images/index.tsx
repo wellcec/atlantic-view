@@ -11,7 +11,7 @@ import { Box, Button } from '@mui/material'
 import Modal from '~/components/molecules/Modal'
 import useUtils from '~/shared/hooks/useUtils'
 import useProductsService from '~/services/useProductsService'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import { IconUpload } from '~/constants/icons'
 import colors from '~/shared/theme/colors'
 import { type ImageType } from '~/models/products'
@@ -51,7 +51,7 @@ const Images = ({
 
   const { base64ToImage, imageToBase64, normalize } = useUtils()
   const { uploadImage } = useProductsService()
-  const { setAlert } = useAlerts()
+  const { notifyError } = useAlerts()
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     const { width, height } = e.currentTarget
@@ -90,9 +90,10 @@ const Images = ({
         },
         (err) => {
           const { message } = err
-          setAlert({ type: 'error', message })
+          notifyError(message)
         }
       )
+
       handleClose()
       setImage('')
     }

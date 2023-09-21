@@ -36,7 +36,7 @@ const ChipsCategories = ({ category, handleRemove }: IProps): React.JSX.Element 
             key={`chip-subCategories-${indexSubCat}`}
             label={subCat?.name}
             variant="outlined"
-            onDelete={handleRemove ? () => { handleRemove(category, subCat) } : () => { }}
+            onDelete={handleRemove ? () => { handleRemove(category, subCat) } : undefined}
             deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}
           />
         ))}

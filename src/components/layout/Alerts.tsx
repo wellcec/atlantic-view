@@ -5,11 +5,12 @@ import Alert from '@mui/material/Alert'
 import Typography from '@mui/material/Typography'
 import { isEmpty } from 'lodash'
 
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import { useAlertsContext } from '~/shared/alerts/AlertContext'
+import { ALERT_TYPES } from '~/models'
 
 const Alerts = (): React.JSX.Element => {
   const [open, setOpen] = useState<boolean>(false)
-  const { alert, setAlert } = useAlerts()
+  const { alert, setAlert } = useAlertsContext()
 
   const handleClose = (_?: React.SyntheticEvent | Event, reason?: string): void => {
     if (reason === 'clickaway') {
@@ -17,7 +18,7 @@ const Alerts = (): React.JSX.Element => {
     }
 
     setOpen(false)
-    setAlert({ type: 'info', message: '' })
+    setAlert({ type: ALERT_TYPES.info, message: '' })
   }
 
   useEffect(() => {

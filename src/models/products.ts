@@ -1,3 +1,4 @@
+import type React from 'react'
 import { type AxiosResponse } from 'axios'
 import { type CategoryType } from './categories'
 
@@ -65,6 +66,12 @@ export interface IGetAllImagesResponse {
 }
 
 export type Mode = 'create' | 'update' | 'list'
+
+export const MODES = {
+  create: 'create' as Mode,
+  update: 'update' as Mode,
+  list: 'list' as Mode
+}
 
 export interface IProductsContext {
   product?: ProductType

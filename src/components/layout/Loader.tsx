@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import EventEmitter from 'events'
 
 import Box from '@mui/material/Box'
@@ -39,15 +39,7 @@ const Loader = ({ show, setLoading }: IProps): React.JSX.Element | boolean => {
   const styles = useStyles()
   const [disabled, setDisabled] = useState<number>(0)
   const [showByEvent, setShowByEvent] = useState<boolean>(false)
-  const [message, setMessage] = useState<React.JSX.Element>(<SlashScreen><></></SlashScreen>)
-
-  const textMessage = useMemo(() => (
-    <Box fontSize={15} mt={1.2} p={3} borderRadius={2.6} bgcolor="#fff">
-      Aguarde mais um pouquinho,
-      <br />
-      estamos carregando...
-    </Box>
-  ), [])
+  const [message, setMessage] = useState<React.JSX.Element>(<></>)
 
   useEffect(() => {
     const showLoader = (): void => {
@@ -78,20 +70,22 @@ const Loader = ({ show, setLoading }: IProps): React.JSX.Element | boolean => {
   }, [])
 
   useEffect(() => {
-    if (disabled === 0 && (show || showByEvent)) {
-      setMessage(<SlashScreen><></></SlashScreen>)
-    }
-  }, [disabled, show, showByEvent, textMessage])
+    setMessage(<></>)
 
-  return (disabled === 0 && (show || showByEvent) && (
-    <Box className={styles.root}>
-      <Box p={1}>
-        <Typography align="center" variant="h6" color="primary">
-          {message}
-        </Typography>
-      </Box>
-    </Box>
-  ))
+    if (disabled === 0 && (show || showByEvent)) {
+      setMessage((
+        <Box className={styles.root}>
+          <Box p={1}>
+            <Typography align="center" variant="h6" color="primary">
+              <SlashScreen />
+            </Typography>
+          </Box>
+        </Box>
+      ))
+    }
+  }, [disabled, show, showByEvent])
+
+  return (disabled === 0 && (show || showByEvent) && message)
 }
 
 export default Loader

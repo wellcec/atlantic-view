@@ -15,8 +15,9 @@ import colors from '~/shared/theme/colors'
 import useTestsForm from '~/shared/hooks/useTestsForm'
 
 import {
+  MODES,
   type CreateProductType, type ImageType, type StatusProductType, type TagType
-} from 'models/products'
+} from '~/models/products'
 import { type CategoryType } from '~/models/categories'
 import { type VariationType } from '~/models/variations'
 
@@ -29,7 +30,7 @@ import AddVariations from '~/components/organisms/AddVariations'
 import AddCategories from '~/components/organisms/AddCategories'
 
 import useProductsService from '~/services/useProductsService'
-import { useAlerts } from '~/shared/alerts/AlertContext'
+import useAlerts from '~/shared/alerts/useAlerts'
 import ButtonRemove from '~/components/atoms/ButtonRemove'
 import useUtils from '~/shared/hooks/useUtils'
 import Images from './Images'
@@ -94,7 +95,7 @@ const New = (): React.JSX.Element => {
   })
 
   const styles = useStyles()
-  const { setAlert } = useAlerts()
+  const { notifySuccess, notifyWarning } = useAlerts()
   const { showErrorMsg } = useError()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
   const { getAllImages, deleteTempImageById, deleteImageById, createProduct, updateProduct } = useProductsService()
@@ -119,7 +120,17 @@ const New = (): React.JSX.Element => {
     }),
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: (data) => {
+    onSubmit: async (data) => {
+      if (images.length === 0) {
+        notifyWarning('O produto deve possuir ao menos uma imagem.')
+        return
+      }
+
+      if (categories.length === 0) {
+        notifyWarning('Adicione alguma categoria.')
+        return
+      }
+
       const payload: CreateProductType = {
         ...data,
         status: statusProduct,
@@ -131,27 +142,27 @@ const New = (): React.JSX.Element => {
         valueUnique: formatCurrencyRequest(data.valueUnique)
       }
 
-      if (mode === 'create') {
-        createProduct(payload).then(
+      if (mode === MODES.create) {
+        await createProduct(payload).then(
           () => {
             setProduct(undefined)
-            setMode('list')
-            setAlert({ type: 'success', message: 'Produto criado com sucesso.' })
+            notifySuccess('Produto criado com sucesso.')
           },
           showErrorMsg
         )
       }
 
-      if (mode === 'update' && product) {
-        updateProduct(product?.id, payload).then(
+      if (mode === MODES.update && product) {
+        await updateProduct(product?.id, payload).then(
           () => {
             setProduct(undefined)
-            setMode('list')
-            setAlert({ type: 'success', message: 'Produto atualizado com sucesso.' })
+            notifySuccess('Produto atualizado com sucesso.')
           },
           showErrorMsg
         )
       }
+
+      setMode(MODES.list)
     }
   })
 
@@ -171,7 +182,7 @@ const New = (): React.JSX.Element => {
     if (titleProduct && titleProduct !== '') {
       setOpenAddImages(!openAddImages)
     } else {
-      setAlert({ type: 'warning', message: 'Nome do produto é necessário.' })
+      notifyWarning('Nome do produto é necessário.')
     }
   }
 
@@ -183,14 +194,14 @@ const New = (): React.JSX.Element => {
       },
       showErrorMsg
     )
-  }, [getAllImages, setAlert])
+  }, [getAllImages, showErrorMsg])
 
   const onCreateImage = (image: ImageType): void => {
     setImages([...images, image])
   }
 
   const deleteImage = useCallback((id: string) => {
-    if (mode === 'create') {
+    if (mode === MODES.create) {
       deleteTempImageById(id).then(
         () => {
           getTempImages()
@@ -199,7 +210,7 @@ const New = (): React.JSX.Element => {
       )
     }
 
-    if (mode === 'update') {
+    if (mode === MODES.update) {
       deleteImageById(product?.id ?? '', id).then(
         () => {
           const newArrImages = images.filter((img) => img.id !== id)
@@ -208,10 +219,12 @@ const New = (): React.JSX.Element => {
         showErrorMsg
       )
     }
-  }, [deleteTempImageById, deleteImageById, getTempImages, setAlert, mode, product, images])
+  }, [
+    deleteTempImageById, deleteImageById, getTempImages, mode, product, images, showErrorMsg
+  ])
 
   useEffect(() => {
-    if (mode === 'create') {
+    if (mode === MODES.create) {
       getTempImages()
     }
   }, [getTempImages, mode])
@@ -257,7 +270,7 @@ const New = (): React.JSX.Element => {
   }, [product])
 
   return (
-    <Container title={mode === 'create' ? 'Novo produto' : 'Editar produto'}>
+    <Container title={mode === MODES.create ? 'Novo produto' : 'Editar produto'}>
       <Box display="flex" justifyContent="end">
         <Button variant="text" onClick={() => { setAllExpanded(!allExpanded) }}>
           <Box display="flex" alignItems="center" gap={2} mx={1.5}>
@@ -403,7 +416,7 @@ const New = (): React.JSX.Element => {
         <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
           <Button variant="outlined" color="primary" onClick={() => {
             setProduct(undefined)
-            setMode('list')
+            setMode(MODES.list)
           }}>
             Cancelar
           </Button>

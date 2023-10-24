@@ -77,6 +77,8 @@ const DEFAULT_VALUES = {
   shipping: ShippingKeys.correios
 }
 
+type TypeForm = typeof DEFAULT_VALUES
+
 const New = (): React.JSX.Element => {
   const [panelAccordion, setPanelAccordion] = useState(firstInfoKey)
   const [allExpanded, setAllExpanded] = useState(true)
@@ -114,13 +116,13 @@ const New = (): React.JSX.Element => {
       length: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       width: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       shipping: Yup.string().required(PREENCHIMENTO_OBRIGATORIO).test({
-        test: (v) => (v === ShippingKeys.free || v === ShippingKeys.correios),
+        test: (v: any) => (v === ShippingKeys.free || v === ShippingKeys.correios),
         message: 'Tipo de frete inválido'
       })
     }),
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: async (data) => {
+    onSubmit: async (data: TypeForm) => {
       if (images.length === 0) {
         notifyWarning('O produto deve possuir ao menos uma imagem.')
         return
@@ -153,7 +155,7 @@ const New = (): React.JSX.Element => {
       }
 
       if (mode === MODES.update && product) {
-        await updateProduct(product?.id, payload).then(
+        await updateProduct(product?._id ?? '', payload).then(
           () => {
             setProduct(undefined)
             notifySuccess('Produto atualizado com sucesso.')
@@ -211,9 +213,9 @@ const New = (): React.JSX.Element => {
     }
 
     if (mode === MODES.update) {
-      deleteImageById(product?.id ?? '', id).then(
+      deleteImageById(product?._id ?? '', id).then(
         () => {
-          const newArrImages = images.filter((img) => img.id !== id)
+          const newArrImages = images.filter((img) => img._id !== id)
           setImages([...newArrImages])
         },
         showErrorMsg
@@ -244,7 +246,8 @@ const New = (): React.JSX.Element => {
         tags = [],
         images = [],
         categories = [],
-        variations = []
+        variations = [],
+        shipping
       } = product || {}
 
       formik.setFieldValue('title', title)
@@ -255,6 +258,7 @@ const New = (): React.JSX.Element => {
       formik.setFieldValue('valueUnique', formatCurrencyString(valueUnique))
       formik.setFieldValue('width', width)
       formik.setFieldValue('weight', weight)
+      formik.setFieldValue('shipping', shipping)
 
       setCategories(categories)
       setImages(images)
@@ -311,7 +315,7 @@ const New = (): React.JSX.Element => {
                     <ImageListItemBar
                       className={styles.imageBar}
                       actionIcon={
-                        <ButtonRemove title="Remover imagem" onClick={() => { deleteImage(img.id) }} />
+                        <ButtonRemove title="Remover imagem" onClick={() => { deleteImage(img._id) }} />
                       }
                     />
                   </ImageListItem>

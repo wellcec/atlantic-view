@@ -1,7 +1,7 @@
 import { type AxiosResponse } from 'axios'
 
 export interface UserType {
-  id: string
+  _id: string
   name: string
   document: string
   createdDate: Date

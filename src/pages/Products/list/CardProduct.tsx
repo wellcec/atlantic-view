@@ -48,7 +48,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
         sx={{ height: 200, cursor: 'pointer' }}
         image={`images/${product.images[0].fileName}`}
         title={product.title}
-        onClick={() => { handleEdit(product.id) }}
+        onClick={() => { handleEdit(product._id ?? '') }}
       />
 
       <CardContent>
@@ -73,7 +73,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
             <Switch
               size="small"
               checked={product?.status?.isActive ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isActive: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product._id ?? '', { isActive: checked }) }}
             />
           </Box>
 
@@ -85,7 +85,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
             <Switch
               size="small"
               checked={product?.status?.isHighlighted ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id, { isHighlighted: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product._id ?? '', { isHighlighted: checked }) }}
             />
           </Box>
         </Box>

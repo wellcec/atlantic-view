@@ -37,6 +37,7 @@ const AddCategories = ({
   const [selected, setSelected] = useState<CategoryType | null>(null)
   const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
 
+  console.log('selected', selected)
   const { getCategories } = useCategoriesService()
   const { notifyError } = useAlerts()
 
@@ -57,7 +58,7 @@ const AddCategories = ({
 
   const handleAddCategory = (newSubCategory: SubCategoryType): void => {
     if (selected) {
-      const existCategory = data.find((cat) => cat.id === selected.id)
+      const existCategory = data.find((cat) => cat._id === selected._id)
 
       if (!existCategory) {
         const newCategory: CategoryType = {
@@ -71,7 +72,7 @@ const AddCategories = ({
         setData(newarr)
       } else {
         const existSubcat = existCategory
-          .subCategories.find((subCat) => subCat.id === newSubCategory.id)
+          .subCategories.find((subCat) => subCat._id === newSubCategory._id)
 
         if (!existSubcat) {
           const newSubcats = [...existCategory.subCategories, newSubCategory]
@@ -85,7 +86,7 @@ const AddCategories = ({
   }
 
   const handleRemove = (category: CategoryType, subCategory: SubCategoryType): void => {
-    const newSubcats = category.subCategories.filter((subCat) => subCat.id !== subCategory.id)
+    const newSubcats = category.subCategories.filter((subCat) => subCat._id !== subCategory._id)
     const index = data.indexOf(category)
     data[index].subCategories = newSubcats
 
@@ -99,7 +100,7 @@ const AddCategories = ({
   const isAlreadyAdd = (subCategory: SubCategoryType): boolean => {
     const category = data
       .find((catItem) => catItem.subCategories
-        .find((subCatItem) => subCatItem.id === subCategory.id))
+        .find((subCatItem) => subCatItem._id === subCategory._id))
     return !!category
   }
 
@@ -135,7 +136,7 @@ const AddCategories = ({
               noOptionsText="Nenhuma opção correspondente"
               ListboxProps={{ style: { fontSize: 16 } }}
               PaperComponent={CustomPaper}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option._id === value._id}
               renderInput={(params) => (
                 <TextField
                   {...params}

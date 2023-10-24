@@ -37,6 +37,8 @@ const DEFAULT_VALUES = {
   name: ''
 }
 
+type TypeForm = typeof DEFAULT_VALUES
+
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
@@ -70,7 +72,7 @@ const Categories = (): React.JSX.Element => {
     }),
     validateOnBlur: true,
     validateOnChange: true,
-    onSubmit: (data) => {
+    onSubmit: (data: TypeForm) => {
       if (action === ACTIONS.create) {
         const category: CategoryType = {
           name: data.name,
@@ -92,7 +94,7 @@ const Categories = (): React.JSX.Element => {
       }
 
       if (action === ACTIONS.update) {
-        getProductsByCategory(objToAction?.id ?? '').then(
+        getProductsByCategory(objToAction?._id ?? '').then(
           (response) => {
             const { data = [], count } = response.data || {}
             if (count > 0) {
@@ -119,6 +121,7 @@ const Categories = (): React.JSX.Element => {
     getCategories(newFilter ?? filter).then(
       (response: GetAllCategoriesType) => {
         const { data = [], count } = response.data ?? {}
+
         setTotalCategories(count)
         setCategories(data)
       },
@@ -138,7 +141,7 @@ const Categories = (): React.JSX.Element => {
   }
 
   const deleteCategory = useCallback(() => {
-    deleteCat(objToAction?.id ?? '').then(
+    deleteCat(objToAction?._id ?? '').then(
       () => {
         notifySuccess('Categoria excluída com sucesso.')
         setConfirmOpen(false)
@@ -158,7 +161,7 @@ const Categories = (): React.JSX.Element => {
       subCategories
     }
 
-    updateCat(objToAction?.id ?? '', category).then(
+    updateCat(objToAction?._id ?? '', category).then(
       () => {
         notifySuccess('Categoria atualizada com sucesso.')
         setAction(ACTIONS.create)
@@ -175,7 +178,7 @@ const Categories = (): React.JSX.Element => {
         setOpenModal(false)
       }
     )
-  }, [formik.values.name, getAllCategories, objToAction?.id, notifySuccess, notifyError, subCategories, updateCat])
+  }, [formik.values.name, getAllCategories, objToAction?._id, notifySuccess, notifyError, subCategories, updateCat])
 
   const handleNewCategory = (): void => {
     formik.resetForm()

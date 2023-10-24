@@ -110,7 +110,7 @@ const List = (): React.JSX.Element => {
   }
 
   const handleDelete = (): void => {
-    deleteProduct(objToAction?.id ?? '').then(
+    deleteProduct(objToAction?._id ?? '').then(
       () => {
         getProducts()
         notifySuccess('Produto excluído com sucesso.')

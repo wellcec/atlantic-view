@@ -1,7 +1,7 @@
 import { type AxiosResponse } from 'axios'
 
 export interface VariationType {
-  id?: string
+  _id: string
   name: string
   createdDate?: Date
 }

@@ -1,15 +1,18 @@
 import React from 'react'
-import { Box, Button } from '@mui/material'
+import { Box, Fab } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 import { IconDelete } from '~/constants/icons'
 
 const useStyles = makeStyles(() => ({
-  buttonAdd: {
-    paddingLeft: 12,
-    paddingRight: 12,
-    minWidth: 46,
+  buttonRemove: {
+    maxHeight: 46,
     maxWidth: 46,
-    borderRadius: '50%'
+    zIndex: 'auto',
+
+    '& svg': {
+      color: '#fff',
+      fill: '#fff'
+    }
   }
 }))
 
@@ -22,11 +25,11 @@ const ButtonRemove = ({ title, onClick }: IProps): React.JSX.Element => {
   const styles = useStyles()
 
   return (
-    <Button variant="contained" color="error" title={title} className={styles.buttonAdd} onClick={onClick}>
+    <Fab color="error" title={title} className={styles.buttonRemove} onClick={onClick}>
       <Box display="flex" alignItems="center">
-        <IconDelete color="#fff" />
+        <IconDelete />
       </Box>
-    </Button>
+    </Fab>
   )
 }
 

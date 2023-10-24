@@ -1,13 +1,13 @@
 import { type AxiosResponse } from 'axios'
 
 export interface SubCategoryType {
-  id?: string
+  _id: string
   name: string
   createdDate?: Date
 }
 
 export interface CategoryType {
-  id?: string
+  _id?: string
   name: string
   subCategories: SubCategoryType[]
   createdDate?: Date

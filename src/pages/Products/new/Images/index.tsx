@@ -84,7 +84,7 @@ const Images = ({
         (response) => {
           const data = response?.data ?? {}
 
-          if (data?.id) {
+          if (data?._id) {
             onCreateImage(data)
           }
         },

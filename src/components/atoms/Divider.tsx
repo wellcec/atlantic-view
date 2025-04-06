@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography, Divider as ComponentDivider } from '@mui/material'
+import { Typography, Divider as ComponentDivider, Box } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
 const useStyles = makeStyles(() => ({
@@ -16,9 +16,10 @@ const useStyles = makeStyles(() => ({
 interface IProps {
   title: string
   hasControl?: boolean
+  Buttons?: React.JSX.Element
 }
 
-const Divider = ({ title, hasControl }: IProps): React.JSX.Element => {
+const Divider = ({ title, hasControl, Buttons }: IProps): React.JSX.Element => {
   const styles = useStyles()
 
   return (
@@ -34,9 +35,13 @@ const Divider = ({ title, hasControl }: IProps): React.JSX.Element => {
       }}
       style={{ width: hasControl ? '92%' : '98%' }}
     >
-      <Typography variant="body1" fontWeight={600}>
-        {title}
-      </Typography>
+      <Box display="flex" alignItems="center" gap={1}>
+        <Typography variant="body1" fontWeight={600}>
+          {title}
+        </Typography>
+
+        {Buttons && (Buttons)}
+      </Box>
     </ComponentDivider>
   )
 }

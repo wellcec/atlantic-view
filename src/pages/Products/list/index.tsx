@@ -100,7 +100,7 @@ const List = (): React.JSX.Element => {
     }
 
     setProducts([...products])
-    updateStatusProduct(id, status).then(
+    updateStatusProduct(id, products[index].status).then(
       () => { },
       (err) => {
         const { message } = err?.data ?? {}
@@ -110,7 +110,7 @@ const List = (): React.JSX.Element => {
   }
 
   const handleDelete = (): void => {
-    deleteProduct(objToAction?._id ?? '').then(
+    deleteProduct(objToAction?.id ?? '').then(
       () => {
         getProducts()
         notifySuccess('Produto excluído com sucesso.')
@@ -129,7 +129,7 @@ const List = (): React.JSX.Element => {
   const handleEdit = (id: string): void => {
     getProductById(id).then(
       (response) => {
-        setProduct(response?.data ?? undefined)
+        setProduct(response?.data.result ?? undefined)
         setMode(MODES.update)
       },
       (err) => {

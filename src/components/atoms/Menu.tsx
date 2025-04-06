@@ -1,16 +1,21 @@
 import React, { type PropsWithChildren } from 'react'
 import {
-  Menu as ComponentMenu, type Theme
+  Menu as ComponentMenu
 } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
+import { type Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme: Theme) => ({
-  menu: {
-    '& .MuiPaper-root': {
-      boxShadow: theme.shadows[8]
+const useStyles = makeStyles((theme: Theme) => {
+  console.log('asdasas', theme)
+
+  return ({
+    menu: {
+      '& .MuiPaper-root': {
+        boxShadow: theme.shadows[8]
+      }
     }
-  }
-}))
+  })
+})
 
 interface IProps {
   open: boolean

@@ -5,6 +5,9 @@ export const DEFAULT_THEME: IDefaultTheme = {
   primary: '#4d4cac'
 }
 
+export const FOLDER_TEMP = 'temp'
+export const FOLDER_IMAGES = 'images'
+
 export const NEW_PRODUCT_KEYS = {
   firstInfo: 'firstInfo',
   images: 'images',

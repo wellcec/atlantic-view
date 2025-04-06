@@ -1,15 +1,17 @@
 import { type AxiosResponse } from 'axios'
+import type IBaseResponseType from './base'
 
 export interface SubCategoryType {
-  _id: string
+  // id: string
   name: string
   createdDate?: Date
 }
 
 export interface CategoryType {
-  _id?: string
+  id?: string
   name: string
   subCategories: SubCategoryType[]
+  updatedDate?: Date
   createdDate?: Date
 }
 
@@ -18,6 +20,10 @@ export interface IGetAllCategoriesResponse {
   page: number
   pageSize: number
   count: number
+}
+
+export interface IResponseCreateCategory extends IBaseResponseType {
+  result: CategoryType
 }
 
 export type GetAllCategoriesType = AxiosResponse<IGetAllCategoriesResponse, any>

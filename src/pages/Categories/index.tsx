@@ -18,7 +18,6 @@ import { type CategoryType, type GetAllCategoriesType, type SubCategoryType } fr
 import Paper from '~/components/layout/Paper'
 import Modal from '~/components/molecules/Modal'
 import useCategoriesService from '~/services/useCategoriesService'
-import useProductsService from '~/services/useProductsService'
 import { PREENCHIMENTO_OBRIGATORIO } from '~/constants/messages'
 import useAlerts from '~/shared/alerts/useAlerts'
 import useDebounce from '~/shared/hooks/useDebounce'
@@ -59,9 +58,8 @@ const Categories = (): React.JSX.Element => {
   const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
 
   const {
-    getCategories, createCategory, updateCategory: updateCat, deleteCategory: deleteCat
+    getCategories, createCategory, updateCategory: updateCat, deleteCategory: deleteCat, productByCategory
   } = useCategoriesService()
-  const { getProductsByCategory } = useProductsService()
   const { notifyError, notifySuccess } = useAlerts()
   const { debounceWait } = useDebounce()
 
@@ -94,13 +92,13 @@ const Categories = (): React.JSX.Element => {
       }
 
       if (action === ACTIONS.update) {
-        getProductsByCategory(objToAction?._id ?? '').then(
+        productByCategory(objToAction?.id ?? '').then(
           (response) => {
-            const { data = [], count } = response.data || {}
-            if (count > 0) {
-              setTotalByCategory(count)
+            const { result } = response.data || {}
+            if (result.length > 0) {
+              setTotalByCategory(result.length)
               setConfirmUpdateOpen(true)
-              setProductsByCategory(data)
+              setProductsByCategory(result)
             } else {
               updateCategory()
             }
@@ -141,7 +139,7 @@ const Categories = (): React.JSX.Element => {
   }
 
   const deleteCategory = useCallback(() => {
-    deleteCat(objToAction?._id ?? '').then(
+    deleteCat(objToAction?.id ?? '').then(
       () => {
         notifySuccess('Categoria excluída com sucesso.')
         setConfirmOpen(false)
@@ -161,7 +159,7 @@ const Categories = (): React.JSX.Element => {
       subCategories
     }
 
-    updateCat(objToAction?._id ?? '', category).then(
+    updateCat(objToAction?.id ?? '', category).then(
       () => {
         notifySuccess('Categoria atualizada com sucesso.')
         setAction(ACTIONS.create)
@@ -178,7 +176,7 @@ const Categories = (): React.JSX.Element => {
         setOpenModal(false)
       }
     )
-  }, [formik.values.name, getAllCategories, objToAction?._id, notifySuccess, notifyError, subCategories, updateCat])
+  }, [formik.values.name, getAllCategories, objToAction?.id, notifySuccess, notifyError, subCategories, updateCat])
 
   const handleNewCategory = (): void => {
     formik.resetForm()

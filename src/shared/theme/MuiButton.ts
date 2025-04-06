@@ -5,8 +5,8 @@ export const buttonStyle = {
   borderRadius: 25,
   lineHeight: '14px',
   padding: '9px 30px',
-  minHeight: 45,
-  maxHeight: 45
+  minHeight: 40,
+  maxHeight: 40
 }
 export const buttonPrimaryStyle = {
   ...buttonStyle,

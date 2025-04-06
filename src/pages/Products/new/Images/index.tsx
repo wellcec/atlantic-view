@@ -14,7 +14,7 @@ import useProductsService from '~/services/useProductsService'
 import useAlerts from '~/shared/alerts/useAlerts'
 import { IconUpload } from '~/constants/icons'
 import colors from '~/shared/theme/colors'
-import { type ImageType } from '~/models/products'
+import { type Mode, type ImageType } from '~/models/products'
 
 const centerAspectCrop = (
   mediaWidth: number,
@@ -35,22 +35,20 @@ const centerAspectCrop = (
 )
 
 interface IProps {
-  lengthImages: number
-  titleProduct: string
+  fileName: string
   open: boolean
+  mode: Mode
   handleClose: () => void
   onCreateImage: (image: ImageType) => void
 }
 
-const Images = ({
-  lengthImages, titleProduct, open, handleClose, onCreateImage
-}: IProps): React.JSX.Element => {
+const Images = ({ fileName, open, mode, handleClose, onCreateImage }: IProps): React.JSX.Element => {
   const [image, setImage] = useState<any>(undefined)
   const [crop, setCrop] = useState<Crop>()
   const [fileImage, setFileImage] = useState<any>()
 
-  const { base64ToImage, imageToBase64, normalize } = useUtils()
-  const { uploadImage } = useProductsService()
+  const { base64ToImage, imageToBase64 } = useUtils()
+  const { uploadImage, uploadTempImage } = useProductsService()
   const { notifyError } = useAlerts()
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
@@ -77,22 +75,39 @@ const Images = ({
 
     const base64image = imageToBase64(fileImage, crop)
     if (base64image) {
-      const nameImage = normalize(titleProduct)
-      const formdataimage = base64ToImage(base64image, `${lengthImages}-${nameImage}.png`)
+      const formdataimage = base64ToImage(base64image, `${fileName}.png`)
 
-      await uploadImage([formdataimage]).then(
-        (response) => {
-          const data = response?.data ?? {}
+      if (mode === 'create') {
+        await uploadTempImage([formdataimage]).then(
+          (response) => {
+            const data = response?.data ?? {}
 
-          if (data?._id) {
-            onCreateImage(data)
+            if (data?.result) {
+              onCreateImage(data?.result)
+            }
+          },
+          (err) => {
+            const { message } = err
+            notifyError(message)
           }
-        },
-        (err) => {
-          const { message } = err
-          notifyError(message)
-        }
-      )
+        )
+      }
+
+      if (mode === 'update') {
+        await uploadImage([formdataimage]).then(
+          (response) => {
+            const data = response?.data ?? {}
+
+            if (data?.result) {
+              onCreateImage(data?.result)
+            }
+          },
+          (err) => {
+            const { message } = err
+            notifyError(message)
+          }
+        )
+      }
 
       handleClose()
       setImage('')

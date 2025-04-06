@@ -58,6 +58,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' && pr
   flexDirection: 'column',
   flexGrow: 1,
   padding: theme.spacing(3),
+  width: '100%',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen
@@ -122,6 +123,8 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
 
   const [openDrawer, setOpenDrawer] = useState<boolean>(true)
 
+  const downSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
+
   const switchRoute = (path: string): void => {
     if (downSM) {
       setOpenDrawer(false)
@@ -130,8 +133,6 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
   }
 
   const isCurrentPath = (paths: string[]): boolean => paths.includes(location.pathname)
-
-  const downSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
 
   return (
     <Box display="flex" height={1} overflow="auto" style={{ overflowX: 'hidden' }}>

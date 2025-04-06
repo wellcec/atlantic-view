@@ -1,6 +1,6 @@
 export const ShippingKeys = {
-  free: 'free',
-  correios: 'correios'
+  free: 0,
+  correios: 1
 }
 
 export const ShipingOptions = [

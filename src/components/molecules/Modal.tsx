@@ -1,6 +1,6 @@
-import React, { type PropsWithChildren } from 'react'
+import React, { type PropsWithChildren, useEffect, useRef } from 'react'
 import {
-  Box, Modal as ComponentModal, Fade, IconButton, Paper, type Theme, Typography
+  Box, Modal as ComponentModal, IconButton, Paper, type Theme, Typography
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import makeStyles from '@mui/styles/makeStyles'
@@ -54,35 +54,51 @@ const Modal = ({
 }: PropsWithChildren<IProps>): React.JSX.Element => {
   const styles = useStyles()
 
+  const ref = useRef(null)
+
+  const handleClickOutside = (event: MouseEvent): void => {
+    // @ts-expect-error
+    const idmodal = event.target?.id ?? ''
+
+    if (idmodal === 'default-modal-component') {
+      handleClose()
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   return (
     <ComponentModal
+      ref={ref}
       open={open}
       onClose={handleClose}
-      closeAfterTransition
     >
-      <Fade in={open}>
-        <Box className={styles.modal}>
-          <Paper className={styles.paper}>
-            {title && (
-              <Typography variant="subtitle1" color="text.main" className={styles.titulo}>
-                {title}
-              </Typography>
-            )}
+      <Box className={styles.modal} id="default-modal-component">
+        <Paper className={styles.paper}>
+          {title && (
+            <Typography variant="subtitle1" color="text.main" className={styles.titulo}>
+              {title}
+            </Typography>
+          )}
 
-            <IconButton
-              title="Fechar"
-              className={styles.close}
-              onClick={handleClose}
-            >
-              <CloseIcon />
-            </IconButton>
+          <IconButton
+            title="Fechar"
+            className={styles.close}
+            onClick={handleClose}
+          >
+            <CloseIcon />
+          </IconButton>
 
-            <Box mt={3}>
-              {children}
-            </Box>
-          </Paper>
-        </Box>
-      </Fade>
+          <Box mt={3}>
+            {children}
+          </Box>
+        </Paper>
+      </Box>
     </ComponentModal>
   )
 }

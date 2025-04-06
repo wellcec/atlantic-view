@@ -15,13 +15,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import { type ProductType, type StatusProductType } from '~/models/products'
 import useUtils from '~/shared/hooks/useUtils'
+import { env } from '~/config/env'
 
 const useStyles = makeStyles((theme: Theme) => ({
   actions: {
     justifyContent: 'space-between'
   },
   card: {
-    transition: `all 0.3s ${theme.transitions.easing.easeInOut}`,
+    // transition: `all 0.3s ${theme.transitions.easing.easeInOut}`,
     '&:hover': {
       opacity: '0.9'
     }
@@ -46,9 +47,9 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
       <CardMedia
         className={styles.card}
         sx={{ height: 200, cursor: 'pointer' }}
-        image={`images/${product.images[0].fileName}`}
+        image={`${env.api.FILES_BASE_URL}images/${product.images[0].fileName}`}
         title={product.title}
-        onClick={() => { handleEdit(product._id ?? '') }}
+        onClick={() => { handleEdit(product.id ?? '') }}
       />
 
       <CardContent>
@@ -73,7 +74,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
             <Switch
               size="small"
               checked={product?.status?.isActive ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product._id ?? '', { isActive: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id ?? '', { isActive: checked }) }}
             />
           </Box>
 
@@ -85,7 +86,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
             <Switch
               size="small"
               checked={product?.status?.isHighlighted ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product._id ?? '', { isHighlighted: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id ?? '', { isHighlighted: checked }) }}
             />
           </Box>
         </Box>

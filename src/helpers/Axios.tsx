@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 import useSecurity from '~/shared/hooks/useSecurity'
+import { env } from '~/config/env'
 
-axios.defaults.baseURL = 'http://localhost:3001/'
+axios.defaults.baseURL = env.api.API_BASE_URL
 
 interface IProps {
   handleShowLoading: (loading: boolean) => void

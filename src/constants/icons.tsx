@@ -2,6 +2,7 @@ import React from 'react'
 import SVG from 'react-inlinesvg'
 
 import iconEdit from '~/assets/icons/icon-edit.svg'
+import iconAdd from '~/assets/icons/icon-add.svg'
 import iconDelete from '~/assets/icons/icon-delete.svg'
 import iconSearch from '~/assets/icons/icon-search.svg'
 import iconDoubleArrowDown from '~/assets/icons/icon-double-arrow-down.svg'
@@ -20,6 +21,10 @@ interface IColor {
   color?: string
   size?: number
 }
+
+export const IconAdd = ({ color = colors.error.main, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconAdd} width={size} height={size} fill={color} />
+)
 
 export const IconEdit = ({ color = colors.primary.main, size = SIZE_ICONS }: IColor): React.JSX.Element => (
   <SVG src={iconEdit} width={size} height={size} fill={color} />

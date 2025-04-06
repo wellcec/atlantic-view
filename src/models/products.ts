@@ -1,21 +1,21 @@
 import type React from 'react'
 import { type AxiosResponse } from 'axios'
 import { type CategoryType } from './categories'
+import type IBaseResponseType from './base'
 
 export interface ImageType {
-  _id: string
+  id: string
   fileName: string
   base64: string
   createdDate: Date
 }
 
 export interface TagType {
-  _id: string
   name: string
 }
 
 export interface VariantionType {
-  _id: string
+  id: string
   name: string
 }
 
@@ -31,7 +31,7 @@ export interface StatusProductType {
 export type StatusProductProps = keyof StatusProductType
 
 export interface ProductType {
-  _id?: string
+  id?: string
   title: string
   subtitle: string
   value: number
@@ -43,14 +43,14 @@ export interface ProductType {
   categories: CategoryType[]
   images: ImageType[]
   variations: VariantionType[]
-  tags: TagType[]
+  tags: string[]
   status: StatusProductType
-  shipping: string
+  shipping: number
   createdDate: Date
   updatedDate: Date
 }
 
-export type CreateProductType = Omit<ProductType, '_id' | 'createdDate' | 'updatedDate'>
+export type CreateProductType = Omit<ProductType, 'id' | 'createdDate' | 'updatedDate'>
 
 export interface IGetAllProductsResponse {
   data: ProductType[]
@@ -63,6 +63,14 @@ export type GetAllProductsType = AxiosResponse<IGetAllProductsResponse, any>
 
 export interface IGetAllImagesResponse {
   data: ImageType[]
+}
+
+export interface IResponseProduct extends IBaseResponseType {
+  result: ProductType
+}
+
+export interface IResponseProductsByCategory extends IBaseResponseType {
+  result: ProductType[]
 }
 
 export type Mode = 'create' | 'update' | 'list'

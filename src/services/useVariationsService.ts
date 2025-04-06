@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
 import axios, { type AxiosResponse } from 'axios'
-import { type ISampleFilter, type ISuccessResponse } from 'models'
-import { type VariationType, type IGetAllVariationsResponse } from 'models/variations'
+import { type ISampleFilter } from 'models'
+import { type VariationType, type IGetAllVariationsResponse, type IResponseTypeVariation, type TypeVariationType, type IResponseCreateTypeVariation } from 'models/variations'
+import { type ISuccessResponse } from '~/models/base'
 
 const noLoading: any = {
   noLoading: true
@@ -11,6 +12,8 @@ interface IVariationsService {
   getVariations: (filter: ISampleFilter) => Promise<AxiosResponse<IGetAllVariationsResponse, any>>
   createVariation: (data: VariationType) => Promise<AxiosResponse<ISuccessResponse, any>>
   deleteVariation: (id: string) => Promise<AxiosResponse<ISuccessResponse, any>>
+  getTypeVariations: () => Promise<AxiosResponse<IResponseTypeVariation, any>>
+  createTypeVariation: (data: TypeVariationType) => Promise<AxiosResponse<IResponseCreateTypeVariation, any>>
 }
 
 const useVariationsService = (): IVariationsService => {
@@ -20,10 +23,16 @@ const useVariationsService = (): IVariationsService => {
 
   const deleteVariation = useCallback((id: string) => axios.delete<ISuccessResponse>(`api/variations/${id}`), [])
 
+  const getTypeVariations = useCallback(() => axios.get<IResponseTypeVariation>('api/variations/type', noLoading), [])
+
+  const createTypeVariation = useCallback((data: TypeVariationType) => axios.post<IResponseCreateTypeVariation>('api/variations/type/create', data), [])
+
   return {
     getVariations,
     createVariation,
-    deleteVariation
+    deleteVariation,
+    getTypeVariations,
+    createTypeVariation
   }
 }
 

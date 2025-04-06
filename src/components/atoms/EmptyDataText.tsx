@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material'
 import React from 'react'
+import { Box, Typography } from '@mui/material'
 
 interface IProps {
   text: string
@@ -7,9 +7,11 @@ interface IProps {
 
 const EmptyDataText = ({ text }: IProps): React.JSX.Element => (
   <Box width={1} textAlign="center">
-    <Typography variant="body2" color="primary">
-      <i>{text}</i>
-    </Typography>
+    <Typography
+      variant="body2"
+      color="primary"
+      dangerouslySetInnerHTML={{ __html: `<i>${text}</i>` }}
+    />
   </Box>
 )
 

@@ -1,9 +1,33 @@
 import { type AxiosResponse } from 'axios'
+import type IBaseResponseType from './base'
+import { type ISuccessResponse } from './base'
 
 export interface VariationType {
-  _id: string
+  id?: string
+  idType?: string
+  nameType?: string
+  images?: string[]
   name: string
   createdDate?: Date
+}
+
+export interface TypeVariationType {
+  id?: string
+  name: string
+  hasImages: boolean
+  createdDate?: Date
+}
+
+export interface TypeVariationViewType extends TypeVariationType {
+  variations?: VariationType[]
+}
+
+export interface IResponseCreateTypeVariation extends ISuccessResponse {
+  result: TypeVariationType
+}
+
+export interface IResponseTypeVariation extends IBaseResponseType {
+  data: TypeVariationType[]
 }
 
 export interface IGetAllVariationsResponse {

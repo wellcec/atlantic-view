@@ -3,13 +3,12 @@ import { Box, Chip } from '@mui/material'
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
 import { IconDelete } from '~/constants/icons'
-import { type VariationType } from '~/models/variations'
 
 interface IProps {
   text: string
   titleButton: string
   data: any[]
-  setData: (variationAdded: VariationType[]) => void
+  setData: (item: any[]) => void
   action?: (item: any) => void
   actionDelete?: (item: any) => void
 }

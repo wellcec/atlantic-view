@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 
+import type IBaseResponseType from './base'
+
 export interface IDefaultTheme {
   id: string
   primary: string
@@ -12,8 +14,8 @@ export interface IMenuItem {
   paths: string[]
 }
 
-export interface ISuccessResponse {
-  message: string
+export interface IResponseMutation extends IBaseResponseType {
+  result: number
 }
 
 export interface INoLoading {

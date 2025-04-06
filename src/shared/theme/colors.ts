@@ -13,6 +13,7 @@ interface Pallete {
   background: {
     main: string
     container: string
+    borderLight: string
   }
   info: {
     light: string
@@ -55,7 +56,8 @@ const colors: Pallete = {
   },
   background: {
     main: '#fff',
-    container: '#f0f0f9'
+    container: '#f0f0f9',
+    borderLight: '#B1B3C9'
   },
   info: {
     light: '#ECF8FF',

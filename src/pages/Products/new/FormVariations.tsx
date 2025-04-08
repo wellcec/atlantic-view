@@ -261,7 +261,6 @@ const FormVariations = (): React.JSX.Element => {
                 deleteIcon={(
                   <Box display="flex" alignItems="center">
                     {isSelectedTypeVariation(item) && (<IconCheckCircule color={colors.success.main} />)}
-                    {!isSelectedTypeVariation(item) && (<IconDelete />)}
                   </Box>
                 )}
               />

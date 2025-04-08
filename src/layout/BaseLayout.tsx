@@ -21,10 +21,12 @@ import { styled, type CSSObject } from '@mui/material/styles'
 import makeStyles from '@mui/styles/makeStyles'
 
 import iconLogo from '~/assets/images/logo64.png'
+import animation from '~/assets/LogoAnimation.json'
 import colors from '~/shared/theme/colors'
 import { DEFAULT_THEME } from '~/constants'
 import { MenuItems } from '~/constants/menus'
 import { IconMenuHamburguer, IconSingleArrowLeftCircule } from '~/constants/icons'
+import { Player } from '@lottiefiles/react-lottie-player'
 
 const drawerWidth = 240
 
@@ -181,14 +183,22 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
       >
         <Box
           p={2.1}
+          mb={2}
           display="flex"
           minHeight={100}
           alignItems="center"
           justifyContent={openDrawer ? 'space-between' : 'center'}
         >
           {openDrawer && (
-            <Box display="flex" gap="10px" alignItems="center" ml={8}>
-              <img src={iconLogo} alt="Logo" />
+            <Box display="flex" gap="10px" alignItems="center" ml={1.2} mb={2}>
+              <Box width={160} height={100}>
+                <Player
+                  src={animation}
+                  className="player"
+                  loop
+                  autoplay
+                />
+              </Box>
             </Box>
           )}
 
@@ -203,7 +213,7 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
           </IconButton>
         </Box>
 
-        <List>
+        <List sx={{ flex: 1 }}>
           {MenuItems.map((menuItem, index) => (
             <ListItem
               disablePadding
@@ -230,6 +240,12 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
             </ListItem>
           ))}
         </List>
+
+        <Box textAlign="center" mb={2}>
+          <Typography variant="body2" color="primary">
+            <i>Atlantic v1.0.0</i>
+          </Typography>
+        </Box>
       </Drawer>
 
       <Main open={openDrawer} mobile={downSM}>

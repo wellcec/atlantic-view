@@ -1,8 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import {
-  Box, Button, Chip,
-  Grid, ImageList, ImageListItem, ImageListItemBar
-} from '@mui/material'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Box, Button, Grid } from '@mui/material'
+import TrendingFlatIcon from '@mui/icons-material/TrendingFlat'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import makeStyles from '@mui/styles/makeStyles'
@@ -15,32 +13,26 @@ import useTestsForm from '~/shared/hooks/useTestsForm'
 
 import {
   MODES,
-  type CreateProductType, type ImageType, type StatusProductType, type TagType
+  type CreateProductType, type StatusProductType, type TagType
 } from '~/models/products'
 import { type CategoryType } from '~/models/categories'
-import { type VariationType } from '~/models/variations'
 
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import AddChips from '~/components/molecules/AddChips'
 import Container from '~/components/layout/ContainerMain'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
-import AddVariations from '~/components/organisms/AddVariations'
 import AddCategories from '~/components/organisms/AddCategories'
 
 import useProductsService from '~/services/useProductsService'
 import useAlerts from '~/shared/alerts/useAlerts'
-import ButtonRemove from '~/components/atoms/ButtonRemove'
 import useUtils from '~/shared/hooks/useUtils'
-import Images from './Images'
 import FormProduct from './FormProduct'
 import ChipsCategories from './ChipsCategories'
-import { useProductsContext } from '../fragments/context'
-import { ShippingKeys } from '../fragments/constants'
+import { useProductsContext } from '../context'
+import { DefaultProduct, DefaultStatusProduct, ShippingKeys } from '../constants'
 import FormStatus from './FormStatus'
 import useError from '~/shared/hooks/useError'
-import { env } from '~/config/env'
 import ButtonTab from '~/components/atoms/ButtonTab'
-import Divider from '~/components/atoms/Divider'
 import FormVariations from './FormVariations'
 
 const {
@@ -77,15 +69,9 @@ const useStyles = makeStyles(() => ({
 }))
 
 const DEFAULT_VALUES = {
-  title: '',
-  subtitle: '',
+  ...DefaultProduct,
   value: 'R$ 0,00',
-  valueUnique: 'R$ 0,00',
-  weight: 0,
-  height: 0,
-  length: 0,
-  width: 0,
-  shipping: ShippingKeys.correios
+  valueUnique: 'R$ 0,00'
 }
 
 type TypeForm = typeof DEFAULT_VALUES
@@ -93,23 +79,14 @@ type TypeForm = typeof DEFAULT_VALUES
 const New = (): React.JSX.Element => {
   const [selectedTab, setSelectedTab] = useState(firstInfoKey)
   const [tags, setTags] = useState<TagType[]>([])
-  const [categories, setCategories] = useState<CategoryType[]>([])
   const [openAddCategories, setOpenAddCategories] = useState<boolean>(false)
-  const [variations, setVariations] = useState<VariationType[]>([])
-  const [images, setImages] = useState<ImageType[]>([])
-  const [openAddImages, setOpenAddImages] = useState<boolean>(false)
-  const [statusProduct, setStatusProduct] = useState<StatusProductType>({
-    isLaunch: false,
-    isSale: false,
-    isBestSeller: false,
-    isPreOrder: false
-  })
+  const [statusProduct, setStatusProduct] = useState<StatusProductType>(DefaultStatusProduct)
 
   const styles = useStyles()
   const { notifySuccess, notifyWarning } = useAlerts()
   const { showErrorMsg } = useError()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { getAllImages, deleteTempImageById, deleteImageById, createProduct, updateProduct, clearTempImages } = useProductsService()
+  const { createProduct, updateProduct, clearTempImages } = useProductsService()
   const { mode, setMode, product, setProduct } = useProductsContext()
   const { formatCurrencyRequest, formatCurrencyString } = useUtils()
 
@@ -132,11 +109,6 @@ const New = (): React.JSX.Element => {
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: async (data: TypeForm) => {
-      if (images.length === 0) {
-        notifyWarning('O produto deve possuir ao menos uma imagem.')
-        return
-      }
-
       if (categories.length === 0) {
         notifyWarning('Adicione alguma categoria.')
         return
@@ -146,9 +118,8 @@ const New = (): React.JSX.Element => {
         ...data,
         status: statusProduct,
         categories,
-        variations,
+        variations: product?.variations,
         tags: tags.map((t) => t.name),
-        images,
         value: formatCurrencyRequest(data.value),
         valueUnique: formatCurrencyRequest(data.valueUnique)
       }
@@ -177,6 +148,17 @@ const New = (): React.JSX.Element => {
     }
   })
 
+  const categories = useMemo(() => product?.categories ?? [], [product?.categories])
+
+  const hasSomeImageInProduct = (): boolean => {
+    const typeVariations = product?.variations ?? []
+
+    return typeVariations.some(tv =>
+      tv.hasImages &&
+      tv.variations?.some(v => (v.images?.length ?? 0) > 0)
+    )
+  }
+
   const handleChangeTab = (key: string): void => {
     if (key === selectedTab) {
       setSelectedTab('')
@@ -194,28 +176,9 @@ const New = (): React.JSX.Element => {
     )
   }, [clearTempImages, showErrorMsg])
 
-  // const deleteImage = useCallback((id: string) => {
-  //   if (mode === MODES.create) {
-  //     deleteTempImageById(id).then(
-  //       () => {
-  //         getTempImages()
-  //       },
-  //       showErrorMsg
-  //     )
-  //   }
-
-  //   if (mode === MODES.update) {
-  //     deleteImageById(product?.id ?? '', id).then(
-  //       () => {
-  //         const newArrImages = images.filter((img) => img.id !== id)
-  //         setImages([...newArrImages])
-  //       },
-  //       showErrorMsg
-  //     )
-  //   }
-  // }, [
-  //   deleteTempImageById, deleteImageById, getTempImages, mode, product, images, showErrorMsg
-  // ])
+  const handleSetCategories = (categories: CategoryType[]): void => {
+    setProduct({ ...product, categories })
+  }
 
   useEffect(() => {
     if (mode === MODES.create) {
@@ -224,23 +187,26 @@ const New = (): React.JSX.Element => {
   }, [clearTempData, mode])
 
   useEffect(() => {
-    console.log(product)
+    console.log('product', product)
 
-    if (product) {
+    if (product === undefined) {
+      setProduct(DefaultProduct)
+    }
+
+    if (!product?.id) {
+      setMode(MODES.create)
+    }
+
+    if (product?.id) {
       const {
         title,
         subtitle,
         height,
         length,
-        status,
         value,
         valueUnique,
         weight,
         width,
-        tags = [],
-        images = [],
-        categories = [],
-        variations = [],
         shipping
       } = product || {}
 
@@ -253,21 +219,6 @@ const New = (): React.JSX.Element => {
       formik.setFieldValue('width', width)
       formik.setFieldValue('weight', weight)
       formik.setFieldValue('shipping', shipping)
-
-      setCategories(categories)
-      setImages(images)
-      setStatusProduct({
-        isBestSeller: status.isBestSeller,
-        isLaunch: status.isLaunch,
-        isPreOrder: status.isPreOrder,
-        isSale: status.isSale
-      })
-
-      const tagsTyping: TagType[] = tags.map((x: string): TagType => ({ name: x }))
-      setTags(tagsTyping)
-      setVariations(variations)
-    } else {
-      setMode(MODES.create)
     }
   }, [product])
 
@@ -277,8 +228,12 @@ const New = (): React.JSX.Element => {
         <Box>
           <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2} mb={2} className={styles.border}>
             {TABS_PRODUCT_KEYS.map((item, index) => (
-              <Box key={`tabs_keys_product-${index}`}>
+              <Box key={`tabs_keys_product-${index}`} display="flex" alignItems="center" gap={1}>
                 <ButtonTab selected={getSelectedTab(item.key)} text={item.title} onClick={() => { handleChangeTab(item.key) }} />
+
+                {TABS_PRODUCT_KEYS.length !== index + 1 && (
+                  <TrendingFlatIcon />
+                )}
               </Box>
             ))}
           </Box>
@@ -287,7 +242,7 @@ const New = (): React.JSX.Element => {
             {getSelectedTab(firstInfoKey) && (
               <>
                 <Box mb={3}>
-                  <FormProduct hasImages={images.length > 0} parentFormik={formik} />
+                  <FormProduct hasImages={hasSomeImageInProduct()} parentFormik={formik} />
                 </Box>
 
                 <Grid container spacing={2}>
@@ -326,13 +281,13 @@ const New = (): React.JSX.Element => {
             )}
 
             {getSelectedTab(variationsKey) && (
-              <FormVariations parentFormik={formik} />
+              <FormVariations />
             )}
 
             {openAddCategories && (
               <AddCategories
                 data={categories}
-                setData={setCategories}
+                setData={handleSetCategories}
                 open={openAddCategories}
                 handleClose={() => { setOpenAddCategories(!openAddCategories) }}
               />

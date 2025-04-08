@@ -14,7 +14,8 @@ export const NEW_PRODUCT_KEYS = {
   categories: 'categories',
   variations: 'variations',
   tags: 'tags',
-  status: 'status'
+  status: 'status',
+  descriptions: 'descriptions'
 }
 
 export const DEFAULT_PAGESIZE = 10

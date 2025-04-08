@@ -28,7 +28,7 @@ interface IProps {
   open: boolean
   handleClose: () => void
   data: CategoryType[]
-  setData: React.Dispatch<React.SetStateAction<any[]>>
+  setData: (categories: CategoryType[]) => void
 }
 
 const AddCategories = ({

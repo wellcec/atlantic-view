@@ -20,7 +20,7 @@ import { MODES, type GetAllProductsType, type ProductType, type StatusProductTyp
 import useProductsService from '~/services/useProductsService'
 import { type ISampleFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
-import { useProductsContext } from '../fragments/context'
+import { useProductsContext } from '../context'
 import { DEFAULT_PAGESIZE } from '~/constants'
 import CardProduct from './CardProduct'
 

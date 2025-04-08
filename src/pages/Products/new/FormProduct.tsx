@@ -7,7 +7,8 @@ import FormInput from '~/components/atoms/Inputs/InputForm'
 import useUtils from '~/shared/hooks/useUtils'
 import InputText from '~/components/atoms/Inputs/InputText'
 import InputSufix from '~/components/atoms/Inputs/InputSufix'
-import ShipingOptions from '../fragments/constants'
+import ShipingOptions from '../constants'
+import { useProductsContext } from '../context'
 
 interface IProps {
   parentFormik: any
@@ -16,6 +17,7 @@ interface IProps {
 
 const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => {
   const { formatFormCurrency, formatNumber } = useUtils()
+  const { product, setProduct } = useProductsContext()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>, prop: string): void => {
     const { value } = event.target
@@ -23,6 +25,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
     const formattedValue = formatFormCurrency(numericValue)
 
     parentFormik.setFieldValue(prop, formattedValue)
+    setProduct({ ...product, [prop]: formattedValue })
   }
 
   return (
@@ -35,6 +38,10 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             error={parentFormik.touched.title && !!parentFormik.errors.title}
             value={parentFormik.values.title}
             disabled={hasImages}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setProduct({ ...product, title: event.target.value })
+              parentFormik.setFieldValue('title', event.target.value)
+            }}
           />
         </FormInput>
       </Grid>
@@ -46,6 +53,10 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             {...parentFormik.getFieldProps('subtitle')}
             error={parentFormik.touched.subtitle && !!parentFormik.errors.subtitle}
             value={parentFormik.values.subtitle}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setProduct({ ...product, subtitle: event.target.value })
+              parentFormik.setFieldValue('subtitle', event.target.value)
+            }}
           />
         </FormInput>
       </Grid>
@@ -87,6 +98,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('weight', value)
+              setProduct({ ...product, weight: value })
             }}
           />
         </FormInput>
@@ -103,6 +115,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('height', value)
+              setProduct({ ...product, height: value })
             }}
           />
         </FormInput>
@@ -119,6 +132,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('length', value)
+              setProduct({ ...product, length: value })
             }}
           />
         </FormInput>
@@ -135,6 +149,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const value = formatNumber(event?.target?.value || '', 'int')
               parentFormik.setFieldValue('width', value)
+              setProduct({ ...product, width: value })
             }}
           />
         </FormInput>
@@ -148,6 +163,9 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             value={parentFormik.values.shipping}
             {...parentFormik.getFieldProps('shipping')}
             error={parentFormik.touched.shipping && !!parentFormik.errors.shipping}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setProduct({ ...product, shipping: parseInt(event.target.value) })
+            }}
           >
             <MenuItem value="n/a" disabled>
               Selecione tipo de frete

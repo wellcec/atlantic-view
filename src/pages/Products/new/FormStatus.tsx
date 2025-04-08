@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Checkbox, FormControlLabel, FormGroup } from '@mui/material'
 import { type StatusProductProps, type StatusProductType } from '~/models/products'
+import { useProductsContext } from '../context'
 
 interface IProps {
   statusProduct: StatusProductType
@@ -8,9 +9,12 @@ interface IProps {
 }
 
 const FormStatus = ({ statusProduct, setStatusProduct }: IProps): React.JSX.Element => {
+  const { product, setProduct } = useProductsContext()
+
   const handleChangeStatus = (checked: boolean, prop: StatusProductProps): void => {
     statusProduct[prop] = checked
     setStatusProduct({ ...statusProduct })
+    setProduct({ ...product, status: { ...statusProduct } })
   }
 
   return (

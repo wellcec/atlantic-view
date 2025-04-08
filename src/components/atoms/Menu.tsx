@@ -5,17 +5,13 @@ import {
 import makeStyles from '@mui/styles/makeStyles'
 import { type Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme: Theme) => {
-  console.log('asdasas', theme)
-
-  return ({
-    menu: {
-      '& .MuiPaper-root': {
-        boxShadow: theme.shadows[8]
-      }
+const useStyles = makeStyles((theme: Theme) => ({
+  menu: {
+    '& .MuiPaper-root': {
+      boxShadow: theme.shadows[8]
     }
-  })
-})
+  }
+}))
 
 interface IProps {
   open: boolean

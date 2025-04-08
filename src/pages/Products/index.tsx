@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { MODES, type Mode, type ProductType } from '~/models/products'
-import { Provider } from './fragments/context'
+import { Provider } from './context'
 import New from './new'
 import List from './list'
 

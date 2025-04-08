@@ -5,8 +5,6 @@ import makeStyles from '@mui/styles/makeStyles'
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import Divider from '~/components/atoms/Divider'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
-import AddChips from '~/components/molecules/AddChips'
-import AddVariations from '~/components/organisms/AddVariations'
 import { IconAdd, IconCheckCircule, IconDelete } from '~/constants/icons'
 import { type TypeVariationViewType, type TypeVariationType, type VariationType } from '~/models/variations'
 import useVariationsService from '~/services/useVariationsService'
@@ -15,14 +13,12 @@ import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
 import colors from '~/shared/theme/colors'
 import AddVariationsModal from '../modals/AddVariationsModal'
 import Images from './Images'
-import { MODES, type ImageType } from '~/models/products'
+import { MODES } from '~/models/products'
 import useUtils from '~/shared/hooks/useUtils'
 import ButtonRemove from '~/components/atoms/ButtonRemove'
-import { useProductsContext } from '../fragments/context'
+import { useProductsContext } from '../context'
 import { FOLDER_IMAGES, FOLDER_TEMP } from '~/constants'
 import { env } from '~/config/env'
-import useProductsService from '~/services/useProductsService'
-import useError from '~/shared/hooks/useError'
 
 const useStyles = makeStyles(() => ({
   borderImages: {
@@ -43,14 +39,10 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-interface IProps {
-  parentFormik: any
-}
-
-const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
+const FormVariations = (): React.JSX.Element => {
   const styles = useStyles()
 
-  const { mode } = useProductsContext()
+  const { mode, product, setProduct } = useProductsContext()
   const { getTypeVariations, createTypeVariation } = useVariationsService()
   const { notifyError, notifyWarning } = useAlerts()
   const { normalize } = useUtils()
@@ -64,17 +56,22 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
   const [indexTypeVariation, setIndexTypeVariation] = useState<number>(0)
   const [openAddImages, setOpenAddImages] = useState<boolean>(false)
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
-  const [variations, setVariations] = useState<VariationType[]>([])
+  // const [variations, setVariations] = useState<VariationType[]>([])
   const [typeVariations, setTypeVariations] = useState<TypeVariationType[]>([])
   const [selectedTypeVariations, setSelectedTypeVariations] = useState<TypeVariationViewType[]>([])
   const [typeVariationToAddVariation, setTypeVariationToAddVariation] = useState<TypeVariationViewType>()
 
   const isSelectedTypeVariation = (item: TypeVariationType): boolean => selectedTypeVariations.some((x) => x.id === item.id)
-  const isSelectedVariation = (item: VariationType): boolean => variations.some((x) => x.id === item.id)
+  // const isSelectedVariation = (item: VariationType): boolean => variations.some((x) => x.id === item.id)
 
   const getUrlImagem = (fileName: string): string => {
     const folder = mode === MODES.create ? FOLDER_TEMP : FOLDER_IMAGES
     return `${env.api.FILES_BASE_URL}${folder}/${fileName}.png`
+  }
+
+  const saveTypeVariationInProduct = (typeVariations: TypeVariationViewType[]): void => {
+    setSelectedTypeVariations(typeVariations)
+    setProduct({ ...product, variations: typeVariations })
   }
 
   const handleAddVariation = (typeVariation: TypeVariationType): void => {
@@ -110,7 +107,7 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
     }
 
     selectedTypeVariations[index] = current
-    setSelectedTypeVariations([...selectedTypeVariations])
+    saveTypeVariationInProduct([...selectedTypeVariations])
     setOpenAddVariations(!openAddVariations)
     setInputValueVariation('')
   }
@@ -121,12 +118,12 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
     }
 
     const newarr = [...selectedTypeVariations, itemToAdd]
-    setSelectedTypeVariations(newarr)
+    saveTypeVariationInProduct(newarr)
   }
 
-  const handleDeleteToData = (itemToRemove: TypeVariationType): void => {
-    const newarr = typeVariations.filter((item) => item.name !== itemToRemove.name)
-    setTypeVariations(newarr)
+  const handleDeleteToData = (itemToRemove: TypeVariationViewType): void => {
+    const newarr = selectedTypeVariations.filter((item) => item.id !== itemToRemove.id)
+    saveTypeVariationInProduct([...newarr])
   }
 
   const handleModalCreateVariation = (typeToAddVariation: TypeVariationType): void => {
@@ -141,11 +138,13 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
   }
 
   const handleModalAddImage = (typeVariation: TypeVariationViewType, variation: VariationType): void => {
-    const nameProduct = parentFormik.values.title ?? ''
+    const nameProduct = product?.title ?? ''
 
     if (nameProduct === '') {
       notifyWarning('Nome do produto é necessário.')
+      return
     }
+
     const mountedfileName = normalize(`${(typeVariation.variations?.length ?? 0)} ${nameProduct} ${typeVariation.name} ${variation.name}`)
 
     const indexType = selectedTypeVariations.findIndex((x) => x.id === typeVariation.id)
@@ -167,7 +166,7 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
     }
 
     selectedTypeVariations[indexTypeVariation] = typeVariation
-    setSelectedTypeVariations([...selectedTypeVariations])
+    saveTypeVariationInProduct([...selectedTypeVariations])
   }
 
   const handleAddItem = (): void => {
@@ -203,14 +202,16 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
         notifyError(message)
       }
     )
-  }, [getTypeVariations])
+  }, [getTypeVariations, notifyError])
 
   useEffect(() => {
+    if (product) {
+      setSelectedTypeVariations(product?.variations ?? [])
+    }
+
     _getTypeVariations()
   }, [])
 
-  console.log('selectedTypeVariations', selectedTypeVariations)
-  console.log('mode', mode)
   return (
     <>
       <Box>
@@ -259,7 +260,8 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
                 onDelete={() => { }}
                 deleteIcon={(
                   <Box display="flex" alignItems="center">
-                    {isSelectedTypeVariation(item) ? <IconCheckCircule color={colors.success.main} /> : <IconDelete />}
+                    {isSelectedTypeVariation(item) && (<IconCheckCircule color={colors.success.main} />)}
+                    {!isSelectedTypeVariation(item) && (<IconDelete />)}
                   </Box>
                 )}
               />
@@ -276,11 +278,19 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
                 title={`➡️ ${typeVariation.name}`}
                 Buttons={(
                   <Box>
-                    <IconButton title={`Adicionar variação para ${typeVariation.name}`} size="small" onClick={() => { handleModalCreateVariation(typeVariation) }}>
+                    <IconButton
+                      size="small"
+                      title={`Adicionar variação para ${typeVariation.name}`}
+                      onClick={() => { handleModalCreateVariation(typeVariation) }}
+                    >
                       <IconAdd color={colors.success.main} />
                     </IconButton>
 
-                    <IconButton title="Remover tipo de variação" size="small">
+                    <IconButton
+                      size="small"
+                      title="Remover tipo de variação"
+                      onClick={() => { handleDeleteToData(typeVariation) }}
+                    >
                       <IconDelete />
                     </IconButton>
                   </Box>
@@ -302,7 +312,7 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
                       <Box p={2} mb={1} className={styles.borderImages}>
                         <Box>
                           <Typography variant="subtitle2" color="primary">
-                            <i>{variation.name}</i>
+                            <b><i>{variation.name}</i></b>
                           </Typography>
 
                           <DividerMui />
@@ -352,7 +362,7 @@ const FormVariations = ({ parentFormik }: IProps): React.JSX.Element => {
         ))}
       </Box>
 
-      {(openAddImages && parentFormik.values.title !== '') && (
+      {(openAddImages && product?.title !== '') && (
         <Images
           open={openAddImages}
           fileName={fileName}

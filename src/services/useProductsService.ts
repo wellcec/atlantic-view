@@ -26,7 +26,7 @@ interface IUseProductsService {
   deleteImageById: (id: string, idImage: string) => Promise<AxiosResponse<ISuccessResponse, any>>
   updateStatusProduct: (id: string, status: StatusProductType) => Promise<AxiosResponse<IResponseMutation, any>>
   getProductById: (id: string) => Promise<AxiosResponse<IResponseProduct, any>>
-  deleteTempImageById: (id: string) => Promise<AxiosResponse<ISuccessResponse, any>>
+  deleteTempImageByName: (files: string[]) => Promise<AxiosResponse<ISuccessResponse, any>>
 }
 
 const useProductsService = (): IUseProductsService => {
@@ -65,7 +65,7 @@ const useProductsService = (): IUseProductsService => {
 
   const deleteImageById = useCallback((id: string, idImage: string) => axios.delete<ISuccessResponse>(`api/products/${id}/images/${idImage}`), [])
 
-  const deleteTempImageById = useCallback((id: string) => axios.delete<ISuccessResponse>(`api/images/temporary/${id}`), [])
+  const deleteTempImageByName = useCallback((files: string[]) => axios.post<ISuccessResponse>('api/images/delete/temp', { filesName: files }), [])
 
   const createProduct = useCallback((product: CreateProductType) => axios.post<IResponseProduct>('api/products/create', product), [])
 
@@ -87,7 +87,7 @@ const useProductsService = (): IUseProductsService => {
     deleteImageById,
     updateStatusProduct,
     getProductById,
-    deleteTempImageById
+    deleteTempImageByName
   }
 }
 

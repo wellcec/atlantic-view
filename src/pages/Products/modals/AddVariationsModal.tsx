@@ -1,5 +1,5 @@
-import { Box, Button, useMediaQuery, type Theme } from '@mui/material'
 import React from 'react'
+import { Box, Button, useMediaQuery, type Theme } from '@mui/material'
 import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
 import Modal from '~/components/molecules/Modal'
 import { type TypeVariationType } from '~/models/variations'
@@ -29,6 +29,14 @@ const AddVariationsModal = ({ open, handleClose, typeVariation, inputValueVariat
     return 700
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (event.key === 'Enter') {
+      if (typeVariation) {
+        handleAddVariation(typeVariation)
+      }
+    }
+  }
+
   return (
     <>
       {typeVariation !== undefined && (
@@ -42,6 +50,7 @@ const AddVariationsModal = ({ open, handleClose, typeVariation, inputValueVariat
                   const { value } = event.target
                   setInputValueVariation(value)
                 }}
+                onKeyDown={handleKeyDown}
               />
             </Box>
 

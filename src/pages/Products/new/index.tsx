@@ -78,7 +78,6 @@ type TypeForm = typeof DEFAULT_VALUES
 
 const New = (): React.JSX.Element => {
   const [selectedTab, setSelectedTab] = useState(firstInfoKey)
-  const [tags, setTags] = useState<TagType[]>([])
   const [openAddCategories, setOpenAddCategories] = useState<boolean>(false)
   const [statusProduct, setStatusProduct] = useState<StatusProductType>(DefaultStatusProduct)
 
@@ -118,8 +117,8 @@ const New = (): React.JSX.Element => {
         ...data,
         status: statusProduct,
         categories,
-        variations: product?.variations,
-        tags: tags.map((t) => t.name),
+        typeVariations: product?.typeVariations,
+        tags: product?.tags,
         value: formatCurrencyRequest(data.value),
         valueUnique: formatCurrencyRequest(data.valueUnique)
       }
@@ -149,9 +148,15 @@ const New = (): React.JSX.Element => {
   })
 
   const categories = useMemo(() => product?.categories ?? [], [product?.categories])
+  const tags = useMemo(() => product?.tags?.map((x) => ({ name: x })) ?? [], [product?.tags])
+
+  const handleAddTags = (t: TagType[]): void => {
+    const tagsTyping = t.map((x) => x.name)
+    setProduct({ ...product, tags: tagsTyping })
+  }
 
   const hasSomeImageInProduct = (): boolean => {
-    const typeVariations = product?.variations ?? []
+    const typeVariations = product?.typeVariations ?? []
 
     return typeVariations.some(tv =>
       tv.hasImages &&
@@ -169,7 +174,7 @@ const New = (): React.JSX.Element => {
 
   const getSelectedTab = (key: string): boolean => selectedTab === key
 
-  const clearTempData = useCallback(() => {
+  const _clearTempImages = useCallback(() => {
     clearTempImages().then(
       () => { },
       showErrorMsg
@@ -182,9 +187,9 @@ const New = (): React.JSX.Element => {
 
   useEffect(() => {
     if (mode === MODES.create) {
-      clearTempData()
+      _clearTempImages()
     }
-  }, [clearTempData, mode])
+  }, [_clearTempImages, mode])
 
   useEffect(() => {
     console.log('product', product)
@@ -223,7 +228,7 @@ const New = (): React.JSX.Element => {
   }, [product])
 
   return (
-    <Container title={mode === MODES.create ? 'Novo produto' : 'Editar produto'}>
+    <Container title={mode === MODES.create ? 'Novo produto' : 'Atualizando produto'}>
       <Box display="flex" flexDirection="column" justifyContent="space-between" height={1}>
         <Box>
           <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2} mb={2} className={styles.border}>
@@ -251,7 +256,7 @@ const New = (): React.JSX.Element => {
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <AddChips text="Nome da tag" titleButton="Adicionar tag" data={tags} setData={setTags} />
+                    <AddChips text="Nome da tag" titleButton="Adicionar tag" data={tags} setData={handleAddTags} />
                     {tags.length === 0 && (<EmptyDataText text="Nenhuma tag adicionada" />)}
                   </Grid>
                 </Grid>
@@ -304,7 +309,7 @@ const New = (): React.JSX.Element => {
               Cancelar
             </Button>
             <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>
-              Criar produto
+              {mode === MODES.create ? 'Criar produto' : 'Atualizar produto'}
             </Button>
           </Box>
         </Box>

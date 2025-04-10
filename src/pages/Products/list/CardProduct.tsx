@@ -42,12 +42,17 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
 
   const { formatCurrencyString } = useUtils()
 
+  const getFirstImage = (): string => {
+    const img = product.typeVariations?.[0]?.variations?.[0]?.images?.[0] ?? ''
+    return `${img}.png`
+  }
+
   return (
     <Card>
       <CardMedia
         className={styles.card}
         sx={{ height: 200, cursor: 'pointer' }}
-        image={`${env.api.FILES_BASE_URL}images/${product.images[0].fileName}`}
+        image={`${env.api.FILES_BASE_URL}images/${getFirstImage()}`}
         title={product.title}
         onClick={() => { handleEdit(product.id ?? '') }}
       />

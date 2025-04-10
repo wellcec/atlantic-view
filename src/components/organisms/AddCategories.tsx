@@ -37,7 +37,6 @@ const AddCategories = ({
   const [selected, setSelected] = useState<CategoryType | null>(null)
   const [categoriesOptions, setCategoriesOptions] = useState<CategoryType[]>([])
 
-  console.log('selected', selected)
   const { getCategories } = useCategoriesService()
   const { notifyError } = useAlerts()
 

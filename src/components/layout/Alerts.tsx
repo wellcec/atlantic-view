@@ -34,7 +34,7 @@ const Alerts = (): React.JSX.Element => {
           <Snackbar
             open={open}
             onClose={handleClose}
-            autoHideDuration={2000}
+            autoHideDuration={4000}
             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           >
             <Alert onClose={handleClose} severity={alert.type} sx={{ width: '100%' }} variant="filled">

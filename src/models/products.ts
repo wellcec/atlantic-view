@@ -42,7 +42,7 @@ export interface ProductType {
   length?: number
   width?: number
   categories?: CategoryType[]
-  variations?: TypeVariationViewType[]
+  typeVariations?: TypeVariationViewType[]
   tags?: string[]
   status?: StatusProductType
   shipping?: number

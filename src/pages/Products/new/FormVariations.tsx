@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Box, Button, Checkbox, Chip, FormControlLabel, FormGroup, IconButton, Typography, Divider as DividerMui, ImageList, ImageListItem, ImageListItemBar } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
@@ -19,6 +19,7 @@ import ButtonRemove from '~/components/atoms/ButtonRemove'
 import { useProductsContext } from '../context'
 import { FOLDER_IMAGES, FOLDER_TEMP } from '~/constants'
 import { env } from '~/config/env'
+import useProductsService from '~/services/useProductsService'
 
 const useStyles = makeStyles(() => ({
   borderImages: {
@@ -41,9 +42,11 @@ const useStyles = makeStyles(() => ({
 
 const FormVariations = (): React.JSX.Element => {
   const styles = useStyles()
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const { mode, product, setProduct } = useProductsContext()
   const { getTypeVariations, createTypeVariation } = useVariationsService()
+  const { deleteTempImageByName } = useProductsService()
   const { notifyError, notifyWarning } = useAlerts()
   const { normalize } = useUtils()
 
@@ -71,7 +74,7 @@ const FormVariations = (): React.JSX.Element => {
 
   const saveTypeVariationInProduct = (typeVariations: TypeVariationViewType[]): void => {
     setSelectedTypeVariations(typeVariations)
-    setProduct({ ...product, variations: typeVariations })
+    setProduct({ ...product, typeVariations })
   }
 
   const handleAddVariation = (typeVariation: TypeVariationType): void => {
@@ -108,7 +111,7 @@ const FormVariations = (): React.JSX.Element => {
 
     selectedTypeVariations[index] = current
     saveTypeVariationInProduct([...selectedTypeVariations])
-    setOpenAddVariations(!openAddVariations)
+    setOpenAddVariations(false)
     setInputValueVariation('')
   }
 
@@ -127,14 +130,39 @@ const FormVariations = (): React.JSX.Element => {
   }
 
   const handleModalCreateVariation = (typeToAddVariation: TypeVariationType): void => {
-    setOpenAddVariations(!openAddVariations)
+    buttonRef.current?.blur()
+    setOpenAddVariations(true)
     setTypeVariationToAddVariation(typeToAddVariation)
+  }
+
+  const handleDeleteVariation = (indexTypeVariation: number, indexVariation: number): void => {
+    const typeVariation = selectedTypeVariations[indexTypeVariation]
+    let variations = typeVariation.variations ?? []
+
+    const variation = variations[indexVariation]
+
+    variations = variations.filter((x) => x.name !== variation.name)
+    typeVariation.variations = variations
+    selectedTypeVariations[indexTypeVariation] = typeVariation
+
+    if (typeVariation.hasImages && variation?.images && variation.images.length > 0) {
+      const imagesToDelete: string[] = variation.images.map((x) => x)
+
+      deleteTempImageByName(imagesToDelete).then(
+        () => {
+          saveTypeVariationInProduct([...selectedTypeVariations])
+        },
+        (err) => {
+          const { message } = err
+          notifyError(message)
+        })
+    }
   }
 
   const handleCloseModalCreateVariation = (): void => {
     setInputValueVariation('')
     setTypeVariationToAddVariation(undefined)
-    setOpenAddVariations(!openAddVariations)
+    setOpenAddVariations(false)
   }
 
   const handleModalAddImage = (typeVariation: TypeVariationViewType, variation: VariationType): void => {
@@ -145,15 +173,37 @@ const FormVariations = (): React.JSX.Element => {
       return
     }
 
-    const mountedfileName = normalize(`${(typeVariation.variations?.length ?? 0)} ${nameProduct} ${typeVariation.name} ${variation.name}`)
+    const mountedfileName = normalize(`${(typeVariation.variations?.length ?? 0)} ${nameProduct} ${typeVariation.name} ${variation.name} ${(variation?.images?.length ?? 0)}`)
 
     const indexType = selectedTypeVariations.findIndex((x) => x.id === typeVariation.id)
-    const indexVariation = (typeVariation.variations ?? []).findIndex((x) => x.id === variation.id)
+    const indexVariation = (typeVariation.variations ?? []).findIndex((x) => x.name === variation.name)
 
     setFileName(mountedfileName)
     setOpenAddImages(!openAddImages)
     setIndexTypeVariation(indexType)
     setIndexVariation(indexVariation)
+  }
+
+  const handleDeleteImage = (indexTypeVariation: number, indexVariation: number, image: string): void => {
+    deleteTempImageByName([image]).then(
+      () => {
+        const typeVariation = selectedTypeVariations[indexTypeVariation]
+        const variation = (typeVariation.variations ?? [])[indexVariation]
+
+        variation.images = (variation.images ?? []).filter((x) => x !== image)
+        variation.images = [...variation.images]
+
+        if (typeVariation.variations) {
+          typeVariation.variations[indexVariation] = variation
+        }
+
+        selectedTypeVariations[indexTypeVariation] = typeVariation
+        saveTypeVariationInProduct([...selectedTypeVariations])
+      },
+      (err) => {
+        const { message } = err
+        notifyError(message)
+      })
   }
 
   const onCreateImage = (): void => {
@@ -206,7 +256,7 @@ const FormVariations = (): React.JSX.Element => {
 
   useEffect(() => {
     if (product) {
-      setSelectedTypeVariations(product?.variations ?? [])
+      setSelectedTypeVariations(product?.typeVariations ?? [])
     }
 
     _getTypeVariations()
@@ -270,14 +320,15 @@ const FormVariations = (): React.JSX.Element => {
       </Box>
 
       <Box>
-        {selectedTypeVariations.map((typeVariation, index) => (
-          <Box mb={3} key={`selectedtype-${index}`}>
+        {selectedTypeVariations.map((typeVariation, indexTypeVariation) => (
+          <Box mb={3} key={`selectedtype-${indexTypeVariation}`}>
             <Box mb={2}>
               <Divider
                 title={`➡️ ${typeVariation.name}`}
                 Buttons={(
                   <Box>
                     <IconButton
+                      ref={buttonRef}
                       size="small"
                       title={`Adicionar variação para ${typeVariation.name}`}
                       onClick={() => { handleModalCreateVariation(typeVariation) }}
@@ -299,8 +350,8 @@ const FormVariations = (): React.JSX.Element => {
 
             <Box display={typeVariation.hasImages ? 'block' : 'flex'} gap={1} flexWrap="wrap">
               {(typeVariation.variations !== undefined && typeVariation.variations?.length > 0) &&
-                typeVariation.variations.map((variation, index) => (
-                  <Box key={`variations-${index}`}>
+                typeVariation.variations.map((variation, indexVariation) => (
+                  <Box key={`variations-${indexVariation}`}>
                     {!typeVariation.hasImages && (
                       <Box width="fit-content" p={2} className={styles.borderImages}>
                         {variation.name}
@@ -310,46 +361,58 @@ const FormVariations = (): React.JSX.Element => {
                     {typeVariation.hasImages && (
                       <Box p={2} mb={1} className={styles.borderImages}>
                         <Box>
-                          <Typography variant="subtitle2" color="primary">
-                            <b><i>{variation.name}</i></b>
-                          </Typography>
+                          <Box display="flex" justifyContent="space-between" mb={1}>
+                            <Typography variant="subtitle2" color="primary">
+                              <b><i>{variation.name}</i></b>
+                            </Typography>
+
+                            <Box display="flex" gap={2}>
+                              <Button variant="outlined" onClick={() => { handleModalAddImage(typeVariation, variation) }}>
+                                Adicionar imagem
+                              </Button>
+
+                              <IconButton
+                                size="medium"
+                                title="Remover variação"
+                                onClick={() => { handleDeleteVariation(indexTypeVariation, indexVariation) }}
+                              >
+                                <IconDelete size={25} />
+                              </IconButton>
+                            </Box>
+                          </Box>
 
                           <DividerMui />
                         </Box>
 
-                        <Box display="flex" mt={2}>
+                        <Box display="flex" alignItems="center" mt={2}>
                           <Box flex="1">
-                            <ImageList variant="masonry" cols={4} gap={10} className={styles.list}>
-                              {(variation.images ?? []).map((img, index) => (
-                                <ImageListItem key={`images-product-${index}`}>
-                                  <img
-                                    key={`temp-image-temp-${index}`}
-                                    className={styles.img}
-                                    src={getUrlImagem(img)}
-                                    srcSet={getUrlImagem(img)}
-                                    alt={img}
-                                    loading="lazy"
-                                  />
+                            {(variation.images ?? []).length > 0 && (
+                              <ImageList variant="masonry" cols={4} gap={10} className={styles.list}>
+                                {(variation.images ?? []).map((img, indexImage) => (
+                                  <ImageListItem key={`images-product-${indexImage}`}>
+                                    <img
+                                      key={`temp-image-temp-${indexImage}`}
+                                      className={styles.img}
+                                      src={getUrlImagem(img)}
+                                      srcSet={getUrlImagem(img)}
+                                      alt={img}
+                                      loading="lazy"
+                                    />
 
-                                  <ImageListItemBar
-                                    className={styles.imageBar}
-                                    actionIcon={
-                                      <ButtonRemove title="Remover imagem" onClick={() => { }} />
-                                    }
-                                  />
-                                </ImageListItem>
-                              ))}
-                            </ImageList>
+                                    <ImageListItemBar
+                                      className={styles.imageBar}
+                                      actionIcon={
+                                        <ButtonRemove title="Remover imagem" onClick={() => { handleDeleteImage(indexTypeVariation, indexVariation, img) }} />
+                                      }
+                                    />
+                                  </ImageListItem>
+                                ))}
+                              </ImageList>
+                            )}
 
                             {(variation.images ?? []).length === 0 && (
                               <EmptyDataText text={`Nenhuma imagem adicionada para <b>${typeVariation.name} - ${variation.name}</b>`} />
                             )}
-                          </Box>
-
-                          <Box>
-                            <Button variant="outlined" onClick={() => { handleModalAddImage(typeVariation, variation) }}>
-                              Adicionar imagem
-                            </Button>
                           </Box>
                         </Box>
                       </Box>

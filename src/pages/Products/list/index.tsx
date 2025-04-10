@@ -49,7 +49,7 @@ const List = (): React.JSX.Element => {
     setObjToAction(product)
   }
 
-  const getProducts = useCallback((newFilter?: ISampleFilter) => {
+  const _getAllProducts = useCallback((newFilter?: ISampleFilter) => {
     getAllProducts(newFilter ?? filter).then(
       (response: GetAllProductsType) => {
         const { data = [], count } = response.data ?? {}
@@ -59,8 +59,8 @@ const List = (): React.JSX.Element => {
       (err) => {
         setProducts([])
         setTotalProducts(0)
-        const { message } = err
-        notifyError(message)
+        const { title, message } = err.data
+        notifyError(`${title} - ${message}`)
       }
     )
   }, [filter, getAllProducts, notifyError])
@@ -68,7 +68,7 @@ const List = (): React.JSX.Element => {
   const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
     const newFilter = { ...filter, page }
     setFilter(newFilter)
-    getProducts(newFilter)
+    _getAllProducts(newFilter)
   }
 
   const handleCloseMenu = (): void => {
@@ -90,7 +90,7 @@ const List = (): React.JSX.Element => {
     const newFilter = { ...filter, term: value }
     setFilter(newFilter)
 
-    debounceWait(() => { getProducts(newFilter) })
+    debounceWait(() => { _getAllProducts(newFilter) })
   }
 
   const handleUpdateStatus = (index: number, id: string, status: StatusProductType): void => {
@@ -112,7 +112,7 @@ const List = (): React.JSX.Element => {
   const handleDelete = (): void => {
     deleteProduct(objToAction?.id ?? '').then(
       () => {
-        getProducts()
+        _getAllProducts()
         notifySuccess('Produto excluído com sucesso.')
       },
       (err) => {
@@ -141,9 +141,9 @@ const List = (): React.JSX.Element => {
 
   useEffect(() => {
     if (mode === MODES.list) {
-      getProducts()
+      _getAllProducts()
     }
-  }, [mode, getProducts])
+  }, [mode, _getAllProducts])
 
   return (
     <>

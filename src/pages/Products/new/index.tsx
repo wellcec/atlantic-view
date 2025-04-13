@@ -34,6 +34,8 @@ import FormStatus from './FormStatus'
 import useError from '~/shared/hooks/useError'
 import ButtonTab from '~/components/atoms/ButtonTab'
 import FormVariations from './FormVariations'
+import { useCreateProduct } from '~/clients/products/createProduct'
+import { useClearTempImages } from '~/clients/products/clearTempImages'
 
 const {
   firstInfo: firstInfoKey,
@@ -85,9 +87,16 @@ const New = (): React.JSX.Element => {
   const { notifySuccess, notifyWarning } = useAlerts()
   const { showErrorMsg } = useError()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { createProduct, updateProduct, clearTempImages } = useProductsService()
+  const { createProduct, updateProduct } = useProductsService()
   const { mode, setMode, product, setProduct } = useProductsContext()
   const { formatCurrencyRequest, formatCurrencyString } = useUtils()
+
+  const { mutateAsync: mutateCreateProduct } = useCreateProduct(() => {
+    setProduct(undefined)
+    setMode(MODES.list)
+  })
+
+  const { mutateAsync: clearTempImages } = useClearTempImages()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -124,14 +133,16 @@ const New = (): React.JSX.Element => {
       }
 
       if (mode === MODES.create) {
-        await createProduct(payload).then(
-          () => {
-            setProduct(undefined)
-            setMode(MODES.list)
-            notifySuccess('Produto criado com sucesso.')
-          },
-          showErrorMsg
-        )
+        await mutateCreateProduct(payload)
+
+        // await createProduct(payload).then(
+        //   () => {
+        //     setProduct(undefined)
+        //     setMode(MODES.list)
+        //     notifySuccess('Produto criado com sucesso.')
+        //   },
+        //   showErrorMsg
+        // )
       }
 
       if (mode === MODES.update && product) {
@@ -166,7 +177,6 @@ const New = (): React.JSX.Element => {
 
   const handleChangeTab = (key: string): void => {
     if (key === selectedTab) {
-      setSelectedTab('')
       return
     }
     setSelectedTab(key)
@@ -174,22 +184,15 @@ const New = (): React.JSX.Element => {
 
   const getSelectedTab = (key: string): boolean => selectedTab === key
 
-  const _clearTempImages = useCallback(() => {
-    clearTempImages().then(
-      () => { },
-      showErrorMsg
-    )
-  }, [clearTempImages, showErrorMsg])
-
   const handleSetCategories = (categories: CategoryType[]): void => {
     setProduct({ ...product, categories })
   }
 
   useEffect(() => {
     if (mode === MODES.create) {
-      _clearTempImages()
+      clearTempImages()
     }
-  }, [_clearTempImages, mode])
+  }, [mode, clearTempImages])
 
   useEffect(() => {
     console.log('product', product)

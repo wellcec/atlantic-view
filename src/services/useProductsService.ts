@@ -54,8 +54,7 @@ const useProductsService = (): IUseProductsService => {
     })
   }, [])
 
-  const getProducts = useCallback((filter: ISampleFilter) => axios
-    .get<IGetAllProductsResponse>(`api/products?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
+  const getProducts = useCallback((filter: ISampleFilter) => axios.get<IGetAllProductsResponse>(`api/products?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
 
   const getProductById = useCallback((id: string) => axios.get<IResponseProduct>(`api/products/${id}`), [])
 

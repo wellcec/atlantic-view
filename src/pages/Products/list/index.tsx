@@ -23,6 +23,10 @@ import useDebounce from '~/shared/hooks/useDebounce'
 import { useProductsContext } from '../context'
 import { DEFAULT_PAGESIZE } from '~/constants'
 import CardProduct from './CardProduct'
+import { useGetProducts } from '~/clients/products/getProducts'
+import { useUpdateStatusProduct } from '~/clients/products/updateStatusProduct'
+import { useGetProductById } from '~/clients/products/getProductById'
+import { useDeleteProduct } from '~/clients/products/deleteProduct'
 
 const emptyFilter: ISampleFilter = {
   term: '',
@@ -34,6 +38,7 @@ const List = (): React.JSX.Element => {
   const [objToAction, setObjToAction] = useState<ProductType>()
   const [totalProducts, setTotalProducts] = useState<number>(0)
   const [products, setProducts] = useState<ProductType[]>([])
+  const [productId, setProductId] = useState<string>('')
   const [confirmatioOpen, setConfirmatioOpen] = useState<boolean>(false)
   const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -41,34 +46,46 @@ const List = (): React.JSX.Element => {
 
   const { notifyError, notifyWarning, notifySuccess } = useAlerts()
   const { mode, setMode, setProduct } = useProductsContext()
-  const { getProducts: getAllProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
+  // const { getProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
   const { debounceWait } = useDebounce()
+
+  // List products
+  const {
+    data: resultProducts,
+    isSuccess: isSuccessProducts,
+    isError: isErrorProducts,
+    error: errorProducts,
+    refetch: refetchProducts
+  } = useGetProducts(filter)
+
+  // Update product
+  const { mutate: mutateStatusProduct } = useUpdateStatusProduct()
+
+  // Get product by id
+  const {
+    data: resultProductToUpdate,
+    isSuccess: isSuccessProductUpdate,
+    isError: isErrorProdcutUpdate,
+    error: errorProductUpdate
+  } = useGetProductById(productId)
+
+  // Delete product
+  const { mutateAsync: mutateDeleteProduct } = useDeleteProduct(() => {
+    setConfirmatioOpen(false)
+    setAnchorEl(null)
+    setObjToAction(undefined)
+  }, filter)
+
+  // -------
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, product: ProductType): void => {
     setAnchorEl(event.currentTarget)
     setObjToAction(product)
   }
 
-  const _getAllProducts = useCallback((newFilter?: ISampleFilter) => {
-    getAllProducts(newFilter ?? filter).then(
-      (response: GetAllProductsType) => {
-        const { data = [], count } = response.data ?? {}
-        setProducts(data)
-        setTotalProducts(count)
-      },
-      (err) => {
-        setProducts([])
-        setTotalProducts(0)
-        const { title, message } = err.data
-        notifyError(`${title} - ${message}`)
-      }
-    )
-  }, [filter, getAllProducts, notifyError])
-
   const handleChangePage = (_: React.ChangeEvent<unknown>, page: number): void => {
     const newFilter = { ...filter, page }
     setFilter(newFilter)
-    _getAllProducts(newFilter)
   }
 
   const handleCloseMenu = (): void => {
@@ -88,9 +105,10 @@ const List = (): React.JSX.Element => {
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { value } = event.target
     const newFilter = { ...filter, term: value }
-    setFilter(newFilter)
 
-    debounceWait(() => { _getAllProducts(newFilter) })
+    debounceWait(() => {
+      setFilter(newFilter)
+    })
   }
 
   const handleUpdateStatus = (index: number, id: string, status: StatusProductType): void => {
@@ -99,51 +117,48 @@ const List = (): React.JSX.Element => {
       ...status
     }
 
-    setProducts([...products])
-    updateStatusProduct(id, products[index].status).then(
-      () => { },
-      (err) => {
-        const { message } = err?.data ?? {}
-        notifyWarning(message)
-      }
-    )
+    mutateStatusProduct({ id, status: products[index].status })
   }
 
   const handleDelete = (): void => {
-    deleteProduct(objToAction?.id ?? '').then(
-      () => {
-        _getAllProducts()
-        notifySuccess('Produto excluído com sucesso.')
-      },
-      (err) => {
-        const { message } = err?.data ?? {}
-        notifyError(message)
-      }
-    ).finally(() => {
-      setConfirmatioOpen(false)
-      setAnchorEl(null)
-      setObjToAction(undefined)
-    })
+    mutateDeleteProduct(objToAction?.id ?? '')
   }
 
   const handleEdit = (id: string): void => {
-    getProductById(id).then(
-      (response) => {
-        setProduct(response?.data.result ?? undefined)
-        setMode(MODES.update)
-      },
-      (err) => {
-        const { message } = err?.data ?? {}
-        notifyError(message)
-      }
-    )
+    setProductId(id)
   }
 
+  // On get products
   useEffect(() => {
-    if (mode === MODES.list) {
-      _getAllProducts()
+    if (mode === MODES.list && isSuccessProducts) {
+      setProducts(resultProducts?.data ?? [])
+      setTotalProducts(resultProducts?.count ?? 0)
     }
-  }, [mode, _getAllProducts])
+
+    if (isErrorProducts && errorProducts) {
+      setProducts([])
+      setTotalProducts(0)
+      notifyError(`${errorProducts.name} - ${errorProducts.message}`)
+    }
+  }, [mode, isSuccessProducts, isErrorProducts, errorProducts, resultProducts])
+
+  // On get product by id
+  useEffect(() => {
+    if (isSuccessProductUpdate) {
+      setProduct(resultProductToUpdate.result ?? {})
+      setMode(MODES.update)
+    }
+
+    if (isErrorProdcutUpdate && errorProductUpdate) {
+      notifyError(`${errorProductUpdate.name} - ${errorProductUpdate.message}`)
+    }
+  }, [isSuccessProductUpdate, isErrorProdcutUpdate, errorProductUpdate])
+
+  // useEffect(() => {
+  //   if (mode === MODES.list) {
+  //     refetchProducts()
+  //   }
+  // }, [mode])
 
   return (
     <>

@@ -19,7 +19,10 @@ const useAlerts = (): IUseAlerts => {
 
   const notifyWarning = useCallback((message: string): void => { setAlert({ type: warning, message }) }, [setAlert, warning])
 
-  const notifyError = useCallback((message: string): void => { setAlert({ type: error, message }) }, [setAlert, error])
+  const notifyError = useCallback((message: string): void => {
+    const defaultMessage = message.includes('Undefined') || message.includes('undefined') ? 'Erro - Serviço indisponível no momento' : message
+    setAlert({ type: error, message: defaultMessage })
+  }, [setAlert, error])
 
   return {
     notifySuccess,

@@ -6,6 +6,7 @@ interface IUseAlerts {
   notifySuccess: (message: string) => void
   notifyInfo: (message: string) => void
   notifyWarning: (message: string) => void
+  notifyValidations: (validations: string[]) => void
   notifyError: (message: string) => void
 }
 
@@ -24,10 +25,19 @@ const useAlerts = (): IUseAlerts => {
     setAlert({ type: error, message: defaultMessage })
   }, [setAlert, error])
 
+  const notifyValidations = useCallback((validations: string[]): void => {
+    const message = validations.map((x) => {
+      return `&#9900 ${x}`
+    })
+
+    setAlert({ type: warning, message: message.join('</br>') })
+  }, [setAlert, warning])
+
   return {
     notifySuccess,
     notifyInfo,
     notifyWarning,
+    notifyValidations,
     notifyError
   }
 }

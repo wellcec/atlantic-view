@@ -61,9 +61,9 @@ const colors: Pallete = {
   },
   info: {
     light: '#ECF8FF',
-    main: '#A2EAF3',
+    main: '#1BD4ED',
     secondary: '#6EDFEE',
-    dark: '#1BD4ED'
+    dark: '#2e7dc2'
   },
   text: {
     main: '#0B2049',

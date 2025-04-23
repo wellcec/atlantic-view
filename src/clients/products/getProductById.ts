@@ -11,7 +11,7 @@ const getProductById = async (id: string): Promise<IResponseProduct> => {
 export const useGetProductById = (id: string): UseQueryResult<IResponseProduct, Error> => {
   return useQuery<IResponseProduct, Error>({
     queryKey: productsQueryKeys.detail(id),
-    queryFn: () => getProductById(id),
+    queryFn: async () => await getProductById(id),
     enabled: id !== '',
     staleTime: 1000 * 60 * 5
   })

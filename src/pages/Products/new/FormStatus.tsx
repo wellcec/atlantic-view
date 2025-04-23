@@ -19,7 +19,7 @@ const FormStatus = ({ statusProduct, setStatusProduct }: IProps): React.JSX.Elem
 
   return (
     <FormGroup>
-      <Box display="flex" flexWrap="wrap" justifyContent="center">
+      <Box display="flex" flexWrap="wrap" justifyContent="start">
         <FormControlLabel
           control={<Checkbox checked={statusProduct.isLaunch} onChange={(_, checked) => { handleChangeStatus(checked, 'isLaunch') }} />}
           label="Lançamento"

@@ -1,4 +1,4 @@
-import { type IDefaultTheme } from 'models'
+import { type ISampleFilter, type IDefaultTheme } from 'models'
 
 export const DEFAULT_THEME: IDefaultTheme = {
   id: 'default',
@@ -21,5 +21,17 @@ export const NEW_PRODUCT_KEYS = {
 export const DEFAULT_PAGESIZE = 10
 
 export const DEFAULT_CATEGORY_PAGESIZE = 5
+
+export const emptyFilter: ISampleFilter = {
+  term: '',
+  page: 1,
+  pageSize: DEFAULT_PAGESIZE
+}
+
+export const ACCEPTABLE_IMAGES = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg'
+]
 
 export default DEFAULT_THEME

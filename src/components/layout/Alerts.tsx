@@ -38,12 +38,10 @@ const Alerts = (): React.JSX.Element => {
             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
           >
             <Alert onClose={handleClose} severity={alert.type} sx={{ width: '100%' }} variant="filled">
-              <Typography variant="body1">
-                {alert.message}
-              </Typography>
+              <Typography variant="body1" dangerouslySetInnerHTML={{ __html: `${alert.message}` }} />
             </Alert>
           </Snackbar>
-        </Stack>
+        </Stack >
       )}
     </>
   )

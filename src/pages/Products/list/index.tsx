@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -15,68 +15,44 @@ import Menu from '~/components/atoms/Menu'
 import useAlerts from '~/shared/alerts/useAlerts'
 import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
-import { IconDelete, IconEdit } from '~/constants/icons'
-import { MODES, type GetAllProductsType, type ProductType, type StatusProductType } from '~/models/products'
-import useProductsService from '~/services/useProductsService'
+import { IconDelete, IconEdit, IconProducts } from '~/constants/icons'
+import { type ProductType, type StatusProductType } from '~/models/products'
 import { type ISampleFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
-import { useProductsContext } from '../context'
-import { DEFAULT_PAGESIZE } from '~/constants'
+import { DEFAULT_PAGESIZE, emptyFilter } from '~/constants'
 import CardProduct from './CardProduct'
 import { useGetProducts } from '~/clients/products/getProducts'
 import { useUpdateStatusProduct } from '~/clients/products/updateStatusProduct'
-import { useGetProductById } from '~/clients/products/getProductById'
 import { useDeleteProduct } from '~/clients/products/deleteProduct'
-
-const emptyFilter: ISampleFilter = {
-  term: '',
-  page: 1,
-  pageSize: DEFAULT_PAGESIZE
-}
+import { useNavigate } from 'react-router-dom'
 
 const List = (): React.JSX.Element => {
   const [objToAction, setObjToAction] = useState<ProductType>()
   const [totalProducts, setTotalProducts] = useState<number>(0)
   const [products, setProducts] = useState<ProductType[]>([])
-  const [productId, setProductId] = useState<string>('')
   const [confirmatioOpen, setConfirmatioOpen] = useState<boolean>(false)
   const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(anchorEl)
 
-  const { notifyError, notifyWarning, notifySuccess } = useAlerts()
-  const { mode, setMode, setProduct } = useProductsContext()
-  // const { getProducts, updateStatusProduct, deleteProduct, getProductById } = useProductsService()
+  const navigate = useNavigate()
+  const { notifyError } = useAlerts()
   const { debounceWait } = useDebounce()
 
-  // List products
   const {
     data: resultProducts,
     isSuccess: isSuccessProducts,
     isError: isErrorProducts,
-    error: errorProducts,
-    refetch: refetchProducts
+    error: errorProducts
   } = useGetProducts(filter)
 
-  // Update product
   const { mutate: mutateStatusProduct } = useUpdateStatusProduct()
 
-  // Get product by id
-  const {
-    data: resultProductToUpdate,
-    isSuccess: isSuccessProductUpdate,
-    isError: isErrorProdcutUpdate,
-    error: errorProductUpdate
-  } = useGetProductById(productId)
-
-  // Delete product
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct(() => {
     setConfirmatioOpen(false)
     setAnchorEl(null)
     setObjToAction(undefined)
   }, filter)
-
-  // -------
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>, product: ProductType): void => {
     setAnchorEl(event.currentTarget)
@@ -124,13 +100,9 @@ const List = (): React.JSX.Element => {
     mutateDeleteProduct(objToAction?.id ?? '')
   }
 
-  const handleEdit = (id: string): void => {
-    setProductId(id)
-  }
-
   // On get products
   useEffect(() => {
-    if (mode === MODES.list && isSuccessProducts) {
+    if (isSuccessProducts) {
       setProducts(resultProducts?.data ?? [])
       setTotalProducts(resultProducts?.count ?? 0)
     }
@@ -140,29 +112,11 @@ const List = (): React.JSX.Element => {
       setTotalProducts(0)
       notifyError(`${errorProducts.name} - ${errorProducts.message}`)
     }
-  }, [mode, isSuccessProducts, isErrorProducts, errorProducts, resultProducts])
-
-  // On get product by id
-  useEffect(() => {
-    if (isSuccessProductUpdate) {
-      setProduct(resultProductToUpdate.result ?? {})
-      setMode(MODES.update)
-    }
-
-    if (isErrorProdcutUpdate && errorProductUpdate) {
-      notifyError(`${errorProductUpdate.name} - ${errorProductUpdate.message}`)
-    }
-  }, [isSuccessProductUpdate, isErrorProdcutUpdate, errorProductUpdate])
-
-  // useEffect(() => {
-  //   if (mode === MODES.list) {
-  //     refetchProducts()
-  //   }
-  // }, [mode])
+  }, [isSuccessProducts, isErrorProducts, errorProducts, resultProducts])
 
   return (
     <>
-      <Container title="Produtos" fullCard={false}>
+      <Container title="Produtos" fullCard={false} icon={<IconProducts size={30} />}>
         <Box display="flex" flexGrow={0} justifyContent="end" mb={2}>
           <Paper fullWidth>
             <Box display="flex" flexWrap="wrap" gap={2} alignItems="center">
@@ -171,7 +125,7 @@ const List = (): React.JSX.Element => {
               </Box>
 
               <Box>
-                <Button variant="contained" color="success" onClick={() => { setMode(MODES.create) }}>
+                <Button variant="contained" color="success" onClick={() => { navigate('/products/create') }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Box>
                       <AddIcon />
@@ -202,7 +156,6 @@ const List = (): React.JSX.Element => {
                 <CardProduct
                   index={index}
                   product={product}
-                  handleEdit={handleEdit}
                   handleOpenMenu={handleOpenMenu}
                   handleUpdateStatus={handleUpdateStatus}
                 />

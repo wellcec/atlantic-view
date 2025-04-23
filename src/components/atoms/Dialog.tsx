@@ -25,8 +25,8 @@ const Dialog = ({
     onClose={handleCloseConfirm}
   >
     <DialogTitle>
-      <Typography variant="subtitle1" color="text.main" component="span">
-        {title}
+      <Typography variant="subtitle2" color="text.main" component="span">
+        <b>{title}</b>
       </Typography>
     </DialogTitle>
     <DialogContent>
@@ -38,7 +38,7 @@ const Dialog = ({
     <DialogActions>
       <Box display="flex" gap={2} m={2}>
         <Button variant="outlined" onClick={handleCloseConfirm}>Cancelar</Button>
-        <Button variant="contained" onClick={handleDelete}>Confirmar</Button>
+        <Button variant="contained" color="error" onClick={handleDelete}>Confirmar</Button>
       </Box>
     </DialogActions>
   </ComponentDialog>

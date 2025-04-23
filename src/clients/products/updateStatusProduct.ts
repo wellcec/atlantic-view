@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { useMutation, type UseMutationResult, useQueryClient } from '@tanstack/react-query'
+import { useMutation, type UseMutationResult } from '@tanstack/react-query'
 import { type IResponseMutation } from '~/models'
 import { type StatusProductType } from '~/models/products'
-import { productsQueryKeys } from './productsQueryKeys'
 import useAlerts from '~/shared/alerts/useAlerts'
 
 interface IProps {
@@ -16,14 +15,10 @@ const updateStatusProduct = async ({ id, status }: IProps): Promise<IResponseMut
 }
 
 export const useUpdateStatusProduct = (): UseMutationResult<IResponseMutation, any, IProps, unknown> => {
-  const queryClient = useQueryClient()
   const { notifyError } = useAlerts()
 
   return useMutation({
     mutationFn: updateStatusProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...productsQueryKeys.all] })
-    },
     onError: (error: Error) => {
       notifyError(`${error.name} - ${error.message}`)
     }

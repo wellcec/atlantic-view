@@ -15,6 +15,7 @@ export interface TypeVariationType {
   id?: string
   name: string
   hasImages: boolean
+  isUnique: boolean
   createdDate?: Date
 }
 

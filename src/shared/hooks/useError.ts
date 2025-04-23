@@ -6,16 +6,16 @@ interface IUseError {
 }
 
 const useError = (): IUseError => {
-  const { notifyError, notifyWarning } = useAlerts()
+  const { notifyError, notifyValidations } = useAlerts()
 
   const showErrorMsg = useCallback((err: any): void => {
-    const { message } = err?.data ?? {}
+    const { message = '', validations = [] } = err?.data ?? {}
     if (err?.status === 400) {
-      notifyWarning(message)
+      notifyValidations(validations)
     } else {
       notifyError(message)
     }
-  }, [notifyWarning, notifyError])
+  }, [notifyValidations, notifyError])
 
   return { showErrorMsg }
 }

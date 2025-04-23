@@ -1,4 +1,4 @@
-export interface IIBaseResponseType {
+export interface IBaseResponseType {
   code: number
   message: string
   validations: string[]
@@ -9,4 +9,4 @@ export interface ISuccessResponse {
   message: string
 }
 
-export default IIBaseResponseType
+export default IBaseResponseType

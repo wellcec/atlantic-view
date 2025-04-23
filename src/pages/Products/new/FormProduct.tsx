@@ -1,7 +1,9 @@
 import React from 'react'
 import {
-  Grid, MenuItem, Select
+  Grid, MenuItem, Select,
+  Tooltip
 } from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 import FormInput from '~/components/atoms/Inputs/InputForm'
 import useUtils from '~/shared/hooks/useUtils'
@@ -31,7 +33,24 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
   return (
     <Grid container spacing={4}>
       <Grid item xs={12} sm={6} md={3}>
-        <FormInput fullWidth title="Título do produto*" helperText formik={parentFormik} propField="title">
+        <FormInput
+          fullWidth
+          helperText
+          propField="title"
+          title="Título do produto*"
+          formik={parentFormik}
+          tooltip={(
+            <Tooltip
+              placement="right"
+              title={(
+                <>
+                  Os arquivos de imagens são definidos à partir do nome do produto. Por tanto, enquanto tiver imagens o nome do produto é bloqueado.
+                </>
+              )}>
+              <InfoIcon cursor="help" fontSize="small" color="warning" />
+            </Tooltip>
+          )}
+        >
           <InputText
             placeholder="Informe um título"
             {...parentFormik.getFieldProps('title')}
@@ -165,6 +184,7 @@ const FormProduct = ({ hasImages, parentFormik }: IProps): React.JSX.Element => 
             error={parentFormik.touched.shipping && !!parentFormik.errors.shipping}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setProduct({ ...product, shipping: parseInt(event.target.value) })
+              parentFormik.setFieldValue('shipping', parseInt(event.target.value))
             }}
           >
             <MenuItem value="n/a" disabled>

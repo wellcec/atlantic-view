@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'space-between'
   },
   card: {
-    // transition: `all 0.3s ${theme.transitions.easing.easeInOut}`,
+    transition: `all 0.3s ${theme.transitions.easing.easeInOut}`,
     '&:hover': {
       opacity: '0.9'
     }
@@ -32,20 +33,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface IProps {
   index: number
   product: ProductType
-  handleEdit: (id: string) => void
   handleUpdateStatus: (index: number, id: string, status: StatusProductType) => void
   handleOpenMenu: (event: React.MouseEvent<HTMLButtonElement>, product: ProductType) => void
 }
 
-const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpenMenu }: IProps): React.JSX.Element => {
+const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IProps): React.JSX.Element => {
   const styles = useStyles()
-
+  const navigate = useNavigate()
   const { formatCurrencyString } = useUtils()
 
-  const getFirstImage = (): string => {
-    const img = product.typeVariations?.[0]?.variations?.[0]?.images?.[0] ?? ''
-    return `${img}.png`
-  }
+  const getFirstImage = (): string => product.typeVariations?.[0]?.variations?.[0]?.images?.[0] ?? ''
 
   return (
     <Card>
@@ -54,7 +51,7 @@ const CardProduct = ({ index, product, handleEdit, handleUpdateStatus, handleOpe
         sx={{ height: 200, cursor: 'pointer' }}
         image={`${env.api.FILES_BASE_URL}images/${getFirstImage()}`}
         title={product.title}
-        onClick={() => { handleEdit(product.id ?? '') }}
+        onClick={() => { navigate(`/products/update/${product.id ?? ''}`) }}
       />
 
       <CardContent>

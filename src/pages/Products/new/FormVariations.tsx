@@ -1,25 +1,25 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Box, Button, Checkbox, Chip, FormControlLabel, FormGroup, IconButton, Typography, Divider as DividerMui, ImageList, ImageListItem, ImageListItemBar } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
+import { Box, Button, IconButton, Typography, Divider as DividerMui, ImageList, ImageListItem, ImageListItemBar } from '@mui/material'
 import makeStyles from '@mui/styles/makeStyles'
 
-import ButtonAdd from '~/components/atoms/ButtonAdd'
 import Divider from '~/components/atoms/Divider'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
-import { IconAdd, IconCheckCircule, IconDelete } from '~/constants/icons'
+import { IconAdd, IconDelete } from '~/constants/icons'
 import { type TypeVariationViewType, type TypeVariationType, type VariationType } from '~/models/variations'
-import useVariationsService from '~/services/useVariationsService'
 import useAlerts from '~/shared/alerts/useAlerts'
-import InputHarmonic from '~/components/atoms/Inputs/InputHarmonic'
 import colors from '~/shared/theme/colors'
 import AddVariationsModal from '../modals/AddVariationsModal'
 import Images from './Images'
-import { MODES } from '~/models/products'
+import { type ImageType, MODES } from '~/models/products'
 import useUtils from '~/shared/hooks/useUtils'
 import ButtonRemove from '~/components/atoms/ButtonRemove'
 import { useProductsContext } from '../context'
 import { FOLDER_IMAGES, FOLDER_TEMP } from '~/constants'
 import { env } from '~/config/env'
-import useProductsService from '~/services/useProductsService'
+import { useDeleteTempImageByName } from '~/clients/products/deleteTempImage'
+import TypeVariationModal from './TypeVariationModal'
+import ButtonAdd from '~/components/atoms/ButtonAdd'
+import { useDeleteDefinitiveImage } from '~/clients/products/deleteDefinitiveImage'
 
 const useStyles = makeStyles(() => ({
   borderImages: {
@@ -44,32 +44,29 @@ const FormVariations = (): React.JSX.Element => {
   const styles = useStyles()
   const buttonRef = useRef<HTMLButtonElement>(null)
 
-  const { mode, product, setProduct } = useProductsContext()
-  const { getTypeVariations, createTypeVariation } = useVariationsService()
-  const { deleteTempImageByName } = useProductsService()
-  const { notifyError, notifyWarning } = useAlerts()
-  const { normalize } = useUtils()
-
-  const [inputValue, setInputValue] = useState('')
   const [inputValueVariation, setInputValueVariation] = useState('')
-  const [inputCheckedValue, setInputCheckedValue] = useState(false)
   const [fileName, setFileName] = useState('')
 
   const [indexVariation, setIndexVariation] = useState<number>(0)
   const [indexTypeVariation, setIndexTypeVariation] = useState<number>(0)
   const [openAddImages, setOpenAddImages] = useState<boolean>(false)
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
-  // const [variations, setVariations] = useState<VariationType[]>([])
-  const [typeVariations, setTypeVariations] = useState<TypeVariationType[]>([])
+  const [openAddTypeVariations, setOpenAddTypeVariations] = useState<boolean>(false)
   const [selectedTypeVariations, setSelectedTypeVariations] = useState<TypeVariationViewType[]>([])
   const [typeVariationToAddVariation, setTypeVariationToAddVariation] = useState<TypeVariationViewType>()
 
-  const isSelectedTypeVariation = (item: TypeVariationType): boolean => selectedTypeVariations.some((x) => x.id === item.id)
+  const { mode, product, setProduct } = useProductsContext()
+  const { notifyWarning } = useAlerts()
+  const { normalize } = useUtils()
+
+  const deleteTempImageByName = useDeleteTempImageByName()
+  const deleteDefinitiveImageByName = useDeleteDefinitiveImage()
+
   // const isSelectedVariation = (item: VariationType): boolean => variations.some((x) => x.id === item.id)
 
   const getUrlImagem = (fileName: string): string => {
     const folder = mode === MODES.create ? FOLDER_TEMP : FOLDER_IMAGES
-    return `${env.api.FILES_BASE_URL}${folder}/${fileName}.png`
+    return `${env.api.FILES_BASE_URL}${folder}/${fileName}`
   }
 
   const saveTypeVariationInProduct = (typeVariations: TypeVariationViewType[]): void => {
@@ -115,15 +112,6 @@ const FormVariations = (): React.JSX.Element => {
     setInputValueVariation('')
   }
 
-  const handleSelectTypeVariation = (itemToAdd: TypeVariationType): void => {
-    if (isSelectedTypeVariation(itemToAdd)) {
-      return
-    }
-
-    const newarr = [...selectedTypeVariations, itemToAdd]
-    saveTypeVariationInProduct(newarr)
-  }
-
   const handleDeleteToData = (itemToRemove: TypeVariationViewType): void => {
     const newarr = selectedTypeVariations.filter((item) => item.id !== itemToRemove.id)
     saveTypeVariationInProduct([...newarr])
@@ -145,17 +133,22 @@ const FormVariations = (): React.JSX.Element => {
     typeVariation.variations = variations
     selectedTypeVariations[indexTypeVariation] = typeVariation
 
+    const onSuccess = (): void => {
+      saveTypeVariationInProduct([...selectedTypeVariations])
+    }
+
     if (typeVariation.hasImages && variation?.images && variation.images.length > 0) {
       const imagesToDelete: string[] = variation.images.map((x) => x)
 
-      deleteTempImageByName(imagesToDelete).then(
-        () => {
-          saveTypeVariationInProduct([...selectedTypeVariations])
-        },
-        (err) => {
-          const { message } = err
-          notifyError(message)
-        })
+      if (mode === MODES.create) {
+        deleteTempImageByName.mutate(imagesToDelete, { onSuccess })
+      }
+
+      if (mode === MODES.update) {
+        deleteDefinitiveImageByName.mutate(imagesToDelete, { onSuccess })
+      }
+    } else {
+      onSuccess()
     }
   }
 
@@ -185,31 +178,34 @@ const FormVariations = (): React.JSX.Element => {
   }
 
   const handleDeleteImage = (indexTypeVariation: number, indexVariation: number, image: string): void => {
-    deleteTempImageByName([image]).then(
-      () => {
-        const typeVariation = selectedTypeVariations[indexTypeVariation]
-        const variation = (typeVariation.variations ?? [])[indexVariation]
+    const onSuccess = (): void => {
+      const typeVariation = selectedTypeVariations[indexTypeVariation]
+      const variation = (typeVariation.variations ?? [])[indexVariation]
 
-        variation.images = (variation.images ?? []).filter((x) => x !== image)
-        variation.images = [...variation.images]
+      variation.images = (variation.images ?? []).filter((x) => x !== image)
+      variation.images = [...variation.images]
 
-        if (typeVariation.variations) {
-          typeVariation.variations[indexVariation] = variation
-        }
+      if (typeVariation.variations) {
+        typeVariation.variations[indexVariation] = variation
+      }
 
-        selectedTypeVariations[indexTypeVariation] = typeVariation
-        saveTypeVariationInProduct([...selectedTypeVariations])
-      },
-      (err) => {
-        const { message } = err
-        notifyError(message)
-      })
+      selectedTypeVariations[indexTypeVariation] = typeVariation
+      saveTypeVariationInProduct([...selectedTypeVariations])
+    }
+
+    if (mode === MODES.create) {
+      deleteTempImageByName.mutate([image], { onSuccess })
+    }
+
+    if (mode === MODES.update) {
+      deleteDefinitiveImageByName.mutate([image], { onSuccess })
+    }
   }
 
-  const onCreateImage = (): void => {
+  const onCreateImage = (image: ImageType): void => {
     const typeVariation = selectedTypeVariations[indexTypeVariation]
     const variation = (typeVariation.variations ?? [])[indexVariation]
-    variation.images = [...(variation.images ?? []), fileName]
+    variation.images = [...(variation.images ?? []), image.fileName]
 
     if (typeVariation.variations) {
       typeVariation.variations[indexVariation] = variation
@@ -219,47 +215,11 @@ const FormVariations = (): React.JSX.Element => {
     saveTypeVariationInProduct([...selectedTypeVariations])
   }
 
-  const handleAddItem = (): void => {
-    if (inputValue !== '') {
-      const newItem: TypeVariationType = {
-        name: inputValue,
-        hasImages: inputCheckedValue
-      }
-
-      createTypeVariation(newItem).then(
-        () => {
-          const newarr = [...typeVariations, newItem]
-          setTypeVariations(newarr)
-          setInputValue('')
-          setInputCheckedValue(false)
-        },
-        (err) => {
-          const { message } = err
-          notifyError(message)
-        }
-      )
-    }
-  }
-
-  const _getTypeVariations = useCallback(() => {
-    getTypeVariations().then(
-      (response) => {
-        const { data = [] } = response.data ?? {}
-        setTypeVariations(data)
-      },
-      (err) => {
-        const { message } = err
-        notifyError(message)
-      }
-    )
-  }, [getTypeVariations, notifyError])
-
+  // On loading component
   useEffect(() => {
     if (product) {
       setSelectedTypeVariations(product?.typeVariations ?? [])
     }
-
-    _getTypeVariations()
   }, [])
 
   return (
@@ -269,53 +229,8 @@ const FormVariations = (): React.JSX.Element => {
           <Divider title="Adicione tipos de variações" />
         </Box>
 
-        <Box mb={2}>
-          <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap">
-            <Box flex="1" minWidth={385}>
-              <InputHarmonic
-                placeholder="Informe o tipo de variação. Ex.: Cor, Tamanho, Único"
-                value={inputValue}
-                onChange={(event: any) => {
-                  const { value } = event.target
-                  setInputValue(value)
-                }}
-              />
-            </Box>
-
-            <FormGroup>
-              <Box minWidth="max-content">
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={inputCheckedValue} onChange={(_, checked) => { setInputCheckedValue(checked) }} />
-                  }
-                  label="Contém imagens?"
-                />
-              </Box>
-            </FormGroup>
-
-            <ButtonAdd title="Adicionar tipo de variação" onClick={handleAddItem} />
-          </Box>
-
-          {typeVariations?.length === 0 && (
-            <EmptyDataText text="Nenhum tipo de variação criada" />
-          )}
-
-          <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
-            {typeVariations.map((item, index) => (
-              <Chip
-                key={`chip-${index}`}
-                label={`${item?.name} ${item.hasImages ? '(Com imagens)' : ''}`}
-                variant="outlined"
-                onClick={() => { handleSelectTypeVariation(item) }}
-                onDelete={() => { }}
-                deleteIcon={(
-                  <Box display="flex" alignItems="center">
-                    {isSelectedTypeVariation(item) && (<IconCheckCircule color={colors.success.main} />)}
-                  </Box>
-                )}
-              />
-            ))}
-          </Box>
+        <Box textAlign="end">
+          <ButtonAdd title="Adicionar tipo de variação" onClick={() => { setOpenAddTypeVariations(true) }} />
         </Box>
       </Box>
 
@@ -363,7 +278,7 @@ const FormVariations = (): React.JSX.Element => {
                         <Box>
                           <Box display="flex" justifyContent="space-between" mb={1}>
                             <Typography variant="subtitle2" color="primary">
-                              <b><i>{variation.name}</i></b>
+                              <b>{variation.name}</b>
                             </Typography>
 
                             <Box display="flex" gap={2}>
@@ -422,6 +337,10 @@ const FormVariations = (): React.JSX.Element => {
             </Box>
           </Box>
         ))}
+
+        {(selectedTypeVariations && selectedTypeVariations.length === 0) && (
+          <EmptyDataText text="Nenhum tipo de variação selecionado" />
+        )}
       </Box>
 
       {(openAddImages && product?.title !== '') && (
@@ -442,6 +361,16 @@ const FormVariations = (): React.JSX.Element => {
           inputValueVariation={inputValueVariation}
           setInputValueVariation={setInputValueVariation}
           typeVariation={typeVariationToAddVariation}
+        />
+      )}
+
+      {openAddTypeVariations && (
+        <TypeVariationModal
+          mode={mode}
+          open={openAddTypeVariations}
+          handleClose={() => { setOpenAddTypeVariations(false) }}
+          saveTypeVariationInProduct={saveTypeVariationInProduct}
+          selectedTypeVariations={selectedTypeVariations}
         />
       )}
     </>

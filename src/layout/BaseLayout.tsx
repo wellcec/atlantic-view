@@ -134,7 +134,7 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
     navigate(path)
   }
 
-  const isCurrentPath = (paths: string[]): boolean => paths.includes(location.pathname)
+  const isCurrentPath = (paths: string[]): boolean => paths.some(path => location.pathname.startsWith(path))
 
   return (
     <Box display="flex" height={1} overflow="auto" style={{ overflowX: 'hidden' }}>

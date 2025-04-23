@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 interface IUtils {
   formatFormCurrency: (valorNumerico: number) => string
   formatNumber: (value: string | number, type: 'int' | 'float') => number
@@ -6,6 +7,7 @@ interface IUtils {
   normalize: (str: string) => string
   formatCurrencyRequest: (value: string) => number
   formatCurrencyString: (value: number | undefined) => string
+  formatDateISODefault: (date: Date | undefined) => string
 }
 
 const useUtils = (): IUtils => {
@@ -81,14 +83,24 @@ const useUtils = (): IUtils => {
   }
 
   const normalize = (str: string): string => {
-    const normalized = str.replace(/[^a-z0-9A-Z\s]/g, '')
-    const split = normalized.split(' ').filter((str) => str !== '')
+    const semAcento = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    const somenteAlfanumerico = semAcento.replace(/[^a-zA-Z0-9\s]/g, '')
+    const split = somenteAlfanumerico.split(' ').filter((s) => s !== '')
     const join = split.join('-')
     return join.toLowerCase()
   }
 
+  const formatDateISODefault = (date: Date | undefined): string => {
+    if (!date) {
+      return '---'
+    }
+
+    const data = new Date(date)
+    return format(data, 'dd/MM/yyyy HH:mm')
+  }
+
   return {
-    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrencyRequest, formatCurrencyString
+    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrencyRequest, formatCurrencyString, formatDateISODefault
   }
 }
 

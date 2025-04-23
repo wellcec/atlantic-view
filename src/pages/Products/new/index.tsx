@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Button, Grid } from '@mui/material'
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Box, Button, Grid, Typography } from '@mui/material'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import makeStyles from '@mui/styles/makeStyles'
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
 
 import { NEW_PRODUCT_KEYS } from '~/constants/index'
 import { PREENCHIMENTO_OBRIGATORIO } from '~/constants/messages'
@@ -12,7 +12,9 @@ import colors from '~/shared/theme/colors'
 import useTestsForm from '~/shared/hooks/useTestsForm'
 
 import {
+  type Mode,
   MODES,
+  type ProductType,
   type CreateProductType, type StatusProductType, type TagType
 } from '~/models/products'
 import { type CategoryType } from '~/models/categories'
@@ -23,23 +25,26 @@ import Container from '~/components/layout/ContainerMain'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
 import AddCategories from '~/components/organisms/AddCategories'
 
-import useProductsService from '~/services/useProductsService'
 import useAlerts from '~/shared/alerts/useAlerts'
 import useUtils from '~/shared/hooks/useUtils'
 import FormProduct from './FormProduct'
 import ChipsCategories from './ChipsCategories'
-import { useProductsContext } from '../context'
+import { Provider } from '../context'
 import { DefaultProduct, DefaultStatusProduct, ShippingKeys } from '../constants'
 import FormStatus from './FormStatus'
-import useError from '~/shared/hooks/useError'
 import ButtonTab from '~/components/atoms/ButtonTab'
 import FormVariations from './FormVariations'
 import { useCreateProduct } from '~/clients/products/createProduct'
 import { useClearTempImages } from '~/clients/products/clearTempImages'
+import { useUpdateProduct } from '~/clients/products/updateProduct'
+import TitleInformation from '~/components/molecules/TitleInformation'
+import { IconProducts } from '~/constants/icons'
+import { useGetProductById } from '~/clients/products/getProductById'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const {
   firstInfo: firstInfoKey,
-  images: imagesKey,
+  descriptions: descriptionsKey,
   categories: categoriesKey,
   variations: variationsKey
 } = NEW_PRODUCT_KEYS
@@ -48,7 +53,7 @@ const TABS_PRODUCT_KEYS = [
   { title: 'Primeiras informações', key: firstInfoKey },
   { title: 'Categorias', key: categoriesKey },
   { title: 'Variações e Mídia', key: variationsKey },
-  { title: 'Mídia', key: imagesKey }
+  { title: 'Descrições', key: descriptionsKey }
 ]
 
 const useStyles = makeStyles(() => ({
@@ -79,23 +84,33 @@ const DEFAULT_VALUES = {
 type TypeForm = typeof DEFAULT_VALUES
 
 const New = (): React.JSX.Element => {
+  const [product, setProduct] = useState<ProductType | undefined>()
+  const [mode, setMode] = useState<Mode>(MODES.create)
+
   const [selectedTab, setSelectedTab] = useState(firstInfoKey)
   const [openAddCategories, setOpenAddCategories] = useState<boolean>(false)
   const [statusProduct, setStatusProduct] = useState<StatusProductType>(DefaultStatusProduct)
 
   const styles = useStyles()
-  const { notifySuccess, notifyWarning } = useAlerts()
-  const { showErrorMsg } = useError()
+  const navigate = useNavigate()
+  const { productId } = useParams()
+  const { notifyWarning, notifyError } = useAlerts()
   const { greaterThanZero, greaterThanZeroCurrency } = useTestsForm()
-  const { createProduct, updateProduct } = useProductsService()
-  const { mode, setMode, product, setProduct } = useProductsContext()
-  const { formatCurrencyRequest, formatCurrencyString } = useUtils()
+  const { formatCurrencyRequest, formatCurrencyString, formatDateISODefault } = useUtils()
 
-  const { mutateAsync: mutateCreateProduct } = useCreateProduct(() => {
+  const callbackMutation = (): void => {
     setProduct(undefined)
-    setMode(MODES.list)
-  })
+    navigate('/products')
+  }
 
+  const {
+    data: resultProduct,
+    isSuccess: isSuccessProduct,
+    isError: isErrorProdcut,
+    error: errorProduct
+  } = useGetProductById(productId ?? '')
+  const { mutateAsync: mutateCreateProduct } = useCreateProduct(callbackMutation)
+  const { mutateAsync: mudateUpdateProduct } = useUpdateProduct(product?.id ?? '', callbackMutation)
   const { mutateAsync: clearTempImages } = useClearTempImages()
 
   const formik = useFormik({
@@ -134,26 +149,10 @@ const New = (): React.JSX.Element => {
 
       if (mode === MODES.create) {
         await mutateCreateProduct(payload)
-
-        // await createProduct(payload).then(
-        //   () => {
-        //     setProduct(undefined)
-        //     setMode(MODES.list)
-        //     notifySuccess('Produto criado com sucesso.')
-        //   },
-        //   showErrorMsg
-        // )
       }
 
       if (mode === MODES.update && product) {
-        await updateProduct(product?.id ?? '', payload).then(
-          () => {
-            setProduct(undefined)
-            setMode(MODES.list)
-            notifySuccess('Produto atualizado com sucesso.')
-          },
-          showErrorMsg
-        )
+        await mudateUpdateProduct({ id: product?.id ?? '', product: payload })
       }
     }
   })
@@ -195,8 +194,6 @@ const New = (): React.JSX.Element => {
   }, [mode, clearTempImages])
 
   useEffect(() => {
-    console.log('product', product)
-
     if (product === undefined) {
       setProduct(DefaultProduct)
     }
@@ -230,94 +227,140 @@ const New = (): React.JSX.Element => {
     }
   }, [product])
 
+  // On get product by id
+  useEffect(() => {
+    if (isSuccessProduct) {
+      setProduct(resultProduct.result ?? {})
+      setMode(MODES.update)
+    }
+
+    if (isErrorProdcut && errorProduct) {
+      notifyError(`${errorProduct.name} - ${errorProduct.message}`)
+    }
+  }, [isSuccessProduct, isErrorProdcut, errorProduct, productId])
+
   return (
-    <Container title={mode === MODES.create ? 'Novo produto' : 'Atualizando produto'}>
-      <Box display="flex" flexDirection="column" justifyContent="space-between" height={1}>
-        <Box>
-          <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2} mb={2} className={styles.border}>
-            {TABS_PRODUCT_KEYS.map((item, index) => (
-              <Box key={`tabs_keys_product-${index}`} display="flex" alignItems="center" gap={1}>
-                <ButtonTab selected={getSelectedTab(item.key)} text={item.title} onClick={() => { handleChangeTab(item.key) }} />
-
-                {TABS_PRODUCT_KEYS.length !== index + 1 && (
-                  <TrendingFlatIcon />
-                )}
-              </Box>
-            ))}
-          </Box>
-
+    <Provider value={{ product, setProduct, mode, setMode }}>
+      <Container title={mode === MODES.create ? 'Novo produto' : 'Atualizando produto'} icon={<IconProducts size={30} />}>
+        <Box display="flex" flexDirection="column" justifyContent="space-between" height={1}>
           <Box>
-            {getSelectedTab(firstInfoKey) && (
-              <>
-                <Box mb={3}>
-                  <FormProduct hasImages={hasSomeImageInProduct()} parentFormik={formik} />
-                </Box>
+            <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2} mb={2} className={styles.border}>
+              {TABS_PRODUCT_KEYS.map((item, index) => (
+                <Box key={`tabs_keys_product-${index}`} display="flex" alignItems="center" gap={1}>
+                  <ButtonTab selected={getSelectedTab(item.key)} text={item.title} onClick={() => { handleChangeTab(item.key) }} />
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <FormStatus statusProduct={statusProduct} setStatusProduct={setStatusProduct} />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <AddChips text="Nome da tag" titleButton="Adicionar tag" data={tags} setData={handleAddTags} />
-                    {tags.length === 0 && (<EmptyDataText text="Nenhuma tag adicionada" />)}
-                  </Grid>
-                </Grid>
-              </>
-            )}
-
-            {getSelectedTab(categoriesKey) && (
-              <Box display="flex" alignItems="center" gap={1}>
-                <Box width={1}>
-                  {categories.length === 0 && (<EmptyDataText text="Nenhuma categoria adicionada" />)}
-
-                  {categories?.length > 0 && (
-                    <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
-                      {categories?.map((cat, indexCat) => (
-                        <React.Fragment key={`chip-cat-${indexCat}`}>
-                          <ChipsCategories category={cat} />
-                        </React.Fragment>
-                      ))}
-                    </Box>
+                  {TABS_PRODUCT_KEYS.length !== index + 1 && (
+                    <KeyboardDoubleArrowRightIcon />
                   )}
                 </Box>
+              ))}
+            </Box>
 
-                <Box display="flex" alignItems="center">
-                  <ButtonAdd title="Adicionar categoria" onClick={() => { setOpenAddCategories(!openAddCategories) }} />
-                </Box>
-              </Box>
-            )}
+            <Box>
+              {getSelectedTab(firstInfoKey) && (
+                <>
+                  <Box mb={3}>
+                    <TitleInformation title="Primeiras informações" subtitle="Informações essenciais do produto" />
+                    <FormProduct hasImages={hasSomeImageInProduct()} parentFormik={formik} />
+                  </Box>
 
-            {getSelectedTab(variationsKey) && (
-              <FormVariations />
-            )}
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TitleInformation title="Status do produto" subtitle="Define quais stickers aparecerão na exibição do produto" />
+                      <FormStatus statusProduct={statusProduct} setStatusProduct={setStatusProduct} />
+                    </Grid>
 
-            {openAddCategories && (
-              <AddCategories
-                data={categories}
-                setData={handleSetCategories}
-                open={openAddCategories}
-                handleClose={() => { setOpenAddCategories(!openAddCategories) }}
-              />
-            )}
+                    <Grid item xs={12} md={6}>
+                      <TitleInformation title="Tags do produto" subtitle="Define tags que auxiliarão na busca do produto pelo usuário" />
+                      <AddChips text="Nome da tag" titleButton="Adicionar tag" data={tags} setData={handleAddTags} />
+                      {tags.length === 0 && (<EmptyDataText text="Nenhuma tag adicionada" />)}
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+
+              {getSelectedTab(categoriesKey) && (
+                <>
+                  <Box>
+                    <TitleInformation title="Categorias" subtitle="Define em quais categorias o produto se encaixa e onde ele será encontrado no menu" />
+                  </Box>
+
+                  <Box display="flex" alignItems="center" gap={1}>
+
+                    <Box width={1}>
+                      {categories.length === 0 && (<EmptyDataText text="Nenhuma categoria adicionada" />)}
+
+                      {categories?.length > 0 && (
+                        <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
+                          {categories?.map((cat, indexCat) => (
+                            <React.Fragment key={`chip-cat-${indexCat}`}>
+                              <ChipsCategories category={cat} />
+                            </React.Fragment>
+                          ))}
+                        </Box>
+                      )}
+                    </Box>
+
+                    <Box display="flex" alignItems="center">
+                      <ButtonAdd title="Adicionar categoria" onClick={() => { setOpenAddCategories(!openAddCategories) }} />
+                    </Box>
+                  </Box>
+                </>
+              )}
+
+              {getSelectedTab(variationsKey) && (
+                <>
+                  <TitleInformation
+                    title="Variações"
+                    subtitle={`
+                    Define variações do produto, por exemplo, Cor e Tamanho. 
+                    Cada variação possui um tipo que pode ou não ser adicionadas imagens. 
+                    Em caso do produto não possuir variação basta criar um tipo de variação Único que possui imagens.`
+                    }
+                  />
+                  <FormVariations />
+                </>
+              )}
+
+              {openAddCategories && (
+                <AddCategories
+                  data={categories}
+                  setData={handleSetCategories}
+                  open={openAddCategories}
+                  handleClose={() => { setOpenAddCategories(!openAddCategories) }}
+                />
+              )}
+            </Box>
+          </Box>
+
+          <Box display="flex" alignItems="center" justifyContent="space-between" mt={3} pb={1.5}>
+            <Box>
+              <Typography>
+                <b>Criado em: </b>
+                {formatDateISODefault(product?.createdDate)}
+              </Typography>
+
+              <Typography>
+                <b>Atualizado em: </b>
+                {formatDateISODefault(product?.updatedDate)}
+              </Typography>
+            </Box>
+
+            <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
+              <Button variant="outlined" color="primary" onClick={() => {
+                setProduct(undefined)
+                navigate('/products')
+              }}>
+                Cancelar
+              </Button>
+              <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>
+                {mode === MODES.create ? 'Criar produto' : 'Atualizar produto'}
+              </Button>
+            </Box>
           </Box>
         </Box>
-
-        <Box display="flex" alignItems="center" justifyContent="end" mt={3} pb={1.5} ml="auto">
-          <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
-            <Button variant="outlined" color="primary" onClick={() => {
-              setProduct(undefined)
-              setMode(MODES.list)
-            }}>
-              Cancelar
-            </Button>
-            <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>
-              {mode === MODES.create ? 'Criar produto' : 'Atualizar produto'}
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Provider>
   )
 }
 

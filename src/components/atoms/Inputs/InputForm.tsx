@@ -2,6 +2,7 @@ import React, { type PropsWithChildren } from 'react'
 import {
   Box, FormControl, FormLabel, FormHelperText
 } from '@mui/material'
+
 import makeStyles from '@mui/styles/makeStyles'
 import colors from '~/shared/theme/colors'
 
@@ -20,10 +21,11 @@ interface IProps {
   helperText?: boolean
   formik?: any
   propField?: string
+  tooltip?: React.JSX.Element
 }
 
 const InputForm = ({
-  title, fullWidth, formik, helperText, propField, children
+  title, fullWidth, formik, helperText, propField, tooltip, children
 }: PropsWithChildren<IProps>): React.JSX.Element => {
   const styles = useStyles()
   const field = propField ?? ''
@@ -31,8 +33,10 @@ const InputForm = ({
   return (
     <>
       <FormControl fullWidth={fullWidth}>
-        <Box mb={1}>
+        <Box display="flex" alignItems="center" mb={1}>
           <FormLabel className={styles.color}>{title}</FormLabel>
+
+          {tooltip && (tooltip)}
         </Box>
 
         {children}

@@ -11,5 +11,5 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   // <React.StrictMode>
   <ReactQueryProvider />
-  // </React.StrictMode>
+  // </React.StrictMode> 
 )

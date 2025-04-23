@@ -18,14 +18,21 @@ const useStyles = makeStyles(() => ({
 interface IProps {
   title: string
   fullCard?: boolean
+  icon?: React.JSX.Element
 }
 
-const ContainerMain = ({ title, fullCard, children }: PropsWithChildren<IProps>): React.JSX.Element => {
+const ContainerMain = ({ title, fullCard, icon, children }: PropsWithChildren<IProps>): React.JSX.Element => {
   const styles = useStyles()
 
   return (
     <>
-      <Box mb={2} flexGrow={0}>
+      <Box display="flex" gap={2} alignItems="center" mb={2} flexGrow={0}>
+        {icon && (
+          <Box>
+            {icon}
+          </Box>
+        )}
+
         <Typography variant="subtitle1" color="text.main">
           {title}
         </Typography>

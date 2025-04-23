@@ -3,14 +3,14 @@ import axios, { type AxiosResponse } from 'axios'
 import { type IResponseCreateCategory, type CategoryType, type IGetAllCategoriesResponse } from 'models/categories'
 import { type IResponseMutation, type ISampleFilter } from 'models'
 import { type IResponseProductsByCategory } from '~/models/products'
-import { type ISuccessResponse } from '~/models/base'
+import type IBaseResponseType from '~/models/base'
 
 interface ICategoriesService {
   getCategories: (filter: ISampleFilter) => Promise<AxiosResponse<IGetAllCategoriesResponse, any>>
   productByCategory: (id: string) => Promise<AxiosResponse<IResponseProductsByCategory, any>>
-  createCategory: (data: CategoryType) => Promise<AxiosResponse<ISuccessResponse, any>>
-  updateCategory: (id: string, data: CategoryType) => Promise<AxiosResponse<ISuccessResponse, any>>
-  deleteCategory: (id: string) => Promise<AxiosResponse<ISuccessResponse, any>>
+  createCategory: (data: CategoryType) => Promise<AxiosResponse<IBaseResponseType, any>>
+  updateCategory: (id: string, data: CategoryType) => Promise<AxiosResponse<IBaseResponseType, any>>
+  deleteCategory: (id: string) => Promise<AxiosResponse<IBaseResponseType, any>>
 }
 
 const useCategoriesService = (): ICategoriesService => {

@@ -15,6 +15,7 @@ import useAlerts from '~/shared/alerts/useAlerts'
 import { IconUpload } from '~/constants/icons'
 import colors from '~/shared/theme/colors'
 import { type Mode, type ImageType } from '~/models/products'
+import { ACCEPTABLE_IMAGES } from '~/constants'
 
 const centerAspectCrop = (
   mediaWidth: number,
@@ -46,10 +47,11 @@ const Images = ({ fileName, open, mode, handleClose, onCreateImage }: IProps): R
   const [image, setImage] = useState<any>(undefined)
   const [crop, setCrop] = useState<Crop>()
   const [fileImage, setFileImage] = useState<any>()
+  const [fileType, setFileType] = useState<string>()
 
   const { base64ToImage, imageToBase64 } = useUtils()
   const { uploadImage, uploadTempImage } = useProductsService()
-  const { notifyError } = useAlerts()
+  const { notifyError, notifyWarning } = useAlerts()
 
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     const { width, height } = e.currentTarget
@@ -61,6 +63,13 @@ const Images = ({ fileName, open, mode, handleClose, onCreateImage }: IProps): R
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
+
+      if (!ACCEPTABLE_IMAGES.includes(file.type)) {
+        notifyWarning('Formato de imagem inválido. Formato deve ser PNG ou JPEG')
+        return
+      }
+
+      setFileType(file.type.split('/')[1])
       setCrop(undefined)
       const reader = new FileReader()
       reader.addEventListener('load', () => { setImage(reader.result?.toString() ?? '') })
@@ -75,7 +84,7 @@ const Images = ({ fileName, open, mode, handleClose, onCreateImage }: IProps): R
 
     const base64image = imageToBase64(fileImage, crop)
     if (base64image) {
-      const formdataimage = base64ToImage(base64image, `${fileName}.png`)
+      const formdataimage = base64ToImage(base64image, `${fileName}.${fileType}`)
 
       if (mode === 'create') {
         await uploadTempImage([formdataimage]).then(

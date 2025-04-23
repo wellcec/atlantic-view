@@ -34,8 +34,24 @@ const App = (): React.JSX.Element => {
   })
 
   useEffect(() => {
-    const showLoading = isFetchingGlobal > 0 || isMutatingGlobal > 0
-    setLoading(showLoading)
+    const isLoading = isFetchingGlobal > 0 || isMutatingGlobal > 0
+
+    // eslint-disable-next-line no-undef
+    let loadingTimer: NodeJS.Timeout
+
+    if (isLoading) {
+      loadingTimer = setTimeout(() => {
+        setLoading(true)
+      }, 1000)
+    } else {
+      setLoading(false)
+    }
+
+    return () => {
+      if (loadingTimer) {
+        clearTimeout(loadingTimer)
+      }
+    }
   }, [isFetchingGlobal, isMutatingGlobal])
 
   return (
@@ -49,15 +65,7 @@ const App = (): React.JSX.Element => {
             <BrowserRouter>
               <Alerts />
 
-              <AxiosSettings
-                handleShowLoading={(state) => { setEnableLoading(state) }}
-                onStartRequest={() => {
-                  if (enableLoading) {
-                    // setLoading(true)
-                  }
-                }}
-                onStopRequest={() => { setLoading(false) }}
-              />
+              <AxiosSettings handleShowLoading={(state) => { setEnableLoading(state) }} />
 
               <SwitchRoutes />
             </BrowserRouter>

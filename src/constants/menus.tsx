@@ -13,7 +13,7 @@ export const MenuItems: IMenuItem[] = [
   {
     title: 'Home',
     path: '/home',
-    paths: ['/', '/home'],
+    paths: ['/home'],
     icon: () => (
       <SVG
         src={iconDashboard}
@@ -37,7 +37,7 @@ export const MenuItems: IMenuItem[] = [
   {
     title: 'Produtos',
     path: '/products',
-    paths: ['/products'],
+    paths: ['/products', '/products/create', '/products/update'],
     icon: () => (
       <SVG
         src={iconProducts}

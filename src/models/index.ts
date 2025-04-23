@@ -24,6 +24,7 @@ export interface INoLoading {
 
 export interface ISampleFilter {
   term: string
+  typeVariationId?: string
   page: number
   pageSize: number
 }

@@ -31,6 +31,7 @@ import Divider from '~/components/atoms/Divider'
 import InputText from '~/components/atoms/Inputs/InputText'
 import { DEFAULT_CATEGORY_PAGESIZE as DEFAULT_PAGESIZE } from '~/constants'
 import { type ProductType } from '~/models/products'
+import useError from '~/shared/hooks/useError'
 
 const DEFAULT_VALUES = {
   name: ''
@@ -41,7 +42,7 @@ type TypeForm = typeof DEFAULT_VALUES
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: DEFAULT_PAGESIZE
+  pageSize: DEFAULT_PAGESIZE + 3
 }
 
 const Categories = (): React.JSX.Element => {
@@ -62,6 +63,7 @@ const Categories = (): React.JSX.Element => {
   } = useCategoriesService()
   const { notifyError, notifySuccess } = useAlerts()
   const { debounceWait } = useDebounce()
+  const { showErrorMsg } = useError()
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -146,10 +148,7 @@ const Categories = (): React.JSX.Element => {
         setObjToAction(undefined)
         getAllCategories()
       },
-      (error) => {
-        const { message } = error
-        notifyError(message)
-      }
+      showErrorMsg
     )
   }, [deleteCat, objToAction, getAllCategories, notifyError, notifySuccess])
 

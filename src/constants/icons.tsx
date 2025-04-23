@@ -12,10 +12,11 @@ import iconSingleArrowLeftCircule from '~/assets/icons/icon-single-arrow-left-ci
 import iconCheckCircule from '~/assets/icons/icon-check-circule.svg'
 import iconMenuHamburguer from '~/assets/icons/icon-menu-hambuguer.svg'
 import iconUpload from '~/assets/icons/icon-upload.svg'
+import iconProducts from '~/assets/icons/icon-products.svg'
 
 import colors from '~/shared/theme/colors'
 
-const SIZE_ICONS = 20
+const SIZE_ICONS = 23
 
 interface IColor {
   color?: string
@@ -64,4 +65,8 @@ export const IconUpload = ({ color = colors.text.quaternary, size = SIZE_ICONS }
 
 export const IconMenuHamburguer = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
   <SVG src={iconMenuHamburguer} width={size} height={size} fill={color} />
+)
+
+export const IconProducts = ({ color = colors.text.quaternary, size = SIZE_ICONS }: IColor): React.JSX.Element => (
+  <SVG src={iconProducts} width={size} height={size} fill={color} />
 )

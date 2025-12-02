@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import axios, { type AxiosResponse } from 'axios'
-import { type IResponseCreateCategory, type CategoryType, type IGetAllCategoriesResponse } from 'models/categories'
+import { type IResponseCreateCategory, type IGetAllCategoriesResponse, type CategoryType } from 'models/categories'
 import { type IResponseMutation, type ISampleFilter } from 'models'
 import { type IResponseProductsByCategory } from '~/models/products'
 import type IBaseResponseType from '~/models/base'
@@ -17,7 +17,7 @@ const useCategoriesService = (): ICategoriesService => {
   const getCategories = useCallback((filter: ISampleFilter) => axios
     .get<IGetAllCategoriesResponse>(`api/categories?term=${filter.term}&page=${filter.page}&pageSize=${filter.pageSize}`), [])
 
-  const productByCategory = useCallback((id: string) => axios.get<IResponseProductsByCategory>(`api/categories/products-by-category/${id}`), [])
+  const productByCategory = useCallback((id: string) => axios.get<IResponseProductsByCategory>(`api/categories/${id}/products`), [])
 
   const createCategory = useCallback((data: CategoryType) => axios.post<IResponseCreateCategory>('api/categories/create', data), [])
 

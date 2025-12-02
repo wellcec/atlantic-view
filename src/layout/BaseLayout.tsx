@@ -15,7 +15,9 @@ import {
   useTheme,
   useMediaQuery,
   AppBar,
-  Toolbar
+  Toolbar,
+  Collapse,
+  Tooltip
 } from '@mui/material'
 import { styled, type CSSObject } from '@mui/material/styles'
 import makeStyles from '@mui/styles/makeStyles'
@@ -27,6 +29,7 @@ import { DEFAULT_THEME } from '~/constants'
 import { MenuItems } from '~/constants/menus'
 import { IconMenuHamburguer, IconSingleArrowLeftCircule } from '~/constants/icons'
 import { Player } from '@lottiefiles/react-lottie-player'
+import { type IMenuItem } from '~/models'
 
 const drawerWidth = 240
 
@@ -103,6 +106,9 @@ const useStyles = makeStyles(() => ({
       '& .MuiTypography-root': {
         fontWeight: 500
       }
+    },
+    '& .MuiListItemIcon-root': {
+      color: DEFAULT_THEME.primary
     }
   },
   notSelected: {
@@ -124,14 +130,22 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
   const theme = useTheme()
 
   const [openDrawer, setOpenDrawer] = useState<boolean>(true)
+  const [currentMenu, setCurrentMenu] = useState<string>('')
 
   const downSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
 
-  const switchRoute = (path: string): void => {
-    if (downSM) {
-      setOpenDrawer(false)
+  const switchRoute = (menu: IMenuItem): void => {
+    if (menu.type === 'common') {
+      if (downSM) {
+        setOpenDrawer(false)
+      }
+
+      navigate(menu.path)
+      setCurrentMenu('')
+      return
     }
-    navigate(path)
+
+    setCurrentMenu((current) => (current === menu.path) ? '' : menu.path)
   }
 
   const isCurrentPath = (paths: string[]): boolean => paths.some(path => location.pathname.startsWith(path))
@@ -219,24 +233,65 @@ const BaseLayout = ({ children }: PropsWithChildren): React.JSX.Element => {
               disablePadding
               key={`${menuItem.title}-${index}`}
               className={`${isCurrentPath(menuItem.paths) ? styles.selected : styles.notSelected}`}
-              onClick={() => { switchRoute(menuItem.path) }}
+              onClick={() => { switchRoute(menuItem) }}
             >
-              <ListItemButton className={styles.buttonList} style={{ paddingLeft: openDrawer ? 40 : 16 }}>
-                <ListItemIcon style={{ minWidth: openDrawer ? 56 : 35 }}>
-                  {menuItem.icon()}
-                </ListItemIcon>
+              <Box width={1}>
+                <Box>
+                  <ListItemButton className={styles.buttonList} style={{ paddingLeft: openDrawer ? 40 : 16 }}>
+                    <ListItemIcon style={{ minWidth: openDrawer ? 56 : 35 }}>
+                      {menuItem.icon()}
+                    </ListItemIcon>
 
-                {openDrawer && (
-                  <ListItemText primary={
-                    <Typography variant="body1" color="primary" fontWeight={400}>{menuItem.title}</Typography>
-                  }
-                  />
-                )}
+                    {openDrawer && (
+                      <ListItemText primary={
+                        <Typography variant="body1" color="primary" fontWeight={400}>{menuItem.title}</Typography>
+                      }
+                      />
+                    )}
 
-                {isCurrentPath(menuItem.paths) && (
-                  <Divider orientation="vertical" className={styles.divider} />
+                    {isCurrentPath(menuItem.paths) && (
+                      <Divider orientation="vertical" className={styles.divider} />
+                    )}
+                  </ListItemButton>
+                </Box>
+
+                {menuItem.type === 'collapse' && (
+                  <Collapse
+                    sx={{ borderTop: `2px solid ${colors.background.container}`, borderBottom: `2px solid ${colors.background.container}` }}
+                    unmountOnExit
+                    timeout="auto"
+                    className="collapse"
+                    in={(currentMenu === menuItem.path)}
+                  >
+                    <List component="div" disablePadding>
+                      {menuItem.menus?.map((subMenu, index) => (
+                        <Tooltip title={subMenu.title} key={`${menuItem.title}-${index}`} placement="left-end">
+                          <ListItemButton
+                            sx={{ pl: 5 }}
+                            onClick={() => {
+                              if (downSM) {
+                                setOpenDrawer(false)
+                              }
+
+                              navigate(subMenu.path)
+                            }}
+
+                          >
+                            <ListItemIcon>
+                              <Box pl={1}>
+                                &bull;
+                              </Box>
+                            </ListItemIcon>
+                            <ListItemText primary={
+                              <Typography variant="body2" color="primary" fontWeight={400}>{subMenu.title}</Typography>
+                            } />
+                          </ListItemButton>
+                        </Tooltip>
+                      ))}
+                    </List>
+                  </Collapse>
                 )}
-              </ListItemButton>
+              </Box>
             </ListItem>
           ))}
         </List>

@@ -29,6 +29,7 @@
     "react-dom": "^18.2.0",
     "react-image-crop": "^10.1.5",
     "react-inlinesvg": "^4.0.2",
+    "react-quill": "^2.0.0",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.13.0",
     "redux": "^4.2.1",

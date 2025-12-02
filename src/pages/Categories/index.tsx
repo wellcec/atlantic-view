@@ -14,7 +14,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 import Container from '~/components/layout/ContainerMain'
-import { type CategoryType, type GetAllCategoriesType, type SubCategoryType } from 'models/categories'
+import { type CategoryType, type SubCategoryType } from 'models/categories'
 import Paper from '~/components/layout/Paper'
 import Modal from '~/components/molecules/Modal'
 import useCategoriesService from '~/services/useCategoriesService'
@@ -34,7 +34,7 @@ import { type ProductType } from '~/models/products'
 import useError from '~/shared/hooks/useError'
 
 const DEFAULT_VALUES = {
-  name: ''
+  title: ''
 }
 
 type TypeForm = typeof DEFAULT_VALUES
@@ -42,7 +42,7 @@ type TypeForm = typeof DEFAULT_VALUES
 const emptyFilter: ISampleFilter = {
   term: '',
   page: 1,
-  pageSize: DEFAULT_PAGESIZE + 3
+  pageSize: DEFAULT_PAGESIZE
 }
 
 const Categories = (): React.JSX.Element => {
@@ -68,25 +68,25 @@ const Categories = (): React.JSX.Element => {
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
     validationSchema: Yup.object({
-      name: Yup.string().required(PREENCHIMENTO_OBRIGATORIO)
+      title: Yup.string().required(PREENCHIMENTO_OBRIGATORIO)
     }),
     validateOnBlur: true,
     validateOnChange: true,
     onSubmit: (data: TypeForm) => {
       if (action === ACTIONS.create) {
-        const category: CategoryType = {
-          name: data.name,
+        const payload: CategoryType = {
+          title: data.title,
           subCategories
         }
 
-        createCategory(category).then(
+        createCategory(payload).then(
           () => {
             notifySuccess('Categoria criada com sucesso.')
             setOpenModal(false)
             getAllCategories()
           },
           (err) => {
-            const { message } = err
+            const { message } = err.data
             notifyError(message)
             setOpenModal(false)
           }
@@ -94,7 +94,7 @@ const Categories = (): React.JSX.Element => {
       }
 
       if (action === ACTIONS.update) {
-        productByCategory(objToAction?.id ?? '').then(
+        productByCategory(objToAction?.uuid ?? '').then(
           (response) => {
             const { result } = response.data || {}
             if (result.length > 0) {
@@ -102,7 +102,7 @@ const Categories = (): React.JSX.Element => {
               setConfirmUpdateOpen(true)
               setProductsByCategory(result)
             } else {
-              updateCategory()
+              updateCategory(data.title)
             }
           },
           (err) => {
@@ -119,7 +119,7 @@ const Categories = (): React.JSX.Element => {
 
   const getAllCategories = useCallback((newFilter?: ISampleFilter) => {
     getCategories(newFilter ?? filter).then(
-      (response: GetAllCategoriesType) => {
+      (response) => {
         const { data = [], count } = response.data ?? {}
 
         setTotalCategories(count)
@@ -141,7 +141,7 @@ const Categories = (): React.JSX.Element => {
   }
 
   const deleteCategory = useCallback(() => {
-    deleteCat(objToAction?.id ?? '').then(
+    deleteCat(objToAction?.uuid ?? '').then(
       () => {
         notifySuccess('Categoria excluída com sucesso.')
         setConfirmOpen(false)
@@ -152,13 +152,13 @@ const Categories = (): React.JSX.Element => {
     )
   }, [deleteCat, objToAction, getAllCategories, notifyError, notifySuccess])
 
-  const updateCategory = useCallback(() => {
+  const updateCategory = useCallback((title: string) => {
     const category: CategoryType = {
-      name: formik.values.name,
+      title,
       subCategories
     }
 
-    updateCat(objToAction?.id ?? '', category).then(
+    updateCat(objToAction?.uuid ?? '', category).then(
       () => {
         notifySuccess('Categoria atualizada com sucesso.')
         setAction(ACTIONS.create)
@@ -175,7 +175,7 @@ const Categories = (): React.JSX.Element => {
         setOpenModal(false)
       }
     )
-  }, [formik.values.name, getAllCategories, objToAction?.id, notifySuccess, notifyError, subCategories, updateCat])
+  }, [formik.values.title, getAllCategories, objToAction?.uuid, notifySuccess, notifyError, subCategories, updateCat])
 
   const handleNewCategory = (): void => {
     formik.resetForm()
@@ -187,7 +187,7 @@ const Categories = (): React.JSX.Element => {
   const handleEditCategory = (obj: CategoryType): void => {
     const { setValues } = formik
 
-    setValues({ name: obj?.name ?? '' })
+    setValues({ title: obj?.title ?? '' })
     setSubCategories(obj?.subCategories ?? [])
     setOpenModal(true)
     setObjToAction(obj)
@@ -272,7 +272,7 @@ const Categories = (): React.JSX.Element => {
               <Paper>
                 <Grid container display="flex" alignItems="center">
                   <Grid item xs={12} md={2}>
-                    <Typography variant="body2">{item.name}</Typography>
+                    <Typography variant="body2">{item?.title}</Typography>
 
                     <Hidden mdUp>
                       <Box mb={2} />
@@ -281,7 +281,7 @@ const Categories = (): React.JSX.Element => {
 
                   <Grid item xs={12} md={7} display="flex" flexWrap="wrap" gap={2}>
                     {item.subCategories.map((itemsc, indexsc) => (
-                      <Chip key={`subcat-${indexsc}`} label={itemsc?.name} variant="outlined" />
+                      <Chip key={`subcat-${indexsc}`} label={itemsc?.title} variant="outlined" />
                     ))}
                   </Grid>
 
@@ -328,7 +328,7 @@ const Categories = (): React.JSX.Element => {
           <Typography variant="body1" color="primary">
             Deseja realmente excluir a categoria
             {' '}
-            <b>{objToAction?.name}</b>
+            <b>{objToAction?.title}</b>
             {' '}
             e suas sub categorias?
           </Typography>
@@ -340,7 +340,7 @@ const Categories = (): React.JSX.Element => {
           title="Alterar categoria"
           open={confirmUpdateOpen}
           handleCloseConfirm={handleCloseConfirmUpdate}
-          handleDelete={updateCategory}
+          handleDelete={() => { updateCategory(formik.values.title) }}
         >
           <Typography variant="body1" color="primary">
             Esses produtos possuem essa categoria?
@@ -376,8 +376,8 @@ const Categories = (): React.JSX.Element => {
             <InputForm fullWidth title="Nome da categoria*" helperText formik={formik} propField="name">
               <InputText
                 placeholder="Informe um nome"
-                {...formik.getFieldProps('name')}
-                error={formik.touched.name && !!formik.errors.name}
+                {...formik.getFieldProps('title')}
+                error={formik.touched.title && !!formik.errors.title}
               />
             </InputForm>
           </Box>

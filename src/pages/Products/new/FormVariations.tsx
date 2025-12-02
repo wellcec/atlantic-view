@@ -5,7 +5,7 @@ import makeStyles from '@mui/styles/makeStyles'
 import Divider from '~/components/atoms/Divider'
 import EmptyDataText from '~/components/atoms/EmptyDataText'
 import { IconAdd, IconDelete } from '~/constants/icons'
-import { type TypeVariationViewType, type TypeVariationType, type VariationType } from '~/models/variations'
+import { ImageVariationType, TypeVariationViewType, type TypeVariationProductType, type TypeVariationType, type VariationType } from '~/models/variations'
 import useAlerts from '~/shared/alerts/useAlerts'
 import colors from '~/shared/theme/colors'
 import AddVariationsModal from '../modals/AddVariationsModal'
@@ -20,6 +20,7 @@ import { useDeleteTempImageByName } from '~/clients/products/deleteTempImage'
 import TypeVariationModal from './TypeVariationModal'
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import { useDeleteDefinitiveImage } from '~/clients/products/deleteDefinitiveImage'
+import { groupTypeVariations, ungroupTypeVariations } from '../utils'
 
 const useStyles = makeStyles(() => ({
   borderImages: {
@@ -52,26 +53,29 @@ const FormVariations = (): React.JSX.Element => {
   const [openAddImages, setOpenAddImages] = useState<boolean>(false)
   const [openAddVariations, setOpenAddVariations] = useState<boolean>(false)
   const [openAddTypeVariations, setOpenAddTypeVariations] = useState<boolean>(false)
-  const [selectedTypeVariations, setSelectedTypeVariations] = useState<TypeVariationViewType[]>([])
-  const [typeVariationToAddVariation, setTypeVariationToAddVariation] = useState<TypeVariationViewType>()
+  // const [selectedTypeVariations, setSelectedTypeVariations] = useState<TypeVariationViewType[]>([])
+  const [typeVariationToAddVariation, setTypeVariationToAddVariation] = useState<TypeVariationType>()
+
+  const [viewVariations, setViewVariations] = useState<TypeVariationViewType[]>([])
 
   const { mode, product, setProduct } = useProductsContext()
   const { notifyWarning } = useAlerts()
-  const { normalize } = useUtils()
+  const { normalize, generateTimestampCode } = useUtils()
 
   const deleteTempImageByName = useDeleteTempImageByName()
   const deleteDefinitiveImageByName = useDeleteDefinitiveImage()
-
-  // const isSelectedVariation = (item: VariationType): boolean => variations.some((x) => x.id === item.id)
 
   const getUrlImagem = (fileName: string): string => {
     const folder = mode === MODES.create ? FOLDER_TEMP : FOLDER_IMAGES
     return `${env.api.FILES_BASE_URL}${folder}/${fileName}`
   }
 
-  const saveTypeVariationInProduct = (typeVariations: TypeVariationViewType[]): void => {
-    setSelectedTypeVariations(typeVariations)
-    setProduct({ ...product, typeVariations })
+  const saveTypeVariationInProduct = (productVariations: VariationType[]): void => {
+    setViewVariations(groupTypeVariations(productVariations))
+    setProduct({
+      ...product,
+      variations: productVariations
+    })
   }
 
   const handleAddVariation = (typeVariation: TypeVariationType): void => {
@@ -80,22 +84,23 @@ const FormVariations = (): React.JSX.Element => {
       return
     }
 
-    const current = selectedTypeVariations.find((x) => x.id === typeVariation.id)
+    const current = viewVariations.find((x) => x.typeVariation.uuid === typeVariation.uuid)
 
     if (!current) {
       return
     }
 
-    const index = selectedTypeVariations.findIndex((x) => x.id === current?.id)
+    const index = viewVariations.findIndex((x) => x.typeVariation.uuid === current?.typeVariation.uuid)
 
     const newVariation: VariationType = {
-      name: inputValueVariation,
-      idType: typeVariation.id,
-      nameType: typeVariation.name
+      title: inputValueVariation,
+      uuidTypeVariation: typeVariation.uuid,
+      images: [],
+      typeVariation
     }
 
     if (current?.variations !== undefined) {
-      const nameExists = !!current.variations.find((x) => x.name === inputValueVariation)
+      const nameExists = !!current.variations.find((x) => x.title === inputValueVariation)
 
       if (nameExists) {
         return
@@ -106,15 +111,39 @@ const FormVariations = (): React.JSX.Element => {
       current.variations = [newVariation]
     }
 
-    selectedTypeVariations[index] = current
-    saveTypeVariationInProduct([...selectedTypeVariations])
+    viewVariations[index] = current
+    saveTypeVariationInProduct(ungroupTypeVariations([...viewVariations]))
     setOpenAddVariations(false)
     setInputValueVariation('')
   }
 
-  const handleDeleteToData = (itemToRemove: TypeVariationViewType): void => {
-    const newarr = selectedTypeVariations.filter((item) => item.id !== itemToRemove.id)
-    saveTypeVariationInProduct([...newarr])
+  const handleDeleteVariation = (indexTypeVariation: number, indexVariation: number): void => {
+    const typeVariation = viewVariations[indexTypeVariation]
+    let variations = typeVariation.variations ?? []
+
+    const variation = variations[indexVariation]
+
+    variations = variations.filter((x) => x.title !== variation.title)
+    typeVariation.variations = variations
+    viewVariations[indexTypeVariation] = typeVariation
+
+    const onSuccess = (): void => {
+      saveTypeVariationInProduct(ungroupTypeVariations([...viewVariations]))
+    }
+
+    if (variation?.images && variation.images.length > 0) {
+      const imagesToDelete: ImageVariationType[] = variation.images.map((x) => x)
+
+      if (mode === MODES.create) {
+        deleteTempImageByName.mutate(imagesToDelete.map(x => x.fileName), { onSuccess })
+      }
+
+      if (mode === MODES.update) {
+        deleteDefinitiveImageByName.mutate(imagesToDelete.map(x => x.fileName), { onSuccess })
+      }
+    } else {
+      onSuccess()
+    }
   }
 
   const handleModalCreateVariation = (typeToAddVariation: TypeVariationType): void => {
@@ -123,42 +152,34 @@ const FormVariations = (): React.JSX.Element => {
     setTypeVariationToAddVariation(typeToAddVariation)
   }
 
-  const handleDeleteVariation = (indexTypeVariation: number, indexVariation: number): void => {
-    const typeVariation = selectedTypeVariations[indexTypeVariation]
-    let variations = typeVariation.variations ?? []
-
-    const variation = variations[indexVariation]
-
-    variations = variations.filter((x) => x.name !== variation.name)
-    typeVariation.variations = variations
-    selectedTypeVariations[indexTypeVariation] = typeVariation
-
-    const onSuccess = (): void => {
-      saveTypeVariationInProduct([...selectedTypeVariations])
-    }
-
-    if (typeVariation.hasImages && variation?.images && variation.images.length > 0) {
-      const imagesToDelete: string[] = variation.images.map((x) => x)
-
-      if (mode === MODES.create) {
-        deleteTempImageByName.mutate(imagesToDelete, { onSuccess })
-      }
-
-      if (mode === MODES.update) {
-        deleteDefinitiveImageByName.mutate(imagesToDelete, { onSuccess })
-      }
-    } else {
-      onSuccess()
-    }
-  }
-
   const handleCloseModalCreateVariation = (): void => {
     setInputValueVariation('')
     setTypeVariationToAddVariation(undefined)
     setOpenAddVariations(false)
   }
 
-  const handleModalAddImage = (typeVariation: TypeVariationViewType, variation: VariationType): void => {
+  const handleDeleteToData = (itemToRemove: TypeVariationType): void => {
+    const newarr = viewVariations.filter((item) => item.typeVariation.uuid !== itemToRemove.uuid)
+    saveTypeVariationInProduct(ungroupTypeVariations([...newarr]))
+  }
+
+  const onSelectTypeVariation = (typeToAdd: TypeVariationType): void => {
+    const found = viewVariations.find((x) => x.typeVariation?.uuid === typeToAdd?.uuid)
+    if (found) {
+      notifyWarning(`O tipo de variação <b>${typeToAdd.title}</b> já foi adicionado.`)
+      return
+    }
+
+    const newTypeVariation: TypeVariationViewType = {
+      typeVariation: typeToAdd,
+      variations: []
+    }
+
+    const newViewVariations = [...viewVariations, newTypeVariation]
+    setViewVariations(newViewVariations)
+  }
+
+  const handleModalAddImage = (variation: VariationType): void => {
     const nameProduct = product?.title ?? ''
 
     if (nameProduct === '') {
@@ -166,10 +187,10 @@ const FormVariations = (): React.JSX.Element => {
       return
     }
 
-    const mountedfileName = normalize(`${(typeVariation.variations?.length ?? 0)} ${nameProduct} ${typeVariation.name} ${variation.name} ${(variation?.images?.length ?? 0)}`)
+    const mountedfileName = normalize(`$${nameProduct} ${variation.title} ${(variation?.images?.length ?? 0)} ${generateTimestampCode()}`)
 
-    const indexType = selectedTypeVariations.findIndex((x) => x.id === typeVariation.id)
-    const indexVariation = (typeVariation.variations ?? []).findIndex((x) => x.name === variation.name)
+    const indexType = viewVariations.findIndex((x) => x.typeVariation.uuid === variation.uuidTypeVariation)
+    const indexVariation = (viewVariations[indexType].variations ?? []).findIndex((x) => x.title === variation.title)
 
     setFileName(mountedfileName)
     setOpenAddImages(!openAddImages)
@@ -179,18 +200,18 @@ const FormVariations = (): React.JSX.Element => {
 
   const handleDeleteImage = (indexTypeVariation: number, indexVariation: number, image: string): void => {
     const onSuccess = (): void => {
-      const typeVariation = selectedTypeVariations[indexTypeVariation]
+      const typeVariation = viewVariations[indexTypeVariation]
       const variation = (typeVariation.variations ?? [])[indexVariation]
 
-      variation.images = (variation.images ?? []).filter((x) => x !== image)
+      variation.images = (variation.images ?? []).filter((x) => x.fileName !== image)
       variation.images = [...variation.images]
 
       if (typeVariation.variations) {
         typeVariation.variations[indexVariation] = variation
       }
 
-      selectedTypeVariations[indexTypeVariation] = typeVariation
-      saveTypeVariationInProduct([...selectedTypeVariations])
+      viewVariations[indexTypeVariation] = typeVariation
+      saveTypeVariationInProduct(ungroupTypeVariations([...viewVariations]))
     }
 
     if (mode === MODES.create) {
@@ -203,24 +224,27 @@ const FormVariations = (): React.JSX.Element => {
   }
 
   const onCreateImage = (image: ImageType): void => {
-    const typeVariation = selectedTypeVariations[indexTypeVariation]
+    const typeVariation = viewVariations[indexTypeVariation]
     const variation = (typeVariation.variations ?? [])[indexVariation]
-    variation.images = [...(variation.images ?? []), image.fileName]
+    variation.images = [...(variation.images ?? []), {
+      fileName: image.fileName,
+      uuidVariation: variation.uuid,
+    }]
 
     if (typeVariation.variations) {
       typeVariation.variations[indexVariation] = variation
     }
 
-    selectedTypeVariations[indexTypeVariation] = typeVariation
-    saveTypeVariationInProduct([...selectedTypeVariations])
+    viewVariations[indexTypeVariation] = typeVariation
+    saveTypeVariationInProduct(ungroupTypeVariations([...viewVariations]))
   }
 
-  // On loading component
   useEffect(() => {
-    if (product) {
-      setSelectedTypeVariations(product?.typeVariations ?? [])
+    if (product?.variations && product.variations.length > 0) {
+      const viewVariations = groupTypeVariations(product?.variations ?? [])
+      setViewVariations(viewVariations)
     }
-  }, [])
+  }, [product])
 
   return (
     <>
@@ -235,18 +259,18 @@ const FormVariations = (): React.JSX.Element => {
       </Box>
 
       <Box>
-        {selectedTypeVariations.map((typeVariation, indexTypeVariation) => (
-          <Box mb={3} key={`selectedtype-${indexTypeVariation}`}>
+        {viewVariations.map((viewVariation, indexViewVariation) => (
+          <Box mb={3} key={`selectedtype-${indexViewVariation}`}>
             <Box mb={2}>
               <Divider
-                title={`➡️ ${typeVariation.name}`}
+                title={`➡️ ${viewVariation.typeVariation?.title}`}
                 Buttons={(
                   <Box>
                     <IconButton
                       ref={buttonRef}
                       size="small"
-                      title={`Adicionar variação para ${typeVariation.name}`}
-                      onClick={() => { handleModalCreateVariation(typeVariation) }}
+                      title={`Adicionar variação para ${viewVariation.typeVariation?.title}`}
+                      onClick={() => { handleModalCreateVariation(viewVariation.typeVariation) }}
                     >
                       <IconAdd color={colors.success.main} />
                     </IconButton>
@@ -254,7 +278,7 @@ const FormVariations = (): React.JSX.Element => {
                     <IconButton
                       size="small"
                       title="Remover tipo de variação"
-                      onClick={() => { handleDeleteToData(typeVariation) }}
+                      onClick={() => { handleDeleteToData(viewVariation.typeVariation) }}
                     >
                       <IconDelete />
                     </IconButton>
@@ -263,33 +287,33 @@ const FormVariations = (): React.JSX.Element => {
               />
             </Box>
 
-            <Box display={typeVariation.hasImages ? 'block' : 'flex'} gap={1} flexWrap="wrap">
-              {(typeVariation.variations !== undefined && typeVariation.variations?.length > 0) &&
-                typeVariation.variations.map((variation, indexVariation) => (
-                  <Box key={`variations-${indexVariation}`}>
-                    {!typeVariation.hasImages && (
+            <Box display={viewVariation.typeVariation.hasImages ? 'block' : 'flex'} gap={1} flexWrap="wrap">
+              {(viewVariation.variations !== undefined && viewVariation.variations?.length > 0) &&
+                viewVariation.variations.map((variation, indexCurrentVariation) => (
+                  <Box key={`variations-${indexCurrentVariation}`}>
+                    {!viewVariation.typeVariation.hasImages && (
                       <Box width="fit-content" p={2} className={styles.borderImages}>
-                        {variation.name}
+                        {variation.title}
                       </Box>
                     )}
 
-                    {typeVariation.hasImages && (
+                    {viewVariation.typeVariation.hasImages && (
                       <Box p={2} mb={1} className={styles.borderImages}>
                         <Box>
                           <Box display="flex" justifyContent="space-between" mb={1}>
                             <Typography variant="subtitle2" color="primary">
-                              <b>{variation.name}</b>
+                              <b>{variation.title}</b>
                             </Typography>
 
                             <Box display="flex" gap={2}>
-                              <Button variant="outlined" onClick={() => { handleModalAddImage(typeVariation, variation) }}>
+                              <Button variant="outlined" onClick={() => { handleModalAddImage(variation) }}>
                                 Adicionar imagem
                               </Button>
 
                               <IconButton
                                 size="medium"
                                 title="Remover variação"
-                                onClick={() => { handleDeleteVariation(indexTypeVariation, indexVariation) }}
+                                onClick={() => { handleDeleteVariation(indexTypeVariation, indexCurrentVariation) }}
                               >
                                 <IconDelete size={25} />
                               </IconButton>
@@ -308,16 +332,16 @@ const FormVariations = (): React.JSX.Element => {
                                     <img
                                       key={`temp-image-temp-${indexImage}`}
                                       className={styles.img}
-                                      src={getUrlImagem(img)}
-                                      srcSet={getUrlImagem(img)}
-                                      alt={img}
+                                      src={getUrlImagem(img.fileName)}
+                                      srcSet={getUrlImagem(img.fileName)}
+                                      alt={img.fileName}
                                       loading="lazy"
                                     />
 
                                     <ImageListItemBar
                                       className={styles.imageBar}
                                       actionIcon={
-                                        <ButtonRemove title="Remover imagem" onClick={() => { handleDeleteImage(indexTypeVariation, indexVariation, img) }} />
+                                        <ButtonRemove title="Remover imagem" onClick={() => { handleDeleteImage(indexTypeVariation, indexCurrentVariation, img.fileName) }} />
                                       }
                                     />
                                   </ImageListItem>
@@ -326,7 +350,7 @@ const FormVariations = (): React.JSX.Element => {
                             )}
 
                             {(variation.images ?? []).length === 0 && (
-                              <EmptyDataText text={`Nenhuma imagem adicionada para <b>${typeVariation.name} - ${variation.name}</b>`} />
+                              <EmptyDataText text={`Nenhuma imagem adicionada para <b>${viewVariation.typeVariation.title} - ${variation.title}</b>`} />
                             )}
                           </Box>
                         </Box>
@@ -338,7 +362,7 @@ const FormVariations = (): React.JSX.Element => {
           </Box>
         ))}
 
-        {(selectedTypeVariations && selectedTypeVariations.length === 0) && (
+        {(viewVariations && viewVariations.length === 0) && (
           <EmptyDataText text="Nenhum tipo de variação selecionado" />
         )}
       </Box>
@@ -369,8 +393,8 @@ const FormVariations = (): React.JSX.Element => {
           mode={mode}
           open={openAddTypeVariations}
           handleClose={() => { setOpenAddTypeVariations(false) }}
-          saveTypeVariationInProduct={saveTypeVariationInProduct}
-          selectedTypeVariations={selectedTypeVariations}
+          onSelectTypeVariation={onSelectTypeVariation}
+          viewVariations={viewVariations}
         />
       )}
     </>

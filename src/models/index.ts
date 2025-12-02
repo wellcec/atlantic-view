@@ -7,11 +7,19 @@ export interface IDefaultTheme {
   primary: string
 }
 
-export interface IMenuItem {
+export interface ISubMenuItem {
   title: string
   path: string
   icon: any
+}
+
+export interface IMenuItem {
+  title: string
+  type: 'common' | 'collapse'
+  path: string
+  icon: any
   paths: string[]
+  menus?: ISubMenuItem[]
 }
 
 export interface IResponseMutation extends IBaseResponseType {
@@ -25,6 +33,18 @@ export interface INoLoading {
 export interface ISampleFilter {
   term: string
   typeVariationId?: string
+  page: number
+  pageSize: number
+}
+
+export interface ISampleProductsFilter {
+  term: string
+  typeVariationId?: string
+  categoryId?: string
+  asc: boolean
+  tags?: string
+  minValue?: number
+  maxValue?: number
   page: number
   pageSize: number
 }

@@ -39,12 +39,12 @@ const AddVariationsModal = ({ open, handleClose, typeVariation, inputValueVariat
 
   return (
     <>
-      {typeVariation !== undefined && (
-        <Modal open={open} handleClose={handleClose} title={`Adicionar variação para ${typeVariation.name}`}>
+      {!!typeVariation && (
+        <Modal open={open} handleClose={handleClose} title={`Adicionar tipo de variação para ${typeVariation.title}`}>
           <Box display="flex" alignItems="center" gap={2} mb={2} flexWrap="wrap" textAlign="end">
             <Box flex="2" minWidth={getWidth()}>
               <InputHarmonic
-                placeholder={`Adicione uma variação para ${typeVariation.name} Ex.: GG, Verde, 49`}
+                placeholder={`Adicione uma variação para ${typeVariation.title} Ex.: GG, Verde, 49`}
                 value={inputValueVariation}
                 onChange={(event: any) => {
                   const { value } = event.target

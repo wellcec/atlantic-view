@@ -57,7 +57,7 @@ const AddCategories = ({
 
   const handleAddCategory = (newSubCategory: SubCategoryType): void => {
     if (selected) {
-      const existCategory = data.find((cat) => cat.id === selected.id)
+      const existCategory = data.find((cat) => cat.uuid === selected.uuid)
 
       if (!existCategory) {
         const newCategory: CategoryType = {
@@ -69,9 +69,8 @@ const AddCategories = ({
 
         const newarr = [...data, newCategory]
         setData(newarr)
-      } else {
-        const existSubcat = existCategory
-          .subCategories.find((subCat) => subCat.name === newSubCategory.name)
+      } else if (!!existCategory.subCategories) {
+        const existSubcat = existCategory.subCategories?.find((subCat) => subCat.title === newSubCategory.title)
 
         if (!existSubcat) {
           const newSubcats = [...existCategory.subCategories, newSubCategory]
@@ -85,7 +84,7 @@ const AddCategories = ({
   }
 
   const handleRemove = (category: CategoryType, subCategory: SubCategoryType): void => {
-    const newSubcats = category.subCategories.filter((subCat) => subCat.name !== subCategory.name)
+    const newSubcats = category.subCategories?.filter((subCat) => subCat.title !== subCategory.title)
     const index = data.indexOf(category)
     data[index].subCategories = newSubcats
 
@@ -99,7 +98,7 @@ const AddCategories = ({
   const isAlreadyAdd = (subCategory: SubCategoryType): boolean => {
     const category = data
       .find((catItem) => catItem.subCategories
-        .find((subCatItem) => subCatItem.name === subCategory.name))
+        .find((subCatItem) => subCatItem.title === subCategory.title))
     return !!category
   }
 
@@ -119,23 +118,22 @@ const AddCategories = ({
             <Autocomplete
               sx={{ width: '100%' }}
               renderOption={(props, option) => {
-                const { name } = option
                 return (
                   // @ts-expect-error
                   <Box component="div" {...props} style={{ borderBottom: `1px solid ${colors.text.ligth}` }}>
-                    <Typography variant="body2">{name}</Typography>
+                    <Typography variant="body2">{option.title}</Typography>
                   </Box>
                 )
               }}
               handleHomeEndKeys
               autoSelect={false}
               options={categoriesOptions}
-              getOptionLabel={(item) => item?.name || ''}
+              getOptionLabel={(item) => item?.title || ''}
               onChange={handleChange}
               noOptionsText="Nenhuma opção correspondente"
               ListboxProps={{ style: { fontSize: 16 } }}
               PaperComponent={CustomPaper}
-              isOptionEqualToValue={(option, value) => option.name === value.name}
+              isOptionEqualToValue={(option, value) => option.title === value.title}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -164,7 +162,7 @@ const AddCategories = ({
                 {selected?.subCategories.map((item, index) => (
                   <Chip
                     key={`chip-subCategories-${index}`}
-                    label={item?.name}
+                    label={item?.title}
                     variant="outlined"
                     onClick={() => { handleAddCategory(item) }}
                     onDelete={() => { }}

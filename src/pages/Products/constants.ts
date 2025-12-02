@@ -34,7 +34,7 @@ export const DefaultProduct: ProductType = {
   width: 0,
   shipping: ShippingKeys.free,
   status: DefaultStatusProduct,
-  tags: [],
+  listTags: [],
   categories: [],
   variations: []
 }

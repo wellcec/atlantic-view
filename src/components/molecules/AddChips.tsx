@@ -21,7 +21,7 @@ const AddChips = ({
   const handleAddItem = (): void => {
     if (field !== '') {
       const newarr = [...data, {
-        name: field
+        title: field
       }]
 
       setData(newarr)
@@ -60,7 +60,7 @@ const AddChips = ({
         {data.map((item, index) => (
           <Chip
             key={`chip-${index}`}
-            label={item?.name}
+            label={item?.title ?? item}
             variant="outlined"
             onClick={() => { action(item) }}
             onDelete={() => { actionDelete ? actionDelete(item) : handleDeleteItem(item) }}

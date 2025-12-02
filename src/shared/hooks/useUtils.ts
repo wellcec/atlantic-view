@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import TestByte from './fileTest'
 interface IUtils {
   formatFormCurrency: (valorNumerico: number) => string
   formatNumber: (value: string | number, type: 'int' | 'float') => number
@@ -8,6 +9,8 @@ interface IUtils {
   formatCurrencyRequest: (value: string) => number
   formatCurrencyString: (value: number | undefined) => string
   formatDateISODefault: (date: Date | undefined) => string
+  generateTimestampCode: () => string
+  downloadPDF: () => void
 }
 
 const useUtils = (): IUtils => {
@@ -99,8 +102,47 @@ const useUtils = (): IUtils => {
     return format(data, 'dd/MM/yyyy HH:mm')
   }
 
+  const generateTimestampCode = (): string => {
+    const timestamp = new Date().getTime()
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+    return `${timestamp}_${random}`
+  }
+
+  const downloadPDF = (): void => {
+    try {
+      const byteCharacters = atob(TestByte)
+      const byteNumbers = new Array(byteCharacters.length)
+
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: 'application/pdf' })
+
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'documento.pdf'
+      link.click()
+
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Erro:', error)
+    }
+  }
+
   return {
-    formatFormCurrency, formatNumber, imageToBase64, base64ToImage, normalize, formatCurrencyRequest, formatCurrencyString, formatDateISODefault
+    formatFormCurrency,
+    formatNumber,
+    imageToBase64,
+    base64ToImage,
+    normalize,
+    formatCurrencyRequest,
+    formatCurrencyString,
+    formatDateISODefault,
+    generateTimestampCode,
+    downloadPDF
   }
 }
 

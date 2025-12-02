@@ -17,7 +17,7 @@ import {
   type ProductType,
   type CreateProductType, type StatusProductType, type TagType
 } from '~/models/products'
-import { type CategoryType } from '~/models/categories'
+import { CategoryType } from '~/models/categories'
 
 import ButtonAdd from '~/components/atoms/ButtonAdd'
 import AddChips from '~/components/molecules/AddChips'
@@ -41,6 +41,7 @@ import TitleInformation from '~/components/molecules/TitleInformation'
 import { IconProducts } from '~/constants/icons'
 import { useGetProductById } from '~/clients/products/getProductById'
 import { useNavigate, useParams } from 'react-router-dom'
+import FormDescriptions from './FormDescriptions'
 
 const {
   firstInfo: firstInfoKey,
@@ -78,7 +79,7 @@ const useStyles = makeStyles(() => ({
 const DEFAULT_VALUES = {
   ...DefaultProduct,
   value: 'R$ 0,00',
-  valueUnique: 'R$ 0,00'
+  uniqueValue: 'R$ 0,00'
 }
 
 type TypeForm = typeof DEFAULT_VALUES
@@ -110,8 +111,14 @@ const New = (): React.JSX.Element => {
     error: errorProduct
   } = useGetProductById(productId ?? '')
   const { mutateAsync: mutateCreateProduct } = useCreateProduct(callbackMutation)
-  const { mutateAsync: mudateUpdateProduct } = useUpdateProduct(product?.id ?? '', callbackMutation)
+  const { mutateAsync: mudateUpdateProduct } = useUpdateProduct(product?.uuid ?? '', callbackMutation)
   const { mutateAsync: clearTempImages } = useClearTempImages()
+
+  const categories = useMemo(() => product?.categories ?? [], [product?.categories])
+
+  const tags = useMemo(() => product?.tags?.split(';') ?? [], [product?.tags])
+
+  console.log('tags1', tags)
 
   const formik = useFormik({
     initialValues: DEFAULT_VALUES,
@@ -119,7 +126,7 @@ const New = (): React.JSX.Element => {
       title: Yup.string().required(PREENCHIMENTO_OBRIGATORIO),
       subtitle: Yup.string(),
       value: Yup.string().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZeroCurrency),
-      valueUnique: Yup.string(),
+      uniqueValue: Yup.string(),
       weight: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       height: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
       length: Yup.number().required(PREENCHIMENTO_OBRIGATORIO).test(greaterThanZero),
@@ -141,10 +148,10 @@ const New = (): React.JSX.Element => {
         ...data,
         status: statusProduct,
         categories,
-        typeVariations: product?.typeVariations,
+        variations: product?.variations,
         tags: product?.tags,
         value: formatCurrencyRequest(data.value),
-        valueUnique: formatCurrencyRequest(data.valueUnique)
+        uniqueValue: formatCurrencyRequest(data.uniqueValue)
       }
 
       if (mode === MODES.create) {
@@ -152,26 +159,19 @@ const New = (): React.JSX.Element => {
       }
 
       if (mode === MODES.update && product) {
-        await mudateUpdateProduct({ id: product?.id ?? '', product: payload })
+        await mudateUpdateProduct({ id: product?.uuid ?? '', product: payload })
       }
     }
   })
 
-  const categories = useMemo(() => product?.categories ?? [], [product?.categories])
-  const tags = useMemo(() => product?.tags?.map((x) => ({ name: x })) ?? [], [product?.tags])
-
   const handleAddTags = (t: TagType[]): void => {
-    const tagsTyping = t.map((x) => x.name)
-    setProduct({ ...product, tags: tagsTyping })
+    const tagsTyping = t.map((x) => x.title)
+    setProduct({ ...product, tags: tagsTyping.join(';') })
   }
 
   const hasSomeImageInProduct = (): boolean => {
-    const typeVariations = product?.typeVariations ?? []
-
-    return typeVariations.some(tv =>
-      tv.hasImages &&
-      tv.variations?.some(v => (v.images?.length ?? 0) > 0)
-    )
+    const variations = product?.variations ?? []
+    return variations?.some(v => (v.images?.length ?? 0) > 0)
   }
 
   const handleChangeTab = (key: string): void => {
@@ -198,18 +198,18 @@ const New = (): React.JSX.Element => {
       setProduct(DefaultProduct)
     }
 
-    if (!product?.id) {
+    if (!product?.uuid) {
       setMode(MODES.create)
     }
 
-    if (product?.id) {
+    if (product?.uuid) {
       const {
         title,
         subtitle,
         height,
         length,
         value,
-        valueUnique,
+        uniqueValue,
         weight,
         width,
         shipping
@@ -220,7 +220,7 @@ const New = (): React.JSX.Element => {
       formik.setFieldValue('height', height)
       formik.setFieldValue('length', length)
       formik.setFieldValue('value', formatCurrencyString(value))
-      formik.setFieldValue('valueUnique', formatCurrencyString(valueUnique))
+      formik.setFieldValue('valueUnique', formatCurrencyString(uniqueValue))
       formik.setFieldValue('width', width)
       formik.setFieldValue('weight', weight)
       formik.setFieldValue('shipping', shipping)
@@ -318,7 +318,14 @@ const New = (): React.JSX.Element => {
                     Em caso do produto não possuir variação basta criar um tipo de variação Único que possui imagens.`
                     }
                   />
+
                   <FormVariations />
+                </>
+              )}
+
+              {getSelectedTab(descriptionsKey) && (
+                <>
+                  <FormDescriptions />
                 </>
               )}
 
@@ -347,10 +354,14 @@ const New = (): React.JSX.Element => {
             </Box>
 
             <Box display="flex" alignItems="center" justifyContent="end" gap={1}>
-              <Button variant="outlined" color="primary" onClick={() => {
-                setProduct(undefined)
-                navigate('/products')
-              }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  setProduct(undefined)
+                  navigate('/products')
+                }}
+              >
                 Cancelar
               </Button>
               <Button variant="contained" color="primary" onClick={() => formik.submitForm()}>

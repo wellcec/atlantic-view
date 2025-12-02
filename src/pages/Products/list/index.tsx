@@ -17,9 +17,9 @@ import Dialog from '~/components/atoms/Dialog'
 import InputSearch from '~/components/atoms/Inputs/InputSearch'
 import { IconDelete, IconEdit, IconProducts } from '~/constants/icons'
 import { type ProductType, type StatusProductType } from '~/models/products'
-import { type ISampleFilter } from '~/models'
+import { ISampleProductsFilter } from '~/models'
 import useDebounce from '~/shared/hooks/useDebounce'
-import { DEFAULT_PAGESIZE, emptyFilter } from '~/constants'
+import { DEFAULT_PAGESIZE, emptyProductsFilter } from '~/constants'
 import CardProduct from './CardProduct'
 import { useGetProducts } from '~/clients/products/getProducts'
 import { useUpdateStatusProduct } from '~/clients/products/updateStatusProduct'
@@ -31,7 +31,7 @@ const List = (): React.JSX.Element => {
   const [totalProducts, setTotalProducts] = useState<number>(0)
   const [products, setProducts] = useState<ProductType[]>([])
   const [confirmatioOpen, setConfirmatioOpen] = useState<boolean>(false)
-  const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
+  const [filter, setFilter] = useState<ISampleProductsFilter>(emptyProductsFilter)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const openMenu = Boolean(anchorEl)
 
@@ -97,7 +97,7 @@ const List = (): React.JSX.Element => {
   }
 
   const handleDelete = (): void => {
-    mutateDeleteProduct(objToAction?.id ?? '')
+    mutateDeleteProduct(objToAction?.uuid ?? '')
   }
 
   // On get products

@@ -1,4 +1,4 @@
-import { type ISampleFilter, type IDefaultTheme } from 'models'
+import { type ISampleFilter, type IDefaultTheme, type ISampleProductsFilter } from 'models'
 
 export const DEFAULT_THEME: IDefaultTheme = {
   id: 'default',
@@ -24,6 +24,13 @@ export const DEFAULT_CATEGORY_PAGESIZE = 5
 
 export const emptyFilter: ISampleFilter = {
   term: '',
+  page: 1,
+  pageSize: DEFAULT_PAGESIZE
+}
+
+export const emptyProductsFilter: ISampleProductsFilter = {
+  term: '',
+  asc: true,
   page: 1,
   pageSize: DEFAULT_PAGESIZE
 }

@@ -3,7 +3,7 @@ import colors from '~/shared/theme/colors'
 import { Box, Chip, Typography } from '@mui/material'
 import { IconDelete } from '~/constants/icons'
 import makeStyles from '@mui/styles/makeStyles'
-import { type CategoryType, type SubCategoryType } from '~/models/categories'
+import { CategoryResponseType, CategoryType, type SubCategoryType } from '~/models/categories'
 
 const useStyles = makeStyles(() => ({
   selectedCategories: {
@@ -27,14 +27,14 @@ const ChipsCategories = ({ category, handleRemove }: IProps): React.JSX.Element 
   return (
     <Box className={styles.selectedCategories}>
       <Typography variant="body2" color="primary" fontWeight={600}>
-        {category?.name}
+        {category?.title}
       </Typography>
 
       <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2} maxWidth={350}>
         {category?.subCategories?.map((subCat, indexSubCat) => (
           <Chip
             key={`chip-subCategories-${indexSubCat}`}
-            label={subCat?.name}
+            label={subCat?.title}
             variant="outlined"
             onDelete={handleRemove ? () => { handleRemove(category, subCat) } : undefined}
             deleteIcon={<Box display="flex" alignItems="center"><IconDelete /></Box>}

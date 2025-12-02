@@ -2,7 +2,7 @@ import type React from 'react'
 import { type AxiosResponse } from 'axios'
 import { type CategoryType } from './categories'
 import type IBaseResponseType from './base'
-import { type TypeVariationViewType } from './variations'
+import { type VariationType } from './variations'
 
 export interface ImageType {
   id: string
@@ -13,6 +13,7 @@ export interface ImageType {
 
 export interface TagType {
   name: string
+  title: string
 }
 
 export interface VariantionType {
@@ -32,20 +33,20 @@ export interface StatusProductType {
 export type StatusProductProps = keyof StatusProductType
 
 export interface ProductType {
-  id?: string
+  uuid?: string
   title?: string
   subtitle?: string
   value?: number
-  valueUnique?: number
+  uniqueValue?: number
   weight?: number
   height?: number
   length?: number
   width?: number
-  categories?: CategoryType[]
-  typeVariations?: TypeVariationViewType[]
-  tags?: string[]
-  status?: StatusProductType
+  tags?: string
   shipping?: number
+  categories?: CategoryType[]
+  variations?: VariationType[]
+  status?: StatusProductType
   createdDate?: Date
   updatedDate?: Date
 }

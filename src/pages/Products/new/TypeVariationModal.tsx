@@ -30,16 +30,16 @@ interface IProps {
   mode: Mode
   open: boolean
   handleClose: () => void
-  selectedTypeVariations: TypeVariationViewType[]
-  saveTypeVariationInProduct: (typeVariations: TypeVariationViewType[]) => void
+  onSelectTypeVariation: (typeVariation: TypeVariationType) => void
+  viewVariations: TypeVariationViewType[]
 }
 
 const TypeVariationModal = ({
   mode,
   open,
   handleClose,
-  selectedTypeVariations,
-  saveTypeVariationInProduct
+  onSelectTypeVariation,
+  viewVariations
 }: IProps): React.JSX.Element => {
   const styles = useStyles()
   const { notifyError, notifyWarning } = useAlerts()
@@ -53,7 +53,7 @@ const TypeVariationModal = ({
   const [enableCheckProducts, setEnableCheckProducts] = useState<boolean>(false)
   const [filter, setFilter] = useState<ISampleFilter>(emptyFilter)
 
-  const isSelectedTypeVariation = (item: TypeVariationType): boolean => selectedTypeVariations.some((x) => x.id === item.id)
+  // const isSelectedTypeVariation = (item: TypeVariationType): boolean => selectedTypeVariations.some((x) => x.id === item.id)
 
   const {
     data: resultTypeVariations,
@@ -90,20 +90,15 @@ const TypeVariationModal = ({
   }
 
   const handleSelectTypeVariation = (itemToAdd: TypeVariationType): void => {
-    if (isSelectedTypeVariation(itemToAdd)) {
-      return
-    }
-
     if (itemToAdd.isUnique) {
-      const hasUnique = selectedTypeVariations.find((x) => x.isUnique)
+      const hasUnique = viewVariations.find((x) => x.typeVariation?.isUnique)
       if (hasUnique) {
         notifyWarning('Já existe variação única vinculada ao produto.')
         return
       }
     }
 
-    const newarr = [...selectedTypeVariations, itemToAdd]
-    saveTypeVariationInProduct(newarr)
+    onSelectTypeVariation(itemToAdd)
     handleClose()
   }
 
@@ -194,7 +189,7 @@ const TypeVariationModal = ({
             </FormGroup>
 
             <Button variant="contained" onClick={handleAddItem}>
-              Salvar
+              Adicionar
             </Button>
           </Box>
 
@@ -215,32 +210,30 @@ const TypeVariationModal = ({
                       <b>{item?.name}</b>
                       {item.hasImages ? ' (Com imagens)' : ''}
                     </Typography>
-
+                    {/* 
                     {isSelectedTypeVariation(item) && (
                       <Box display="flex" alignItems="center" p={0.2} title="Tipo de variação já vinculada ao produto">
                         <IconCheckCircule color={colors.info.main} />
                       </Box>
-                    )}
+                    )} */}
 
-                    {!isSelectedTypeVariation(item) && (
-                      <Box display="flex" alignItems="center">
-                        <IconButton
-                          size="small"
-                          title="Excluir tipo de variação globalmente"
-                          onClick={() => { handleSelectTypeVariation(item) }}
-                        >
-                          <IconAdd color={colors.success.main} />
-                        </IconButton>
+                    <Box display="flex" alignItems="center">
+                      <IconButton
+                        size="small"
+                        title="Excluir tipo de variação globalmente"
+                        onClick={() => { handleSelectTypeVariation(item) }}
+                      >
+                        <IconAdd color={colors.success.main} />
+                      </IconButton>
 
-                        <IconButton
-                          size="small"
-                          title="Excluir tipo de variação globalmente"
-                          onClick={() => { handleOpenDeleteTypeVariation(item) }}
-                        >
-                          <IconDelete />
-                        </IconButton>
-                      </Box>
-                    )}
+                      <IconButton
+                        size="small"
+                        title="Excluir tipo de variação globalmente"
+                        onClick={() => { handleOpenDeleteTypeVariation(item) }}
+                      >
+                        <IconDelete />
+                      </IconButton>
+                    </Box>
                   </Box>
                 </Box>
               </>

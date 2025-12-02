@@ -1,0 +1,12 @@
+.app-editor .ql-editor {
+  font-family: "Poppins";
+}
+
+/* Set dropdown font-families */
+.ql-font span[data-label="Poppins"]::before {
+  font-family: "Poppins";
+}
+
+.app-editor {
+  height: 100%;
+}

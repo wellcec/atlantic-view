@@ -42,7 +42,7 @@ const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IPr
   const navigate = useNavigate()
   const { formatCurrencyString } = useUtils()
 
-  const getFirstImage = (): string => product.typeVariations?.[0]?.variations?.[0]?.images?.[0] ?? ''
+  const getFirstImage = (): string => product?.variations?.[0]?.images?.[0]?.fileName ?? ''
 
   return (
     <Card>
@@ -51,7 +51,7 @@ const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IPr
         sx={{ height: 200, cursor: 'pointer' }}
         image={`${env.api.FILES_BASE_URL}images/${getFirstImage()}`}
         title={product.title}
-        onClick={() => { navigate(`/products/update/${product.id ?? ''}`) }}
+        onClick={() => { navigate(`/products/update/${product.uuid ?? ''}`) }}
       />
 
       <CardContent>
@@ -62,7 +62,7 @@ const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IPr
           {product.subtitle}
         </Typography>
         <Typography variant="subtitle2" color="text.quaternary">
-          {formatCurrencyString(product.value)} / {formatCurrencyString(product.valueUnique)}
+          {formatCurrencyString(product.value)} / {formatCurrencyString(product.uniqueValue)}
         </Typography>
       </CardContent>
 
@@ -76,7 +76,7 @@ const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IPr
             <Switch
               size="small"
               checked={product?.status?.isActive ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id ?? '', { isActive: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.uuid ?? '', { isActive: checked }) }}
             />
           </Box>
 
@@ -88,7 +88,7 @@ const CardProduct = ({ index, product, handleUpdateStatus, handleOpenMenu }: IPr
             <Switch
               size="small"
               checked={product?.status?.isHighlighted ?? false}
-              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.id ?? '', { isHighlighted: checked }) }}
+              onChange={(_, checked: boolean) => { handleUpdateStatus(index, product.uuid ?? '', { isHighlighted: checked }) }}
             />
           </Box>
         </Box>
